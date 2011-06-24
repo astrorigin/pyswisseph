@@ -1,0 +1,54 @@
+===================
+Pyswisseph Homepage
+===================
+
+-----------------------------------------------
+Python extension to AstroDienst Swiss Ephemeris
+-----------------------------------------------
+
+A very useful module for researchers in astrology!
+
+A number of applications have been written with it, including:
+
+  - `OpenAstro.org`_, a native Ubuntu software by Pelle van der Scheer
+  - `AstroWS`_, a REST web service by Jean-André Santoni
+  - `Oroboros`_, by myself... actually unmaintained, but had its hour of
+    glory in `Linux Format`_ magazine of October 2008, yay!
+
+License:
+
+  - Either `GNU Public License`_ v2 or later
+  - or `Swiss Ephemeris Professional License`_
+
+Usage example:
+
+>>> import swisseph as swe
+>>> help(swe)
+
+Installations with distutils:
+
+``python setup.py install``
+
+Download
+--------
+
+  - Sources are at the `Python Package Index`_
+  - Precompiled binaries for Windows are available for a small fee. `Contact me`_.
+
+Links
+-----
+
+  - Online `API documentation`_
+  - `AstroDienst`_
+
+.. _`OpenAstro.org`: http://www.openastro.org/
+.. _`AstroWS`: http://astro.kivutar.me/
+.. _`Oroboros`: http://pypi.python.org/pypi/oroboros
+.. _`Linux Format`: http://www.linuxformat.co.uk/
+.. _`GNU Public License`: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+.. _`Swiss Ephemeris Professional License`: http://www.astro.com/swisseph/
+.. _`Python Package Index`: http://pypi.python.org/pypi/pyswisseph
+.. _`Contact me`: http://chaosorigin.com/contact.html
+.. _`API documentation`: ./pydoc/index.html
+.. _`AstroDienst`: http://www.astro.com
+..
