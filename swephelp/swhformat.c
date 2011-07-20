@@ -1,7 +1,7 @@
 /*
     Swephelp
 
-    Copyright 2007-2009 Stanislas Marquis <stnsls@gmail.com>
+    Copyright 2007-2011 Stanislas Marquis <stnsls@gmail.com>
 
     Swephelp is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -27,6 +27,7 @@ extern "C"
 #endif
 
 #include "swhformat.h"
+
 #include <swephexp.h>
 
 /** @brief Get degrees, sign number, minutes, seconds, from longitude position

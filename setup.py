@@ -3,7 +3,7 @@
 
 #   This file is part of Pyswisseph.
 #
-#   Copyright (c) 2007-2010 Stanislas Marquis <stnsls@gmail.com>
+#   Copyright (c) 2007-2011 Stanislas Marquis <stnsls@gmail.com>
 #
 #   Pyswisseph is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 Swiss Ephemeris homepage: http://www.astro.com/swisseph/
 
-Now Python 3 compatible.
+Compatible with Python 2.x and 3.x.
 
 Usage example:
 
@@ -38,7 +38,7 @@ Usage example:
 0.098474291148756998
 >>> help(swe)
 
-Installation: ``# python setup.py install``
+Installation (unixes): ``# python setup.py install``
 
 Debian/Ubuntu packages: http://www.openastro.org/
 
@@ -47,9 +47,9 @@ Debian/Ubuntu packages: http://www.openastro.org/
 import os.path, sys
 from distutils.core import setup, Extension
 
-VERSION = '1.76.00-1'
+VERSION = '1.77.00-0'
 
-# This build libswe
+# This builds libswe
 if 'build' in sys.argv or 'install' in sys.argv:
     instdir = os.path.dirname(os.path.abspath(__file__))
     os.chdir(os.path.join(instdir, 'src'))

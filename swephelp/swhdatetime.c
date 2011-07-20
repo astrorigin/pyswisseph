@@ -1,7 +1,7 @@
 /*
     Swephelp
 
-    Copyright 2007-2009 Stanislas Marquis <stnsls@gmail.com>
+    Copyright 2007-2011 Stanislas Marquis <stnsls@gmail.com>
 
     Swephelp is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -27,12 +27,17 @@ extern "C"
 #endif
 
 #include "swhdatetime.h"
-#include <swephexp.h>
-#include <time.h>
-#include <math.h>
-#include <string.h>
-#include <stdlib.h>
+
 #include <assert.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#include <swephexp.h>
+
+#include "swhwin.h"
 
 /** @brief Get current Julian day number, Gregorian calendar
 ** @return Julian day number
@@ -66,8 +71,8 @@ double swh_jdnow(void)
 */
 int swh_revjul(double jd, int flag, int *dt)
 {
-    assert(flag == SE_GREG_CAL || flag == SE_JUL_CAL);
     double t;
+    assert(flag == SE_GREG_CAL || flag == SE_JUL_CAL);
     swe_revjul(jd, flag, &dt[0], &dt[1], &dt[2], &t);
     dt[3] = (int) floor(t);
     t -= dt[3];
@@ -100,9 +105,11 @@ int swh_revjul(double jd, int flag, int *dt)
 int swh_dt2i(const char *dt, int *ret)
 {
     char *ptr, buf[22];
-    strcpy(buf, dt);
 #ifndef WIN32
     char *saveptr;
+#endif
+    strcpy(buf, dt);
+#ifndef WIN32
     ptr = strtok_r(buf, "/", &saveptr);
 #else
     ptr = strtok(buf, "/");

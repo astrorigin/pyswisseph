@@ -1,0 +1,43 @@
+# Pyswisseph CmakeLists.txt for Windows
+
+cmake_minimum_required( VERSION 2.8 )
+project( pyswisseph )
+
+message( STATUS "-- Configuring pyswisseph" )
+
+# Change this as needed
+set( DESIRED_PYTHON_VERSION 2.7 )
+
+# Find Python
+find_package( PythonLibs ${DESIRED_PYTHON_VERSION} EXACT )
+if ( NOT PYTHONLIBS_FOUND )
+    message( FATAL_ERROR "Cannot find Python libraries." )
+endif()
+
+# Configure cswisseph
+add_subdirectory( src )
+
+# Sources
+set( SOURCES
+    pyswisseph.c
+    swephelp/swhdatetime.c
+    swephelp/swhformat.c
+    swephelp/swhsearch.c
+    swephelp/swhraman.c
+    swephelp/swhgeo.c
+    swephelp/swhutil.c
+    )
+
+if ( MSVC )
+    add_definitions( -D_CRT_SECURE_NO_WARNINGS )
+endif()
+
+include_directories( BEFORE src swephelp ${PYTHON_INCLUDE_DIRS} )
+
+add_library( swisseph MODULE ${SOURCES} )
+
+add_dependencies( swisseph swe )
+
+target_link_libraries( swisseph swe ${PYTHON_LIBRARIES} )
+
+# vi: set ai et sw=4:

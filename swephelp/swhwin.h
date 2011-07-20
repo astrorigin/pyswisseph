@@ -17,35 +17,17 @@
     along with Swephelp.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/** @file swephelp.h
-** @brief swephelp export header file
-**
-** Main swephelp header, imports all swephelp functions and defines.
+/** @file swhwin.h
+** @brief swephelp windowz specific header
 */
 
-#ifndef SWEPHELP_H
-#define SWEPHELP_H
+#ifndef SWHWIN_H
+#define SWHWIN_H
 
-/* pollute namespace with fancy aliases */
-#ifndef SWH_USE_ALIASES
-#define SWH_USE_ALIASES     1
-#endif
+#ifdef WIN32
 
-/* use a global mutex to protect swisseph data */
-#ifndef SWH_USE_THREADS
-#define SWH_USE_THREADS     1
-#endif
+#define lround(num) \
+        ((long)(num > 0 ? num + 0.5 : ceil(num - 0.5)))
 
-/* include swisseph functions */
-#include <swephexp.h>
-
-/* swephelp headers */
-#include "swhdatetime.h"
-#include "swhdef.h"
-#include "swhformat.h"
-#include "swhgeo.h"
-#include "swhraman.h"
-#include "swhsearch.h"
-#include "swhutil.h"
-
-#endif /* SWEPHELP_H */
+#endif /* WIN32 */
+#endif /* SWHWIN_H */

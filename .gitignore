@@ -1,13 +1,30 @@
+# Pyswisseph - git ignore
+
+# Precompiled Python files
 *.pyc
 *.pyo
+
+# Backup files
 *~
 *.bak
+
+# Objects files
 *.o
 *.a
+
+# Zip files
 *.zip
 
-swe_unix_src*
+# UltraEdit files
+*.pui
+*.prj
 
+# Swisseph sources
+swe_unix_src*
+doc
+src
+
+#  Others
 index.html
 MANIFEST
 manifest
@@ -16,7 +33,4 @@ build*
 win*
 test*
 pydoc*
-
-doc*
-src*
-
+CMakeLists.txt

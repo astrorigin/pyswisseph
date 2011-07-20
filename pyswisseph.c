@@ -1,7 +1,7 @@
 /*
     This file is part of Pyswisseph.
 
-    Copyright (c) 2007-2010 Stanislas Marquis <smarquis@chaosorigin.com>
+    Copyright (c) 2007-2011 Stanislas Marquis <smarquis@chaosorigin.com>
 
     Pyswisseph is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,17 +25,17 @@ Homepage: http://pyswisseph.chaosorigin.com/
 Swisseph authors: Alois Treindl, Dieter Koch.
 Swisseph homepage: http://www.astro.com/swisseph
 
-Swisseph version: 1.76.00
-Last revision: 12.01.2011
+Swisseph version: 1.77.00
+Last revision: 20.07.2011
 
 */
 
-#define PYSWISSEPH_VERSION      20100218
+#define PYSWISSEPH_VERSION      20110720
 
 /* Set default argument for set_ephe_path function */
-#ifdef WIN32 /* Windows, not too sure... */
+#ifdef WIN32
 #define DFTSET_EPHE_PATH        "C:\\swisseph"
-#else /* unixes */
+#else
 #define DFTSET_EPHE_PATH        "/usr/share/swisseph:/usr/local/share/swisseph"
 #endif
 
@@ -1266,9 +1266,9 @@ static PyObject * pyswe_azalt FUNCARGS_KEYWDS
 {
     double jd, geo[3], xin[3], press = 0.0, temp = 0.0, xaz[3];
     int flag = SE_ECL2HOR;
-    xin[2] = 0.0;
     static char *kwlist[] = {"julday", "lon", "lat", "hei",
         "x", "y", "z", "press", "temp", "flag", NULL};
+    xin[2] = 0.0;
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddd|dddi", kwlist,
         &jd, &geo[0], &geo[1], &geo[2], &xin[0], &xin[1], &xin[2], &press,
         &temp, &flag))
@@ -3252,11 +3252,11 @@ static char pyswe__lord__doc__[] =
 
 static PyObject * pyswe__lord FUNCARGS_KEYWDS
 {
-    int sign;
+    int sign, i;
     static char *kwlist[] = {"sign", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &sign))
         return NULL;
-    int i = swh_lord(sign);
+    i = swh_lord(sign);
     if (i == -1)
     {
         PyErr_SetString(pyswe_Error, "swisseph._lord: Invalid sign number");
@@ -3475,11 +3475,11 @@ static char pyswe__ochchabala__doc__[] =
 static PyObject * pyswe__ochchabala FUNCARGS_KEYWDS
 {
     int ipl;
-    double lon;
+    double lon, d;
     static char *kwlist[] = {"pl", "longitude", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "id", kwlist, &ipl, &lon))
         return NULL;
-    double d = swh_ochchabala(ipl, lon);
+    d = swh_ochchabala(ipl, lon);
     if (d == -1)
     {
         PyErr_SetString(pyswe_Error, "swisseph._ochchabala: Invalid planet");
@@ -3981,7 +3981,7 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddStringConstant(m, "ASTNAMFILE", "seasnam.txt");
     PyModule_AddStringConstant(m, "FICTFILE", "seorbel.txt");
 
-    PyModule_AddStringConstant(m, "EPHE_PATH", ".:/users/ephe2/:/users/ephe/");
+    PyModule_AddStringConstant(m, "EPHE_PATH", SE_EPHE_PATH);
 
     PyModule_AddIntConstant(m, "SPLIT_DEG_ROUND_SEC", SE_SPLIT_DEG_ROUND_SEC);
     PyModule_AddIntConstant(m, "SPLIT_DEG_ROUND_MIN", SE_SPLIT_DEG_ROUND_MIN);
@@ -4000,7 +4000,6 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "COSMICAL_SETTING", SE_COSMICAL_SETTING);
     PyModule_AddIntConstant(m, "ACRONYCHAL_SETTING", SE_ACRONYCHAL_SETTING);
 
-
     PyModule_AddIntConstant(m, "HELFLAG_LONG_SEARCH", SE_HELFLAG_LONG_SEARCH);
     PyModule_AddIntConstant(m, "HELFLAG_HIGH_PRECISION", SE_HELFLAG_HIGH_PRECISION);
     PyModule_AddIntConstant(m, "HELFLAG_OPTICAL_PARAMS", SE_HELFLAG_OPTICAL_PARAMS);
@@ -4011,7 +4010,7 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "HELFLAG_AVKIND_MIN7", SE_HELFLAG_AVKIND_MIN7);
     PyModule_AddIntConstant(m, "HELFLAG_AVKIND_MIN9", SE_HELFLAG_AVKIND_MIN9);
     PyModule_AddIntConstant(m, "HELFLAG_AVKIND", SE_HELFLAG_AVKIND);
-    PyModule_AddIntConstant(m, "TJD_INVALID", TJD_INVALID);
+    PyModule_AddObject(m, "TJD_INVALID", Py_BuildValue("f", TJD_INVALID));
     PyModule_AddIntConstant(m, "SIMULATE_VICTORVB", SIMULATE_VICTORVB);
 
     PyModule_AddIntConstant(m, "PHOTOPIC_FLAG", SE_PHOTOPIC_FLAG);
@@ -4129,8 +4128,10 @@ PyMODINIT_FUNC initswisseph(void)
 #endif /* USE_SWEPHELP */
 
     PyModule_AddIntConstant(m, "__version__", PYSWISSEPH_VERSION);
+    { /* dummy scope for MSVC */
     char buf[10];
     PyModule_AddStringConstant(m, "version", swe_version(buf));
+    } /* dummy scope end */
 
     if (PyErr_Occurred())
         Py_FatalError("Can't initialize module swisseph!");
@@ -4146,4 +4147,3 @@ PyMODINIT_FUNC initswisseph(void)
 }
 
 /* vi: set ai et sw=4 sts=4: */
-

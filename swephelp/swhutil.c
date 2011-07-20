@@ -1,7 +1,7 @@
 /*
     Swephelp
 
-    Copyright 2007-2009 Stanislas Marquis <stnsls@gmail.com>
+    Copyright 2007-2011 Stanislas Marquis <stnsls@gmail.com>
 
     Swephelp is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -27,11 +27,42 @@ extern "C"
 #endif
 
 #include "swhutil.h"
+
+#include <assert.h>
 #include <string.h>
+
 #include <swephexp.h>
 
 #if SWH_USE_THREADS
 
+#ifdef _MSC_VER
+#include <windows.h>
+
+static HANDLE swh_mutex = NULL;
+
+void swh_lock(void)
+{
+    if ( swh_mutex == NULL )
+    {
+        swh_mutex = CreateMutex( NULL, FALSE, NULL );
+        assert( swh_mutex );
+    }
+    WaitForSingleObject( swh_mutex, INFINITE );
+}
+
+void swh_unlock(void)
+{
+    assert( swh_mutex );
+    ReleaseMutex( swh_mutex );
+}
+
+int swh_trylock(void)
+{
+    assert( swh_mutex );
+    return WaitForSingleObject( swh_mutex, 0 );
+}
+
+#else /* not MSVC */
 #include <pthread.h>
 
 static pthread_mutex_t swh_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -51,15 +82,18 @@ int swh_trylock(void)
     return pthread_mutex_trylock(&swh_mutex);
 }
 
-#endif /* SWH_USE_THREADS */
+#endif /* _MSC_VER */
 
-/** @brief
-*/
+void swh_globals_init(swh_Globals *glob)
+{
+    memset(glob, 0, sizeof(swh_Globals));
+}
+
 int swh_set_globals(swh_Globals *glob)
 {
-    if (strlen(glob->ephe_path) != 0)
+    if (glob->ephe_path[0] != '\0')
         swe_set_ephe_path(glob->ephe_path);
-    if (strlen(glob->jpl_path) != 0)
+    if (glob->jpl_path[0] != '\0')
         swe_set_jpl_file(glob->jpl_path);
     if (!(glob->topo_lon > 180 || glob->topo_lon < -180 ||
         glob->topo_lat > 90 || glob->topo_lat < -90 ||
@@ -69,6 +103,8 @@ int swh_set_globals(swh_Globals *glob)
         swe_set_sid_mode(glob->sidmode, glob->t0, glob->ayant0);
     return 0;
 }
+
+#endif /* SWH_USE_THREADS */
 
 #ifdef __cplusplus
 } /* extern "C" */

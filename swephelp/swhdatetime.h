@@ -1,7 +1,7 @@
 /*
     Swephelp
 
-    Copyright 2007-2009 Stanislas Marquis <stnsls@gmail.com>
+    Copyright 2007-2011 Stanislas Marquis <stnsls@gmail.com>
 
     Swephelp is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -34,8 +34,6 @@ extern "C"
 #endif
 
 #include <swephexp.h>
-#include <time.h>
-#include <stdio.h>
 
 /** @brief Get current Julian day number, Gregorian calendar
 ** @return Julian day number

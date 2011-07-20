@@ -1,4 +1,4 @@
-# pyswisseph makefile
+# pyswisseph makefile for unixes
 
 CD = cd
 PY = python

@@ -1,7 +1,7 @@
 include README.txt
-include *.h
 include swisseph.html
 include doc/*
 include src/*
 include swephelp/*.h
 include pydoc/*
+include misc/*

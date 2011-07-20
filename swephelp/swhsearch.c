@@ -1,7 +1,7 @@
 /*
     Swephelp
 
-    Copyright 2007-2009 Stanislas Marquis <stnsls@gmail.com>
+    Copyright 2007-2011 Stanislas Marquis <stnsls@gmail.com>
 
     Swephelp is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -27,6 +27,7 @@ extern "C"
 #endif
 
 #include "swhsearch.h"
+
 #include <swephexp.h>
 
 /** @brief Half a second of time (expressed in day)
@@ -166,8 +167,9 @@ int swh_max_retro_time(int planet, char *err)
 int swh_next_retro(int planet, double jdstart, double step, int backw,
     double dayspan, int flag, double *jdret, double *posret, char *err)
 {
-    int res, direct[3]; direct[2] = 0; /* dummy assign */
+    int res, direct[3];
     double jdstop = 0; /* dummy assign */
+    direct[2] = 0; /* dummy assign */
     /* set limit */
     dayspan = fabs(dayspan);
     if (dayspan)
@@ -350,6 +352,8 @@ int swh_next_aspect2(int planet, double aspect, double fixedpt, double jdstart,
     double step, int backw, double dayspan, int flag, double *jdret,
     double *posret, char *err)
 {
+    int res, res2;
+    double jdtmp, postmp[6];
     aspect = fabs(swe_difdeg2n(0, aspect));
     if (aspect == 0 || aspect == 180)
     {
@@ -357,8 +361,6 @@ int swh_next_aspect2(int planet, double aspect, double fixedpt, double jdstart,
             dayspan, flag, jdret, posret, err);
     }
     /* else try both */
-    int res, res2;
-    double jdtmp, postmp[6];
     res = swh_next_aspect(planet, aspect, fixedpt, jdstart, step, backw,
         dayspan, flag, jdret, posret, err);
     if (res < 0) { return -1; }
@@ -516,6 +518,8 @@ int swh_next_aspect_with2(int planet, double aspect, int other, char *star,
     double jdstart, double step, int backw, double dayspan, int flag,
     double *jdret, double *posret0, double *posret1, char *err)
 {
+    int res, res2;
+    double jdtmp, postmp0[6], postmp1[6];
     aspect = fabs(swe_difdeg2n(0, aspect));
     if (aspect == 0 || aspect == 180)
     {
@@ -523,8 +527,6 @@ int swh_next_aspect_with2(int planet, double aspect, int other, char *star,
             backw, dayspan, flag, jdret, posret0, posret1, err);
     }
     /* else try both */
-    int res, res2;
-    double jdtmp, postmp0[6], postmp1[6];
     res = swh_next_aspect_with(planet, aspect, other, star, jdstart, step,
         backw, dayspan, flag, jdret, posret0, posret1, err);
     if (res < 0) { return -1; }
@@ -672,6 +674,8 @@ int swh_next_aspect_cusp2(int planet, char *star, double aspect, int cusp,
     int flag, double *jdret, double *posret, double *cuspsret, double *ascmcret,
     char *err)
 {
+    int res, res2;
+    double jdtmp, postmp[6], cuspstmp[37], ascmctmp[10];
     aspect = fabs(swe_difdeg2n(0, aspect));
     if (aspect == 0 || aspect == 180)
     {
@@ -680,8 +684,6 @@ int swh_next_aspect_cusp2(int planet, char *star, double aspect, int cusp,
             err);
     }
     /* else try both */
-    int res, res2;
-    double jdtmp, postmp[6], cuspstmp[37], ascmctmp[10];
     res = swh_next_aspect_cusp(planet, star, aspect, cusp, jdstart, lat,
             lon, hsys, step, backw, flag, jdret, posret, cuspsret, ascmcret,
             err);
@@ -734,9 +736,9 @@ int swh_next_aspect_cusp2(int planet, char *star, double aspect, int cusp,
 int swh_match_aspect(double pos0, double speed0, double pos1, double speed1,
     double aspect, double orb, double *diffret, int *applic, double *factor)
 {
+    double diff = swe_difdegn(pos0, pos1);
     aspect = fabs(aspect);
     orb = fabs(orb);
-    double diff = swe_difdegn(pos0, pos1);
     if (diff > aspect)
     {
         if (speed1 > speed0) { *applic = -1; }
@@ -773,10 +775,10 @@ int swh_match_aspect(double pos0, double speed0, double pos1, double speed1,
 int swh_match_aspect2(double pos0, double speed0, double pos1, double speed1,
     double aspect, double orb, double *diffret, int *applic, double *factor)
 {
-    aspect = fabs(aspect);
-    orb = fabs(orb);
     double difdeg2n = swe_difdeg2n(pos0, pos1);
     double diff = fabs(difdeg2n);
+    aspect = fabs(aspect);
+    orb = fabs(orb);
     if (difdeg2n > 0)
     {
         if (diff > aspect)
@@ -864,10 +866,9 @@ int swh_match_aspect3(double pos0, double speed0, double pos1, double speed1,
         return swh_match_aspect(pos0, speed0, pos1, speed1, aspect, app_orb,
             diffret, applic, factor);
     }
-    int i;
     if (app_orb > sep_orb)
     {
-        i = swh_match_aspect(pos0, speed0, pos1, speed1, aspect, app_orb,
+        int i = swh_match_aspect(pos0, speed0, pos1, speed1, aspect, app_orb,
             diffret, applic, factor);
         if (i == 0)
         {
@@ -892,7 +893,7 @@ int swh_match_aspect3(double pos0, double speed0, double pos1, double speed1,
     }
     else
     {
-        i = swh_match_aspect(pos0, speed0, pos1, speed1, aspect, sep_orb,
+        int i = swh_match_aspect(pos0, speed0, pos1, speed1, aspect, sep_orb,
             diffret, applic, factor);
         if (i == 0)
         {
@@ -941,10 +942,9 @@ int swh_match_aspect4(double pos0, double speed0, double pos1, double speed1,
         return swh_match_aspect2(pos0, speed0, pos1, speed1, aspect, app_orb,
             diffret, applic, factor);
     }
-    int i;
     if (app_orb > sep_orb)
     {
-        i = swh_match_aspect2(pos0, speed0, pos1, speed1, aspect, app_orb,
+        int i = swh_match_aspect2(pos0, speed0, pos1, speed1, aspect, app_orb,
             diffret, applic, factor);
         if (i == 0)
         {
@@ -969,7 +969,7 @@ int swh_match_aspect4(double pos0, double speed0, double pos1, double speed1,
     }
     else
     {
-        i = swh_match_aspect2(pos0, speed0, pos1, speed1, aspect, sep_orb,
+        int i = swh_match_aspect2(pos0, speed0, pos1, speed1, aspect, sep_orb,
             diffret, applic, factor);
         if (i == 0)
         {

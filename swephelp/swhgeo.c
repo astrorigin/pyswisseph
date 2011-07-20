@@ -1,7 +1,7 @@
 /*
     Swephelp
 
-    Copyright 2007-2009 Stanislas Marquis <stnsls@gmail.com>
+    Copyright 2007-2011 Stanislas Marquis <stnsls@gmail.com>
 
     Swephelp is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -27,11 +27,14 @@ extern "C"
 #endif
 
 #include "swhgeo.h"
-#include <string.h>
+
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <string.h>
+
+#include "swhwin.h"
 
 /** @brief Get double from latitude or longitude string
 **
@@ -119,9 +122,9 @@ int swh_geod2i(double coord, int *ret)
     coord = fabs(coord);
     ret[0] = (int) floor(coord);
     coord -= ret[0];
-    ret[1] = (int) round(coord * 60);
+    ret[1] = (int) lround(coord * 60);
     coord -= ret[1] / 60.0;
-    ret[2] = (int) round(coord * 3600);
+    ret[2] = (int) lround(coord * 3600);
     if (ret[2] < 0) ret[2] = 0;
     return 0;
 }
@@ -140,9 +143,9 @@ int swh_geod2i(double coord, int *ret)
 */
 int swh_geod2c(double coord, int maxdeg, char *ret)
 {
+    int deg, dir, min, sec;
     if (coord < -(maxdeg) || coord > maxdeg)
         return -1;
-    int deg, dir, min, sec;
     if (coord >= 0)
     {
         deg = (int) floor(coord);
@@ -154,9 +157,9 @@ int swh_geod2c(double coord, int maxdeg, char *ret)
         dir = 0;
     }
     coord = fabs(coord) - deg;
-    min = (int) round(coord * 60);
+    min = (int) lround(coord * 60);
     coord -= min / 60.0;
-    sec = (int) round(coord * 3600);
+    sec = (int) lround(coord * 3600);
     if (maxdeg == 90) /* latitude */
         sprintf(ret, "%.2d:%s:%.2d:%.2d", deg, dir ? "N" : "S", min, sec);
     else /* assuming longitude */

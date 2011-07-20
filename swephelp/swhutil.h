@@ -1,7 +1,7 @@
 /*
     Swephelp
 
-    Copyright 2007-2009 Stanislas Marquis <stnsls@gmail.com>
+    Copyright 2007-2011 Stanislas Marquis <stnsls@gmail.com>
 
     Swephelp is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -25,9 +25,7 @@
 #define SWHUTIL_H
 
 #ifndef SWH_USE_THREADS
-#ifndef WIN32
 #define SWH_USE_THREADS     1
-#endif
 #endif
 
 #ifndef SWH_USE_ALIASES
@@ -47,8 +45,6 @@ void swh_unlock(void);
 
 int swh_trylock(void);
 
-/** @typedef swh_Globals
-*/
 typedef struct
 {
     char    ephe_path[64]; /* swiss eph files path */
@@ -61,14 +57,15 @@ typedef struct
     double  ayant0; /* sidmode param */
 } swh_Globals;
 
-/** @brief
-*/
+void swh_globals_init(swh_Globals *glob);
+
 int swh_set_globals(swh_Globals *glob);
 
 #if SWH_USE_ALIASES
 
-#define SWH_LOCK        swh_lock()
-#define SWH_UNLOCK      swh_unlock()
+#define SWH_LOCK()      swh_lock()
+#define SWH_UNLOCK()    swh_unlock()
+#define SWH_TRYLOCK()   swh_trylock()
 
 #endif /* SWH_USE_ALIASES */
 
@@ -77,5 +74,4 @@ int swh_set_globals(swh_Globals *glob);
 #endif
 
 #endif /* SWH_USE_THREADS */
-
 #endif /* SWHUTIL_H */
