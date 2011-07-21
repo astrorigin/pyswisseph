@@ -19,7 +19,7 @@ install:
 	$(PY) setup.py install
 
 clean:
-	$(RM) build dist pydoc swisseph.html index.html README.html
+	$(RM) build dist pydoc swisseph.html index.html README.html MANIFEST
 
 cleanswe:
 	$(RM) src/*.o src/*.a

@@ -23,8 +23,15 @@ makefiles, unless you add -fPIC to the compilation flags.
 The swisseph shipped with this package has an updated Makefile that should
 work.
 
+Windows
+-------
+
+Under Windows, I am using MSVC 2010 with help of CMake build system.
+See the 'cmake' directory.
+
 Licensing
 ---------
+
 Either GNU Public License v2 or later, or Swiss Ephemeris Professional License.
 
 The choice must be made before the software developer distributes software
