@@ -4,4 +4,4 @@ include doc/*
 include src/*
 include swephelp/*.h
 include pydoc/*
-include misc/*
+include cmake/*

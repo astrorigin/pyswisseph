@@ -40,4 +40,6 @@ add_dependencies( swisseph swe )
 
 target_link_libraries( swisseph swe ${PYTHON_LIBRARIES} )
 
+set_target_properties( swisseph PROPERTIES SUFFIX .pyd )
+
 # vi: set ai et sw=4:
