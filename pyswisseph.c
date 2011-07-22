@@ -1662,7 +1662,7 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // checking longitude
+        /* checking longitude */
         if (PyFloat_Check(o4))
         {
             geopos[0] = PyFloat_AsDouble(o4);
@@ -1684,7 +1684,7 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // checking latitude
+        /* checking latitude */
         if (PyFloat_Check(o5))
         {
             geopos[1] = PyFloat_AsDouble(o5);
@@ -1706,7 +1706,7 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // checking altitude
+        /* checking altitude */
         if (PyFloat_Check(o6))
         {
             geopos[2] = PyFloat_AsDouble(o6);
@@ -1750,7 +1750,7 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // atmospheric pressure
+        /* atmospheric pressure */
         if (PyFloat_Check(o4))
         {
             atmo[0] = PyFloat_AsDouble(o4);
@@ -1772,7 +1772,7 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // atmospheric temperature
+        /* atmospheric temperature */
         if (PyFloat_Check(o5))
         {
             atmo[1] = PyFloat_AsDouble(o5);
@@ -1794,7 +1794,7 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // humidity
+        /* humidity */
         if (PyFloat_Check(o6))
         {
             atmo[2] = PyFloat_AsDouble(o6);
@@ -1816,7 +1816,7 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // Meteorological range
+        /* meteorological range */
         if (PyFloat_Check(o7))
         {
             atmo[3] = PyFloat_AsDouble(o7);
@@ -1863,7 +1863,7 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // observer age
+        /* observer age */
         if (PyFloat_Check(o4))
         {
             observ[0] = PyFloat_AsDouble(o4);
@@ -1886,7 +1886,7 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // snellen ratio
+        /* snellen ratio */
         if (PyFloat_Check(o5))
         {
             observ[1] = PyFloat_AsDouble(o5);
@@ -1909,7 +1909,7 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // mono/binocular
+        /* mono/binocular */
         if (PyFloat_Check(o6))
         {
             observ[2] = PyFloat_AsDouble(o6);
@@ -1932,7 +1932,7 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // telescope magnification
+        /* telescope magnification */
         if (PyFloat_Check(o7))
         {
             observ[3] = PyFloat_AsDouble(o7);
@@ -1955,7 +1955,7 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // optical aperture
+        /* optical aperture */
         if (PyFloat_Check(o8))
         {
             observ[4] = PyFloat_AsDouble(o8);
@@ -1978,7 +1978,7 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // optical transmission
+        /* optical transmission */
         if (PyFloat_Check(o9))
         {
             observ[5] = PyFloat_AsDouble(o9);
@@ -2053,7 +2053,7 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // checking longitude
+        /* checking longitude */
         if (PyFloat_Check(o4))
         {
             geopos[0] = PyFloat_AsDouble(o4);
@@ -2075,7 +2075,7 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // checking latitude
+        /* checking latitude */
         if (PyFloat_Check(o5))
         {
             geopos[1] = PyFloat_AsDouble(o5);
@@ -2097,7 +2097,7 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // checking altitude
+        /* checking altitude */
         if (PyFloat_Check(o6))
         {
             geopos[2] = PyFloat_AsDouble(o6);
@@ -2141,7 +2141,7 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // atmospheric pressure
+        /* atmospheric pressure */
         if (PyFloat_Check(o4))
         {
             atmo[0] = PyFloat_AsDouble(o4);
@@ -2163,7 +2163,7 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // atmospheric temperature
+        /* atmospheric temperature */
         if (PyFloat_Check(o5))
         {
             atmo[1] = PyFloat_AsDouble(o5);
@@ -2185,7 +2185,7 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // humidity
+        /* humidity */
         if (PyFloat_Check(o6))
         {
             atmo[2] = PyFloat_AsDouble(o6);
@@ -2207,7 +2207,7 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // Meteorological range
+        /* meteorological range */
         if (PyFloat_Check(o7))
         {
             atmo[3] = PyFloat_AsDouble(o7);
@@ -2254,7 +2254,7 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // observer age
+        /* observer age */
         if (PyFloat_Check(o4))
         {
             observ[0] = PyFloat_AsDouble(o4);
@@ -2277,7 +2277,7 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // snellen ratio
+        /* snellen ratio */
         if (PyFloat_Check(o5))
         {
             observ[1] = PyFloat_AsDouble(o5);
@@ -2300,7 +2300,7 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // mono/binocular
+        /* mono/binocular */
         if (PyFloat_Check(o6))
         {
             observ[2] = PyFloat_AsDouble(o6);
@@ -2323,7 +2323,7 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // telescope magnification
+        /* telescope magnification */
         if (PyFloat_Check(o7))
         {
             observ[3] = PyFloat_AsDouble(o7);
@@ -2346,7 +2346,7 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // optical aperture
+        /* optical aperture */
         if (PyFloat_Check(o8))
         {
             observ[4] = PyFloat_AsDouble(o8);
@@ -2369,7 +2369,7 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
             return NULL;
         }
 
-        // optical transmission
+        /* optical transmission */
         if (PyFloat_Check(o9))
         {
             observ[5] = PyFloat_AsDouble(o9);
@@ -3790,6 +3790,7 @@ PyMODINIT_FUNC initswisseph(void)
 #endif
 {
     PyObject *m;
+    char buf[10];
 
 #if PY_MAJOR_VERSION >= 3
     m = PyModule_Create(&pyswe_module);
@@ -4062,18 +4063,18 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "AQUARIUS", SWH_AQUARIUS);
     PyModule_AddIntConstant(m, "PISCES", SWH_PISCES);
 
-    PyModule_AddIntConstant(m, "MESHA", SWH_ARIES);
-    PyModule_AddIntConstant(m, "VRISHABA", SWH_TAURUS);
-    PyModule_AddIntConstant(m, "MITHUNA", SWH_GEMINI);
-    PyModule_AddIntConstant(m, "KATAKA", SWH_CANCER);
-    PyModule_AddIntConstant(m, "SIMHA", SWH_LEO);
-    PyModule_AddIntConstant(m, "KANYA", SWH_VIRGO);
-    PyModule_AddIntConstant(m, "THULA", SWH_LIBRA);
-    PyModule_AddIntConstant(m, "VRISHIKA", SWH_SCORPIO);
-    PyModule_AddIntConstant(m, "DHANUS", SWH_SAGITTARIUS);
-    PyModule_AddIntConstant(m, "MAKARA", SWH_CAPRICORN);
-    PyModule_AddIntConstant(m, "KUMBHA", SWH_AQUARIUS);
-    PyModule_AddIntConstant(m, "MEENA", SWH_PISCES);
+    PyModule_AddIntConstant(m, "MESHA", SWH_MESHA);
+    PyModule_AddIntConstant(m, "VRISHABA", SWH_VRISHABA);
+    PyModule_AddIntConstant(m, "MITHUNA", SWH_MITHUNA);
+    PyModule_AddIntConstant(m, "KATAKA", SWH_KATAKA);
+    PyModule_AddIntConstant(m, "SIMHA", SWH_SIMHA);
+    PyModule_AddIntConstant(m, "KANYA", SWH_KANYA);
+    PyModule_AddIntConstant(m, "THULA", SWH_THULA);
+    PyModule_AddIntConstant(m, "VRISHIKA", SWH_VRISHIKA);
+    PyModule_AddIntConstant(m, "DHANUS", SWH_DHANUS);
+    PyModule_AddIntConstant(m, "MAKARA", SWH_MAKARA);
+    PyModule_AddIntConstant(m, "KUMBHA", SWH_KUMBHA);
+    PyModule_AddIntConstant(m, "MEENA", SWH_MEENA);
 
     /* Planets */
     PyModule_AddIntConstant(m, "RAVI", SWH_RAVI);
@@ -4086,15 +4087,15 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "RAHU", SWH_RAHU);
     PyModule_AddIntConstant(m, "KETU", SWH_KETU);
 
-    PyModule_AddIntConstant(m, "SURYA", SWH_RAVI);
-    PyModule_AddIntConstant(m, "SOMA", SWH_CHANDRA);
-    PyModule_AddIntConstant(m, "SOUMYA", SWH_BUDHA);
-    PyModule_AddIntConstant(m, "BHARGAVA", SWH_SUKRA);
-    PyModule_AddIntConstant(m, "ANGARAKA", SWH_KUJA);
-    PyModule_AddIntConstant(m, "BRIHASPATI", SWH_GURU);
-    PyModule_AddIntConstant(m, "MANDA", SWH_SANI);
-    PyModule_AddIntConstant(m, "THAMA", SWH_RAHU);
-    PyModule_AddIntConstant(m, "SIKHI", SWH_KETU);
+    PyModule_AddIntConstant(m, "SURYA", SWH_SURYA);
+    PyModule_AddIntConstant(m, "SOMA", SWH_SOMA);
+    PyModule_AddIntConstant(m, "SOUMYA", SWH_SOUMYA);
+    PyModule_AddIntConstant(m, "BHARGAVA", SWH_BHARGAVA);
+    PyModule_AddIntConstant(m, "ANGARAKA", SWH_ANGARAKA);
+    PyModule_AddIntConstant(m, "BRIHASPATI", SWH_BRIHASPATI);
+    PyModule_AddIntConstant(m, "MANDA", SWH_MANDA);
+    PyModule_AddIntConstant(m, "THAMA", SWH_THAMA);
+    PyModule_AddIntConstant(m, "SIKHI", SWH_SIKHI);
 
     /* Nakshatras */
     PyModule_AddIntConstant(m, "ASWINI", SWH_ASWINI);
@@ -4128,10 +4129,7 @@ PyMODINIT_FUNC initswisseph(void)
 #endif /* USE_SWEPHELP */
 
     PyModule_AddIntConstant(m, "__version__", PYSWISSEPH_VERSION);
-    { /* dummy scope for MSVC */
-    char buf[10];
     PyModule_AddStringConstant(m, "version", swe_version(buf));
-    } /* dummy scope end */
 
     if (PyErr_Occurred())
         Py_FatalError("Can't initialize module swisseph!");

@@ -47,6 +47,7 @@ Debian/Ubuntu packages: http://www.openastro.org/
 import os.path, sys
 from distutils.core import setup, Extension
 
+# Pyswisseph version
 VERSION = '1.77.00-0'
 
 # This builds libswe
@@ -57,6 +58,7 @@ if 'build' in sys.argv or 'install' in sys.argv:
     os.system('make libswe.a')
     os.chdir(instdir)
 
+# Extension
 swemodule = Extension(
     'swisseph',
     include_dirs = ['src', 'swephelp'],
@@ -98,3 +100,6 @@ setup(
     keywords = 'Astrology Ephemeris Swisseph',
     ext_modules = [swemodule]
     )
+
+# vi: set ai et sw=4:
+
