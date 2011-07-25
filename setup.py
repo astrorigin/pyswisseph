@@ -18,7 +18,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with Pyswisseph.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Python extension to AstroDienst's Swiss Ephemeris library.
+"""Python extension to AstroDienst Swiss Ephemeris library.
 
 Swiss Ephemeris homepage: http://www.astro.com/swisseph/
 
@@ -38,9 +38,7 @@ Usage example:
 0.098474291148756998
 >>> help(swe)
 
-Installation (unixes): ``# python setup.py install``
-
-Debian/Ubuntu packages: http://www.openastro.org/
+Standard installation (unixes): ``# python setup.py install``
 
 """
 

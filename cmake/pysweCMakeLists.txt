@@ -3,10 +3,28 @@
 cmake_minimum_required( VERSION 2.8 )
 project( pyswisseph )
 
-message( STATUS "-- Configuring pyswisseph" )
+message( STATUS "-- Configuring pyswisseph..." )
 
-# Change this as needed
+# Python version we are looking for
 set( DESIRED_PYTHON_VERSION 2.7 )
+
+# Options
+option( PYSWE_AUTO_SET_EPHE_PATH "Automaticaly set ephemeris path on module import" ON )
+option( PYSWE_USE_SWEPHELP "Build additional functions" ON )
+
+if ( PYSWE_AUTO_SET_EPHE_PATH )
+    add_definitions( -DPYSWE_AUTO_SET_EPHE_PATH=1 )
+    message( STATUS "... Ephemeris path will be set on module import..." )
+else()
+    add_definitions( -DPYSWE_AUTO_SET_EPHE_PATH=0 )
+endif()
+
+if ( PYSWE_USE_SWEPHELP )
+    add_definitions( -DPYSWE_USE_SWEPHELP=1 )
+    message( STATUS "... Additional functions will be compiled..." )
+else()
+    add_definitions( -DPYSWE_USE_SWEPHELP=0 )
+endif()
 
 # Find Python libs
 find_package( PythonLibs ${DESIRED_PYTHON_VERSION} EXACT )

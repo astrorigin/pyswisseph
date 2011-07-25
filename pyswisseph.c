@@ -26,31 +26,37 @@ Swisseph authors: Alois Treindl, Dieter Koch.
 Swisseph homepage: http://www.astro.com/swisseph
 
 Swisseph version: 1.77.00
-Last revision: 20.07.2011
+Last revision: 25.07.2011
 
 */
 
-#define PYSWISSEPH_VERSION      20110720
+#define PYSWISSEPH_VERSION      20110725
 
-/* Set default argument for set_ephe_path function */
+/* Set the default argument for set_ephe_path function */
+#ifndef PYSWE_DEFAULT_EPHE_PATH
 #ifdef WIN32
-#define DFTSET_EPHE_PATH        "C:\\swisseph"
+#define PYSWE_DEFAULT_EPHE_PATH     "C:\\swisseph"
 #else
-#define DFTSET_EPHE_PATH        "/usr/share/swisseph:/usr/local/share/swisseph"
+#define PYSWE_DEFAULT_EPHE_PATH     "/usr/share/swisseph:/usr/local/share/swisseph"
+#endif
+#endif /* PYSWE_DEFAULT_EPHE_PATH */
+
+/* Wether to automaticly set ephemeris path on module import */
+#ifndef PYSWE_AUTO_SET_EPHE_PATH
+#define PYSWE_AUTO_SET_EPHE_PATH    1
 #endif
 
-/* Automaticly set ephemeris path on module import. (Un)def if (not) needed. */
-#define AUTOSET_EPHE_PATH
-
-/* Undef this to compile only swisseph functions */
-#define USE_SWEPHELP
+/* Wether to build swephelp functions */
+#ifndef PYSWE_USE_SWEPHELP
+#define PYSWE_USE_SWEPHELP      1
+#endif
 
 /* Dont modify below */
 
 #include <Python.h>
 #include <swephexp.h>
 
-#ifdef USE_SWEPHELP
+#if PYSWE_USE_SWEPHELP
 #include <swephelp.h>
 #endif
 
@@ -70,12 +76,12 @@ static PyObject * pyswe_Error; /* Module exception type */
 /* swisseph.set_ephe_path */
 static char pyswe_set_ephe_path__doc__[] =
 "Set ephemeris files path.\n\n"
-"Args: str path=\"" DFTSET_EPHE_PATH "\"\n"
+"Args: str path=\"" PYSWE_DEFAULT_EPHE_PATH "\"\n"
 "Return: None";
 
 static PyObject * pyswe_set_ephe_path FUNCARGS_KEYWDS
 {
-    char *path = DFTSET_EPHE_PATH;
+    char *path = PYSWE_DEFAULT_EPHE_PATH;
     static char *kwlist[] = {"path", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "|s", kwlist, &path))
         return NULL;
@@ -2409,7 +2415,7 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
     }
 }
 
-#ifdef USE_SWEPHELP
+#if PYSWE_USE_SWEPHELP
 /* *** Specific pyswisseph functions. ***
 
 All names begin with an underscore. They are not part of the original swisseph,
@@ -3527,7 +3533,7 @@ static PyObject * pyswe__trylock FUNCARGS_SELF
 }
 
 #endif /* SWH_USE_THREADS */
-#endif /* USE_SWEPHELP */
+#endif /* PYSWE_USE_SWEPHELP */
 
 /* Methods */
 static struct PyMethodDef pyswe_methods[] = {
@@ -3674,7 +3680,7 @@ static struct PyMethodDef pyswe_methods[] = {
     {"vis_limit_mag", (PyCFunction) pyswe_vis_limit_mag,
         METH_VARARGS|METH_KEYWORDS, pyswe_vis_limit_mag__doc__},
 
-#ifdef USE_SWEPHELP
+#if PYSWE_USE_SWEPHELP
     /* pyswisseph/swephelp functions. */
     {"_jdnow", (PyCFunction) pyswe__jdnow,
         METH_NOARGS, pyswe__jdnow__doc__},
@@ -3758,15 +3764,15 @@ static struct PyMethodDef pyswe_methods[] = {
     {"_trylock", (PyCFunction) pyswe__trylock,
         METH_VARARGS|METH_KEYWORDS, pyswe__trylock__doc__},
 #endif /* SWH_USE_THREADS */
-#endif /* USE_SWEPHELP */
+#endif /* PYSWE_USE_SWEPHELP */
     {NULL, (PyCFunction) NULL, 0, NULL}
 };
 
 static char pyswe_module_documentation[] =
-"Python extension to AstroDienst's Swiss Ephemeris library.\n"
-#ifdef AUTOSET_EPHE_PATH
+"Python extension to AstroDienst Swiss Ephemeris library.\n"
+#if PYSWE_AUTO_SET_EPHE_PATH
 "Import of this extension module does automagicaly set the ephemeris path"
-" to \"" DFTSET_EPHE_PATH "\".\n"
+" to \"" PYSWE_DEFAULT_EPHE_PATH "\".\n"
 #endif
 "Extended documentation can be found on AstroDienst website.\n\n"
 "Pyswisseph homepage: http://pyswisseph.chaosorigin.com/\n"
@@ -4018,7 +4024,7 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "SCOTOPIC_FLAG", SE_SCOTOPIC_FLAG);
     PyModule_AddIntConstant(m, "MIXEDOPIC_FLAG", SE_MIXEDOPIC_FLAG);
 
-#ifdef USE_SWEPHELP
+#if PYSWE_USE_SWEPHELP
     /* *** Additional constants -- not swiss ephemeris ***/
 
     /* Aspects */
@@ -4126,7 +4132,7 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "UTTARABHADRA", SWH_UTTARABHADRA);
     PyModule_AddIntConstant(m, "REVATHI", SWH_REVATHI);
 
-#endif /* USE_SWEPHELP */
+#endif /* PYSWE_USE_SWEPHELP */
 
     PyModule_AddIntConstant(m, "__version__", PYSWISSEPH_VERSION);
     PyModule_AddStringConstant(m, "version", swe_version(buf));
@@ -4134,10 +4140,10 @@ PyMODINIT_FUNC initswisseph(void)
     if (PyErr_Occurred())
         Py_FatalError("Can't initialize module swisseph!");
 
-#ifdef AUTOSET_EPHE_PATH
+#if PYSWE_AUTO_SET_EPHE_PATH
     /* Automaticly set ephemeris path on module import */
-    swe_set_ephe_path(DFTSET_EPHE_PATH);
-#endif /* AUTOSET_EPHE_PATH */
+    swe_set_ephe_path(PYSWE_DEFAULT_EPHE_PATH);
+#endif /* PYSWE_AUTO_SET_EPHE_PATH */
 
 #if PY_MAJOR_VERSION >= 3
     return m;

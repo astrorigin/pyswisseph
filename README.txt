@@ -52,6 +52,7 @@ http://www.astro.com/swisseph/
 
 Contact
 -------
+
 Any feedback about pyswisseph is welcome:
 Stanislas Marquis <stnsls@gmail.com>
 
