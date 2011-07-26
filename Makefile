@@ -7,7 +7,7 @@ CP = cp -f
 MKDIR = mkdir -p
 CMAKE = cmake-gui
 PYDOC = epydoc
-RST = rst2html.py
+RST = rst2html
 
 
 all: libswe.a build

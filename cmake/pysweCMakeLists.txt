@@ -48,6 +48,8 @@ set( SOURCES
 
 if ( MSVC )
     add_definitions( -D_CRT_SECURE_NO_WARNINGS )
+else()
+    add_definitions( -std=gnu99 -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fPIC )
 endif()
 
 include_directories( BEFORE src swephelp ${PYTHON_INCLUDE_DIRS} )
@@ -56,8 +58,16 @@ add_library( swisseph MODULE ${SOURCES} )
 
 add_dependencies( swisseph swe )
 
-target_link_libraries( swisseph swe ${PYTHON_LIBRARIES} )
+if ( WIN32 )
+    target_link_libraries( swisseph swe ${PYTHON_LIBRARIES} )
+else()
+    target_link_libraries( swisseph swe m ${PYTHON_LIBRARIES} -pthread -Wl,-O1 -Wl,-Bsymbolic-functions )
+endif()
 
-set_target_properties( swisseph PROPERTIES SUFFIX .pyd )
+if ( WIN32 )
+    set_target_properties( swisseph PROPERTIES SUFFIX .pyd )
+else()
+    set_target_properties( swisseph PROPERTIES PREFIX "" )
+endif()
 
 # vi: set ai et sw=4:

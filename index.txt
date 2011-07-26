@@ -25,9 +25,11 @@ Usage example:
 >>> import swisseph as swe
 >>> help(swe)
 
-Installations with distutils:
+Unixes: standard installation with distutils:
 
 ``python setup.py install``
+
+Windows: CMake compilation scripts for MSVC.
 
 Download
 --------
