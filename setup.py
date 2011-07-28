@@ -48,20 +48,10 @@ from distutils.core import setup, Extension
 # Pyswisseph version
 VERSION = '1.77.00-0'
 
-# This builds libswe
-if 'build' in sys.argv or 'install' in sys.argv:
-    instdir = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(os.path.join(instdir, 'src'))
-    os.system('make clean')
-    os.system('make libswe.a')
-    os.chdir(instdir)
-
 # Extension
 swemodule = Extension(
     'swisseph',
     include_dirs = ['src', 'swephelp'],
-    libraries = ['swe'],
-    library_dirs = ['src'],
     extra_compile_args= ['-std=gnu99'],
     sources = [
         'pyswisseph.c',
@@ -70,7 +60,18 @@ swemodule = Extension(
         'swephelp/swhsearch.c',
         'swephelp/swhraman.c',
         'swephelp/swhgeo.c',
-        'swephelp/swhutil.c'
+        'swephelp/swhutil.c',
+        'src/swecl.c',
+        'src/swedate.c',
+        'src/swehel.c',
+        'src/swehouse.c',
+        'src/swejpl.c',
+        'src/swemmoon.c',
+        'src/swemplan.c',
+        #swemptab.c
+        'src/swepcalc.c',
+        'src/sweph.c',
+        'src/swephlib.c'
         ]
     )
 

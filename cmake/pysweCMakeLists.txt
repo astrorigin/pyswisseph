@@ -1,69 +1,101 @@
-# Pyswisseph CmakeLists.txt for Windows
+# Pyswisseph CMakeLists.txt
 
 cmake_minimum_required( VERSION 2.8 )
+
 project( pyswisseph )
 
 message( STATUS "-- Configuring pyswisseph..." )
 
-# Python version we are looking for
-set( DESIRED_PYTHON_VERSION 2.7 )
+# Python version
+set( PYSWE_DESIRED_PYTHON_VERSION
+    2.7
+    CACHE STRING "Desired Python version" )
 
 # Options
-option( PYSWE_AUTO_SET_EPHE_PATH "Automaticaly set ephemeris path on module import" ON )
-option( PYSWE_USE_SWEPHELP "Build additional functions" ON )
+option( PYSWE_AUTO_SET_EPHE_PATH
+    "Automaticaly set ephemeris path on module import"
+    ON )
+option( PYSWE_USE_SWEPHELP
+    "Build extra functions"
+    ON )
+
+# Default ephemeris path
+if ( WIN32 )
+    set( PYSWE_DEFAULT_EPHE_PATH
+        "C:\\\\swisseph"
+        CACHE STRING "Default ephemeris search path" )
+else()
+    set( PYSWE_DEFAULT_EPHE_PATH
+        "/usr/share/swisseph:/usr/local/share/swisseph"
+        CACHE STRING "Default ephemeris search path" )
+endif()
+add_definitions( -DPYSWE_DEFAULT_EPHE_PATH="${PYSWE_DEFAULT_EPHE_PATH}" )
 
 if ( PYSWE_AUTO_SET_EPHE_PATH )
     add_definitions( -DPYSWE_AUTO_SET_EPHE_PATH=1 )
-    message( STATUS "... Ephemeris path will be set on module import..." )
+    message( STATUS "... Ephemeris path will be set to ${PYSWE_DEFAULT_EPHE_PATH} on module import..." )
 else()
     add_definitions( -DPYSWE_AUTO_SET_EPHE_PATH=0 )
-endif()
+endif( PYSWE_AUTO_SET_EPHE_PATH )
 
 if ( PYSWE_USE_SWEPHELP )
     add_definitions( -DPYSWE_USE_SWEPHELP=1 )
-    message( STATUS "... Additional functions will be compiled..." )
+    message( STATUS "... Extra functions will be compiled..." )
 else()
     add_definitions( -DPYSWE_USE_SWEPHELP=0 )
-endif()
+endif( PYSWE_USE_SWEPHELP )
 
 # Find Python libs
-find_package( PythonLibs ${DESIRED_PYTHON_VERSION} EXACT )
+find_package( PythonLibs ${PYSWE_DESIRED_PYTHON_VERSION} EXACT )
 if ( NOT PYTHONLIBS_FOUND )
-    message( FATAL_ERROR "Cannot find Python libraries." )
+    message( FATAL_ERROR "Cannot find Python libraries (version ${PYSWE_DESIRED_PYTHON_VERSION})" )
 endif()
 
 # Configure cswisseph
 add_subdirectory( src )
 
 # Sources
-set( SOURCES
-    pyswisseph.c
-    swephelp/swhdatetime.c
-    swephelp/swhformat.c
-    swephelp/swhsearch.c
-    swephelp/swhraman.c
-    swephelp/swhgeo.c
-    swephelp/swhutil.c
-    )
+set( SOURCES pyswisseph.c )
 
+if ( PYSWE_USE_SWEPHELP )
+    list( APPEND SOURCES
+        swephelp/swhdatetime.c
+        swephelp/swhformat.c
+        swephelp/swhsearch.c
+        swephelp/swhraman.c
+        swephelp/swhgeo.c
+        swephelp/swhutil.c
+        )
+endif()
+
+# Defines
 if ( MSVC )
     add_definitions( -D_CRT_SECURE_NO_WARNINGS )
 else()
-    add_definitions( -std=gnu99 -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fPIC )
+    add_definitions( -std=gnu99 -pthread -fno-strict-aliasing -DNDEBUG
+        -g -fwrapv -O2 -Wall -Wstrict-prototypes -fPIC )
 endif()
 
-include_directories( BEFORE src swephelp ${PYTHON_INCLUDE_DIRS} )
+# Includes
+include_directories( BEFORE src ${PYTHON_INCLUDE_DIRS} )
 
+if ( PYSWE_USE_SWEPHELP )
+    include_directories( BEFORE swephelp )
+endif()
+
+# Target
 add_library( swisseph MODULE ${SOURCES} )
-
 add_dependencies( swisseph swe )
 
+# Linkage
 if ( WIN32 )
     target_link_libraries( swisseph swe ${PYTHON_LIBRARIES} )
 else()
-    target_link_libraries( swisseph swe m ${PYTHON_LIBRARIES} -pthread -Wl,-O1 -Wl,-Bsymbolic-functions )
+    target_link_libraries( swisseph swe m ${PYTHON_LIBRARIES}
+        -pthread -Wl,-O1 -Wl,-Bsymbolic-functions )
 endif()
 
+# Target properties
 if ( WIN32 )
     set_target_properties( swisseph PROPERTIES SUFFIX .pyd )
 else()
