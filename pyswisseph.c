@@ -26,11 +26,11 @@ Swisseph authors: Alois Treindl, Dieter Koch.
 Swisseph homepage: http://www.astro.com/swisseph
 
 Swisseph version: 1.77.00
-Last revision: 25.07.2011
+Last revision: 08.09.2011
 
 */
 
-#define PYSWISSEPH_VERSION      20110725
+#define PYSWISSEPH_VERSION      20110908
 
 /* Set the default argument for set_ephe_path function */
 #ifndef PYSWE_DEFAULT_EPHE_PATH

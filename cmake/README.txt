@@ -1,2 +1,13 @@
-This directory contains cmake files for development under Windows (MSVC).
- 
+This directory contains cmake files for development under Windows.
+
+It is recommended to use CMake GUI and you read the following.
+
+**************
+KNOWN PROBLEMS
+**************
+
+MinGW: Directory separator of PYSWE_DEFAULT_EPHE_PATH must be entered as a
+triple backslash: "\\\". Ex: C:\\\swisseph\\\ephe
+
+MSVC: Directory separator of PYSWE_DEFAULT_EPHE_PATH must be entered as a
+double backslash: "\\". Ex: C:\\swisseph\\ephe

@@ -6,6 +6,13 @@ project( pyswisseph )
 
 message( STATUS "-- Configuring pyswisseph..." )
 
+# MinGW variable
+if ( WIN32 AND NOT MSVC )
+    set( MINGW ON )
+else()
+    set( MINGW OFF )
+endif()
+
 # Python version
 set( PYSWE_DESIRED_PYTHON_VERSION
     2.7
@@ -20,9 +27,13 @@ option( PYSWE_USE_SWEPHELP
     ON )
 
 # Default ephemeris path
-if ( WIN32 )
+if ( MSVC )
     set( PYSWE_DEFAULT_EPHE_PATH
         "C:\\\\swisseph"
+        CACHE STRING "Default ephemeris search path" )
+elseif( MINGW )
+    set( PYSWE_DEFAULT_EPHE_PATH
+        "C:\\\\\\swisseph"
         CACHE STRING "Default ephemeris search path" )
 else()
     set( PYSWE_DEFAULT_EPHE_PATH
@@ -36,7 +47,7 @@ if ( PYSWE_AUTO_SET_EPHE_PATH )
     message( STATUS "... Ephemeris path will be set to ${PYSWE_DEFAULT_EPHE_PATH} on module import..." )
 else()
     add_definitions( -DPYSWE_AUTO_SET_EPHE_PATH=0 )
-endif( PYSWE_AUTO_SET_EPHE_PATH )
+endif()
 
 if ( PYSWE_USE_SWEPHELP )
     add_definitions( -DPYSWE_USE_SWEPHELP=1 )
@@ -72,8 +83,11 @@ endif()
 if ( MSVC )
     add_definitions( -D_CRT_SECURE_NO_WARNINGS )
 else()
-    add_definitions( -std=gnu99 -pthread -fno-strict-aliasing -DNDEBUG
-        -g -fwrapv -O2 -Wall -Wstrict-prototypes -fPIC )
+    add_definitions( -std=gnu99 -fno-strict-aliasing -DNDEBUG
+        -g -fwrapv -O2 -Wall -Wstrict-prototypes )
+    if ( NOT MINGW )
+        add_definitions( -pthread -fPIC )
+    endif()
 endif()
 
 # Includes
@@ -88,8 +102,11 @@ add_library( swisseph MODULE ${SOURCES} )
 add_dependencies( swisseph swe )
 
 # Linkage
-if ( WIN32 )
+if ( MSVC )
     target_link_libraries( swisseph swe ${PYTHON_LIBRARIES} )
+elseif( MINGW )
+    target_link_libraries( swisseph swe m ${PYTHON_LIBRARIES}
+        pthread -Wl,-O1 -Wl,-Bsymbolic-functions )
 else()
     target_link_libraries( swisseph swe m ${PYTHON_LIBRARIES}
         -pthread -Wl,-O1 -Wl,-Bsymbolic-functions )
@@ -98,6 +115,9 @@ endif()
 # Target properties
 if ( WIN32 )
     set_target_properties( swisseph PROPERTIES SUFFIX .pyd )
+    if ( MINGW )
+        set_target_properties( swisseph PROPERTIES PREFIX "" )
+    endif()
 else()
     set_target_properties( swisseph PROPERTIES PREFIX "" )
 endif()
