@@ -14,20 +14,11 @@ For python version 2.x or 3.x
   - To install in sites-packages: « python setup.py install »
   - To build extension only: « python setup.py build »
 
-64 bits platforms
------------------
-
-Compilation on 64 bits platform will not work with the original swisseph
-makefiles, unless you add -fPIC to the compilation flags.
-
-The swisseph shipped with this package has an updated Makefile that should
-work.
-
 Windows
 -------
 
-Under Windows, I am using MSVC 2010 with help of CMake build system.
-See the 'cmake' directory.
+Under Windows, it is recommended to use MSVC 2010 or MinGW, with help of
+the CMake build system, to build the module. See the 'cmake' directory.
 
 Licensing
 ---------

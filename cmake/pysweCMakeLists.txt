@@ -54,7 +54,7 @@ if ( PYSWE_USE_SWEPHELP )
     message( STATUS "... Extra functions will be compiled..." )
 else()
     add_definitions( -DPYSWE_USE_SWEPHELP=0 )
-endif( PYSWE_USE_SWEPHELP )
+endif()
 
 # Find Python libs
 find_package( PythonLibs ${PYSWE_DESIRED_PYTHON_VERSION} EXACT )
