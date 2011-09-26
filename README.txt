@@ -1,8 +1,9 @@
 Pyswisseph Readme
 -----------------
 
-This directory contains the source of Python extension to the Swiss Ephemeris,
-along with the swisseph source itself, created by AstroDienst.
+This directory contains the source of the Python extension to the Swiss
+Ephemeris (pyswisseph), along with the swisseph source itself, created by
+AstroDienst.
 
   - Homepage: http://pyswisseph.chaosorigin.com/
   - Python Package Index: http://pypi.python.org/pypi/pyswisseph/

@@ -7,7 +7,10 @@ KNOWN PROBLEMS
 **************
 
 MinGW: Directory separator of PYSWE_DEFAULT_EPHE_PATH must be entered as a
-triple backslash: "\\\". Ex: C:\\\swisseph\\\ephe
+triple backslash: "\\\". Eg: C:\\\swisseph\\\ephe
 
 MSVC: Directory separator of PYSWE_DEFAULT_EPHE_PATH must be entered as a
-double backslash: "\\". Ex: C:\\swisseph\\ephe
+double backslash: "\\". Eg: C:\\swisseph\\ephe
+
+..
+

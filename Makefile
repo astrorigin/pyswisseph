@@ -10,12 +10,12 @@ PYDOC = epydoc
 RST = rst2html
 
 
-all: libswe.a build
+all: build
 
 libswe.a:
 	$(CD) src; make $@
 
-build: libswe.a
+build:
 	$(PY) setup.py build
 
 install:
