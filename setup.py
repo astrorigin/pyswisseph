@@ -63,6 +63,9 @@ use_swephelp = True
 # Compile flags
 cflags = ['-std=gnu99']
 
+# Link flags
+ldflags = []
+
 # Don't modify below
 
 import os.path, sys
@@ -186,12 +189,13 @@ if use_swephelp:
 # Pyswisseph extension
 swemodule = Extension(
     'swisseph',
-    include_dirs = includes,
-    extra_compile_args = cflags,
-    sources = sources,
+    define_macros = swe_defines,
     depends = depends,
+    extra_compile_args = cflags,
+    extra_link_args = ldflags,
+    include_dirs = includes,
     libraries = swe_libs,
-    define_macros = swe_defines
+    sources = sources 
     )
 
 setup(
