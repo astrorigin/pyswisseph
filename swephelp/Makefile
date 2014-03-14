@@ -1,7 +1,7 @@
 # Swephelp makefile
 
 CC = gcc
-CFLAGS = -g -O9 -Wall -std=gnu99
+CFLAGS += -g -O9 -Wall -std=gnu99
 # path to swisseph
 INCS = -I. -I./libswe
 
@@ -18,4 +18,4 @@ libswephelp.a: $(SWHOBJ)
 clean:
 	rm -f *.o libswephelp.a
 
-# vi: set fenc=utf-8 ff=unix sw=4 et=4 ts=4 sts=4 :
+# vi: set fenc=utf-8 ff=unix et sw=4 ts=4 sts=4 :
