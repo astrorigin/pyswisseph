@@ -1,0 +1,5 @@
+# This file contains the dates of leap seconds to be taken into account
+# by the Swiss Ephemeris. 
+# For each new leap second add the date of its insertion in the format
+# yyyymmdd, e.g. "20081231" for 21 december 2008
+20081231

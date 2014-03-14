@@ -1,0 +1,24 @@
+# Pyswisseph - gitignore
+
+*~
+*.a
+*.bak
+*.o
+*.pyc
+*.pyo
+*.prj
+*.pui
+*.zip
+
+MANIFEST
+build*
+dist*
+doc
+epydoc*
+make.py
+manifest
+src
+swe_unix_src*
+swisseph.*.so
+swisseph.so
+

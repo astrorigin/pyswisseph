@@ -1,0 +1,7 @@
+include COPYING.TXT
+include README.TXT
+include debian/*
+include epydoc/*
+include libswe/*
+include swephelp/*
+
