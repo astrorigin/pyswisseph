@@ -1,0 +1,280 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>
+    Pyswisseph - Python Extension to the Swiss Ephemeris
+</title>
+<style>
+body {
+    background-color: khaki;
+    color: darkslategray;
+    font-family: sans-serif;
+    letter-spacing: 0.4px;
+    margin: 10px;
+}
+#frame {
+    width: 800px;
+}
+#toptitle {
+    background-color: white;
+    border: 1px solid silver;
+    border-radius: 10px;
+    box-shadow: 2px 2px 3px black;
+    padding: 10px;
+    font-family: serif;
+    font-size: 28px;
+    height: 40px;
+    text-align: center;
+}
+#links {
+    float: left;
+    position: relative;
+    top: 7px;
+    width: 200px;
+}
+.link {
+    background-color: white;
+    border: 1px solid silver;
+    border-radius: 5px;
+    margin: 2px;
+    padding: 2px;
+    padding-left: 10px;
+    text-align: left;
+}
+.link:hover {
+    background-color: gainsboro;
+    border: 1px solid silver;
+    border-bottom: 1px solid gray;
+    border-right: 1px solid gray;
+    cursor: pointer;
+}
+.sep {
+    background-color: palegoldenrod;
+    border: 1px solid silver;
+    border-radius: 5px;
+    font-weight: bold;
+    margin: 2px;
+    padding: 2px;
+    padding-left: 10px;
+    text-align: left;
+}
+#main {
+    float: left;
+    position: relative;
+    left: 7px;
+    top: 7px;
+    width: 597px;
+}
+.title {
+    background-color: tan;
+    border: 1px solid silver;
+    border-bottom: 1px solid gray;
+    border-right: 1px solid gray;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 2px;
+    padding: 2px;
+    padding-left: 10px;
+    text-align: left;
+}
+.text {
+    background-color: white;
+    border: 1px solid silver;
+    border-radius: 5px;
+    display: none;
+    margin: 2px;
+    padding: 2px;
+    text-align: left;
+}
+p {
+    padding-left: 10px;
+    padding-right: 10px;
+    text-align: justify;
+}
+code {
+    background-color: thistle;
+    display: block;
+    font-family: monospace;
+    padding: 5px;
+    margin-bottom: 20px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+.footer {
+    font-family: monospace;
+    font-size: 9px;
+    text-align: right;
+}
+a {
+    text-decoration: none;
+    color: tomato;
+}
+a:hover {
+    text-decoration: underline;
+}
+hr {
+    color: white;
+}
+</style>
+<script type="text/javascript">
+var activeTitle=null;
+var activeText=null;
+function redirect( url )
+{
+    document.location=url;
+}
+function title_hl( tid )
+{
+    var t=document.getElementById(tid);
+    t.style.backgroundColor='gainsboro';
+    t.style.borderBottom='1px solid darkslategray';
+    t.style.borderRight='1px solid darkslategray';
+}
+function title_ll( tid )
+{
+    var t=document.getElementById(tid);
+    t.style.backgroundColor='tan';
+    t.style.borderBottom='1px solid gray';
+    t.style.borderRight='1px solid gray';
+}
+function toggle_display( tid, pid, recursive=true )
+{
+    var t=document.getElementById(tid)
+    var p=document.getElementById(pid);
+    if (recursive && activeTitle!=null){
+        toggle_display(activeTitle,activeText,false);
+    }
+    if(p.style.display=='none'){
+        p.style.display='block';
+        t.onclick=null;
+        t.onmouseover=null;
+        t.onmouseout=null;
+        t.style.backgroundColor='gainsboro';
+        t.style.borderBottom='1px solid darkslategray';
+        t.style.borderRight='1px solid darkslategray';
+        t.style.cursor='auto';
+        activeTitle=tid;
+        activeText=pid;
+    }
+    else{
+        p.style.display='none';
+        t.onclick=function(){toggle_display(tid,pid)};
+        t.onmouseover=function(){title_hl(tid)};
+        t.onmouseout=function(){title_ll(tid)};
+        t.style.backgroundColor='tan';
+        t.style.borderBottom='1px solid gray';
+        t.style.borderRight='1px solid gray';
+        t.style.cursor='pointer';
+    }
+}
+</script>
+</head>
+<body onload="javascript:toggle_display('t0','p0')">
+<div id="frame">
+<div id="toptitle">
+    Python Extension to the Swiss <img src="switzerland_coa.png"/> Ephemeris
+</div>
+<div id="links">
+<div class="sep">
+    Pyswisseph
+</div>
+<div class="link" onclick="javascript:redirect('http://pypi.python.org/pypi/pyswisseph')">
+    Downloads
+</div>
+<div class="link" onclick="javascript:redirect('./epydoc')">
+    API Docs
+</div>
+<div class="link" onclick="javascript:redirect('https://github.com/astrorigin/pyswisseph')">
+    Fork on GitHub
+</div>
+<div class="link" onclick="javascript:redirect('http://www.gnu.org/licenses/old-licenses/gpl-2.0.html')">
+    GNU GPL v2
+</div>
+<div class="sep">
+    Links
+</div>
+<div class="link" onclick="javascript:redirect('http://www.astro.com')">
+    AstroDienst
+</div>
+<div class="link" onclick="javascript:redirect('http://www.python.org')">
+    Python.org
+</div>
+</div><!-- /Links -->
+<div id="main">
+<div class="title" id="t0" onclick="">
+    Introduction
+</div>
+<div class="text" id="p0" style="display:none">
+<p>
+    The Swiss Ephemeris is the high precision ephemeris developed by Astrodienst,
+    largely based upon the DExxx ephemerides from NASA's JPL. The original release
+    in 1997 was based on the DE405/406 ephemeris. Since release 2.00 in February
+    2014, it is based on the DE431 ephemeris released by JPL in September 2013.
+</p>
+<p>
+    The Python Extension to the Swiss Ephemeris (or pyswisseph, or python-swisseph
+    as you wish) brings the functionalities of the original C library to the Python
+    programming language.
+</p>
+</div>
+<div class="title" id="t1" onclick="javascript:toggle_display('t1','p1')"
+    onmouseover="title_hl('t1')" onmouseout="javascript:title_ll('t1')">
+    Legal
+</div>
+<div class="text" id="p1" style="display:none">
+<p>
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+</p>
+</div>
+<div class="title" id="t2" onclick="javascript:toggle_display('t2','p2')"
+    onmouseover="title_hl('t2')" onmouseout="javascript:title_ll('t2')">
+    Installation (gcc)
+</div>
+<div class="text" id="p2" style="display:none">
+<p>
+    The usual way. Download the package, open a terminal, uncompress the archive,
+    go in the newly created directory, execute the setup script and celebrate.
+</p>
+<code>
+    tar jvxf pyswisseph-2.00.00-x.tar.bz2<br/>
+    cd pyswisseph-2.00.00-x<br/>
+    sudo python setup.py install
+</code>
+<p>
+    If you are on a Debian or Ubuntu flavoured linux, you may have the libswe-dev
+    package already installed. Which will be detected and used to build the module.
+</p>
+</div>
+<div class="title" id="t3" onclick="javascript:toggle_display('t3','p3')"
+    onmouseover="title_hl('t3')" onmouseout="javascript:title_ll('t3')">
+    Installation (windows)
+</div>
+<div class="text" id="p3" style="display:none">
+<p>
+    Compilation on windows systems goes the cmake way. You will have to get the
+    software from <a href="http://cmake.org">their website</a>.
+</p>
+</div>
+<hr/>
+<div class="footer">
+    Pyswisseph &copy; 2007-2014 <a href="mailto:smarquis_at_astrorigin_ch">Stanislas Marquis</a>
+    &nbsp;|&nbsp;
+    Swiss Ephemeris &copy; 2014 AstroDienst AG
+</div>
+</div><!-- /Main -->
+</body>
+</html>
