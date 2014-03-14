@@ -14,7 +14,7 @@ MANIFEST
 build*
 dist*
 doc
-epydoc*
+epydoc/*
 make.py
 manifest
 src
