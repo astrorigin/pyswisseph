@@ -77,7 +77,11 @@ if swe_detection:
     print('Searching system libswe...')
     try:
         import subprocess
-        subprocess.check_output(['pkg-config'], stderr=subprocess.STDOUT)
+        try:
+            subprocess.check_output(['pkg-config'], stderr=subprocess.STDOUT)
+        except AttributeError: # < Python 2.7
+            # detection without pkg-config (or use popen)
+            pass
     except subprocess.CalledProcessError:
         has_pkgconfig = True
         print('Found pkg-config')
