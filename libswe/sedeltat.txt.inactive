@@ -1,0 +1,13 @@
+# This file allows to make new Delta T known to the Swiss Ephemeris.
+# Note, these values override the values given in the internal Delta T
+# table of the Swiss Ephemeris.
+#
+# If you want to use this file, change its file name and remove the
+# the extension '.inactive'. As soon as you do so, the values below
+# will be used, i.e. they will override the internal Delta T values
+# of the Swiss Ephemeris. 
+#
+# Format: year and seconds (decimal)
+2007 65.15
+2008 65.46
+2009 65.78

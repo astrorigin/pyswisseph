@@ -1,7 +1,7 @@
 /*
     Swephelp
 
-    Copyright 2007-2011 Stanislas Marquis <stnsls@gmail.com>
+    Copyright 2007-2014 Stanislas Marquis <smarquis@astrorigin.ch>
 
     Swephelp is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -44,8 +44,10 @@
 #include "swhdef.h"
 #include "swhformat.h"
 #include "swhgeo.h"
+#include "swhmisc.h"
 #include "swhraman.h"
 #include "swhsearch.h"
 #include "swhutil.h"
 
 #endif /* SWEPHELP_H */
+/* vi: set fenc=utf-8 ff=unix et sw=4 ts=4 sts=4 : */

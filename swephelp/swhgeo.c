@@ -1,7 +1,7 @@
 /*
     Swephelp
 
-    Copyright 2007-2011 Stanislas Marquis <stnsls@gmail.com>
+    Copyright 2007-2014 Stanislas Marquis <smarquis@astrorigin.ch>
 
     Swephelp is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -21,19 +21,13 @@
 ** @brief Geographical utilities (latitude, longitude, altitude)
 */
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-#include "swhgeo.h"
-
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "swhgeo.h"
 #include "swhwin.h"
 
 /** @brief Get double from latitude or longitude string
@@ -49,7 +43,10 @@ extern "C"
 */
 int swh_geoc2d(const char *coord, double *ret)
 {
-    int deg, dir, min, sec, degmax;
+    int deg, dir, min, sec;
+#ifndef NDEBUG
+    int degmax; /* used in asserts only */
+#endif
     char *ptr, buf[12];
     strcpy(buf, coord);
 #ifndef WIN32
@@ -74,12 +71,16 @@ int swh_geoc2d(const char *coord, double *ret)
     {
         if (strcmp(ptr, "N") == 0 || strcmp(ptr, "E") == 0)
         {
+#ifndef NDEBUG
             degmax = 90;
+#endif
             dir = 1;
         }
         else if (strcmp(ptr, "S") == 0 || strcmp(ptr, "W") == 0)
         {
+#ifndef NDEBUG
             degmax = 180;
+#endif
             dir = 0;
         }
         else
@@ -167,6 +168,4 @@ int swh_geod2c(double coord, int maxdeg, char *ret)
     return 0;
 }
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
+/* vi: set fenc=utf-8 ff=unix et sw=4 ts=4 sts=4 : */

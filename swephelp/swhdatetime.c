@@ -1,7 +1,7 @@
 /*
     Swephelp
 
-    Copyright 2007-2011 Stanislas Marquis <stnsls@gmail.com>
+    Copyright 2007-2014 Stanislas Marquis <smarquis@astrorigin.ch>
 
     Swephelp is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -21,13 +21,6 @@
 ** @brief swephelp date and time functions
 */
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-#include "swhdatetime.h"
-
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -37,6 +30,7 @@ extern "C"
 
 #include <swephexp.h>
 
+#include "swhdatetime.h"
 #include "swhwin.h"
 
 /** @brief Get current Julian day number, Gregorian calendar
@@ -171,6 +165,4 @@ int swh_dt2i(const char *dt, int *ret)
     return 0;
 }
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
+/* vi: set fenc=utf-8 ff=unix et sw=4 ts=4 sts=4 : */

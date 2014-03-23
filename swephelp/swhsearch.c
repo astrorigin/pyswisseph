@@ -1,7 +1,7 @@
 /*
     Swephelp
 
-    Copyright 2007-2011 Stanislas Marquis <stnsls@gmail.com>
+    Copyright 2007-2014 Stanislas Marquis <smarquis@astrorigin.ch>
 
     Swephelp is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -21,11 +21,6 @@
 ** @brief swephelp search functions
 */
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include "swhsearch.h"
 
 #include <swephexp.h>
@@ -36,7 +31,7 @@ extern "C"
 static double swh_precision = ((1.0/86400)/2);
 
 /** @def ISPOSITIVE
-** @brief Return 1 if x is greater than 0, else return 0
+** @brief Return 1 if x is greater than 0, else return 0 (!)
 */
 #define ISPOSITIVE(x)   ((x) > 0 ? 1 : 0)
 
@@ -1046,6 +1041,4 @@ int swh_years_diff(double jd1, double jd2, int flag, double *years, char *err)
     return 0;
 }
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
+/* vi: set fenc=utf-8 ff=unix et sw=4 ts=4 sts=4 : */

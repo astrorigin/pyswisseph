@@ -1,36 +1,24 @@
-# Pyswisseph - git ignore
+# Pyswisseph - gitignore
 
-# Precompiled Python files
+*~
+*.a
+*.bak
+*.o
 *.pyc
 *.pyo
-
-# Backup files
-*~
-*.bak
-
-# Objects files
-*.o
-*.a
-
-# Zip files
+*.prj
+*.pui
 *.zip
 
-# UltraEdit files
-*.pui
-*.prj
-
-# Swisseph sources
-swe_unix_src*
-doc
-src
-
-#  Others
-index.html
 MANIFEST
-manifest
-dist*
 build*
-win*
-test*
-pydoc*
-CMakeLists.txt
+dist*
+doc
+epydoc/*
+make.py
+manifest
+src
+swe_unix_src*
+swisseph.*.so
+swisseph.so
+

@@ -57,27 +57,21 @@ else()
 endif()
 
 # Find Python libs
-find_package( PythonLibs ${PYSWE_DESIRED_PYTHON_VERSION} EXACT )
+find_package( PythonLibs ${PYSWE_DESIRED_PYTHON_VERSION} )
 if ( NOT PYTHONLIBS_FOUND )
     message( FATAL_ERROR "Cannot find Python libraries (version ${PYSWE_DESIRED_PYTHON_VERSION})" )
 endif()
 
 # Configure cswisseph
-add_subdirectory( src )
+add_subdirectory( libswe )
+
+# Configure swephelp
+if ( PYSWE_USE_SWEPHELP )
+    add_subdirectory( swephelp )
+endif()
 
 # Sources
 set( SOURCES pyswisseph.c )
-
-if ( PYSWE_USE_SWEPHELP )
-    list( APPEND SOURCES
-        swephelp/swhdatetime.c
-        swephelp/swhformat.c
-        swephelp/swhsearch.c
-        swephelp/swhraman.c
-        swephelp/swhgeo.c
-        swephelp/swhutil.c
-        )
-endif()
 
 # Defines
 if ( MSVC )
@@ -91,7 +85,7 @@ else()
 endif()
 
 # Includes
-include_directories( BEFORE src ${PYTHON_INCLUDE_DIRS} )
+include_directories( BEFORE libswe ${PYTHON_INCLUDE_DIRS} )
 
 if ( PYSWE_USE_SWEPHELP )
     include_directories( BEFORE swephelp )
@@ -100,6 +94,9 @@ endif()
 # Target
 add_library( swisseph MODULE ${SOURCES} )
 add_dependencies( swisseph swe )
+if ( PYSWE_USE_SWEPHELP )
+    add_dependencies( swisseph swephelp )
+endif()
 
 # Linkage
 if ( MSVC )
@@ -110,6 +107,9 @@ elseif( MINGW )
 else()
     target_link_libraries( swisseph swe m ${PYTHON_LIBRARIES}
         -pthread -Wl,-O1 -Wl,-Bsymbolic-functions )
+endif()
+if ( PYSWE_USE_SWEPHELP )
+    target_link_libraries( swisseph swephelp )
 endif()
 
 # Target properties
@@ -122,4 +122,4 @@ else()
     set_target_properties( swisseph PROPERTIES PREFIX "" )
 endif()
 
-# vi: set ai et sw=4:
+# vi: set fenc=utf-8 ff=unix et sw=4 ts=4 sts=4 :

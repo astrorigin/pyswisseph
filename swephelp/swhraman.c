@@ -1,7 +1,7 @@
 /*
     Swephelp
 
-    Copyright 2007-2011 Stanislas Marquis <stnsls@gmail.com>
+    Copyright 2007-2014 Stanislas Marquis <smarquis@astrorigin.ch>
 
     Swephelp is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -20,16 +20,10 @@
 /** @file swhraman.c
 */
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-#include "swhraman.h"
-
 #include <stdlib.h>
 
 #include "swhdef.h"
+#include "swhraman.h"
 
 /** @brief Get Raman houses cusps
 **
@@ -331,6 +325,4 @@ double swh_ochchabala(int graha, double sputha)
     return fabs(swe_difdeg2n(sputha, x)) / 3.0;
 }
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
+/* vi: set fenc=utf-8 ff=unix et sw=4 ts=4 sts=4 : */

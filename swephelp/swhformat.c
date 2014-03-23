@@ -1,7 +1,7 @@
 /*
     Swephelp
 
-    Copyright 2007-2011 Stanislas Marquis <stnsls@gmail.com>
+    Copyright 2007-2014 Stanislas Marquis <smarquis@astrorigin.ch>
 
     Swephelp is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -21,14 +21,9 @@
 ** @brief swephelp formating functions
 */
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include <swephexp.h>
 
 #include "swhformat.h"
-
-#include <swephexp.h>
 
 /** @brief Get degrees, sign number, minutes, seconds, from longitude position
 **
@@ -90,22 +85,25 @@ int swh_house_system_name(char hsys, char *str)
     case 'R': strcpy(str, "Regiomontanus"); return 0;
     case 'C': strcpy(str, "Campanus"); return 0;
     case 'B': strcpy(str, "Alcabitius"); return 0;
+    case 'M': strcpy(str, "Morinus"); return 0;
     case 'O': strcpy(str, "Porphyry"); return 0;
     case 'A': strcpy(str, "Equal"); return 0;
     case 'E': strcpy(str, "Equal"); return 0;
-    case 'H': strcpy(str, "Horizon/azimuth"); return 0;
+    case 'H': strcpy(str, "Horizon/Azimuth"); return 0;
     case 'V': strcpy(str, "Equal Vehlow"); return 0;
-    case 'X': strcpy(str, "Axial rotation/meridian"); return 0;
+    case 'X': strcpy(str, "Axial Rotation/Meridian"); return 0;
     case 'G': strcpy(str, "Gauquelin"); return 0;
+    case 'T': strcpy(str, "Polich/Page"); return 0;
     case 'U': strcpy(str, "Krusinski"); return 0;
-    case 'W': strcpy(str, "Whole sign"); return 0;
+    case 'W': strcpy(str, "Whole Sign"); return 0;
+    case 'Y': strcpy(str, "APC Houses"); return 0;
     default: return -1;
     }
 }
 
 /** @brief Get house system unique id
 ** @param hsys House system char identifier (see swisseph docs)
-** @return Identifier, or -1 if house system invalid
+** @return A numerical identifier, or -1 if house system invalid
 */
 int swh_house_system_id(char hsys)
 {
@@ -116,22 +114,25 @@ int swh_house_system_id(char hsys)
     case 'R': return 2;
     case 'C': return 3;
     case 'B': return 4;
-    case 'O': return 5;
-    case 'A': return 6;
-    case 'E': return 6; /* same */
-    case 'H': return 7;
-    case 'V': return 8;
-    case 'X': return 9;
-    case 'G': return 10;
-    case 'U': return 11;
-    case 'W': return 12;
+    case 'M': return 5;
+    case 'O': return 6;
+    case 'A': return 7;
+    case 'E': return 7; /* same */
+    case 'H': return 8;
+    case 'V': return 9;
+    case 'X': return 10;
+    case 'G': return 11;
+    case 'T': return 12;
+    case 'U': return 13;
+    case 'W': return 14;
+    case 'Y': return 15;
     default: return -1;
     }
 }
 
 /** @brief Get house system char
 ** @param hsys House system int identifier
-** @return iIdentifier, or -1 if house system invalid
+** @return Identifier, or -1 if house system invalid
 */
 char swh_house_system_char(int hsys)
 {
@@ -142,15 +143,18 @@ char swh_house_system_char(int hsys)
     case 2: return 'R';
     case 3: return 'C';
     case 4: return 'B';
-    case 5: return 'O';
-    case 6: return 'A';
-    /* case 6: return 'E'; / same */
-    case 7: return 'H';
-    case 8: return 'V';
-    case 9: return 'X';
-    case 10: return 'G';
-    case 11: return 'U';
-    case 12: return 'W';
+    case 5: return 'M';
+    case 6: return 'O';
+    case 7: return 'A';
+    /* case 7: return 'E'; / same */
+    case 8: return 'H';
+    case 9: return 'V';
+    case 10: return 'X';
+    case 11: return 'G';
+    case 12: return 'T';
+    case 13: return 'U';
+    case 14: return 'W';
+    case 15: return 'Y';
     default: return -1;
     }
 }
@@ -182,6 +186,4 @@ int swh_sidereal_mode_id(int sidmode)
     else return -1;
 }
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
+/* vi: set fenc=utf-8 ff=unix et sw=4 ts=4 sts=4 : */

@@ -1,0 +1,9 @@
+*.c text eol=lf
+*.cfg text eol=lf
+*.h text eol=lf
+*.html text eol=lf
+*.in text eol=lf
+Makefile text eol=lf
+*.py text eol=lf
+*.TXT text eol=lf
+*.txt text eol=lf

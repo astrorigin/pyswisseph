@@ -1,5 +1,4 @@
 # Swisseph CMakeLists.txt
-# Put it inside 'src' directory.
 
 cmake_minimum_required( VERSION 2.8 )
 project( cswisseph )

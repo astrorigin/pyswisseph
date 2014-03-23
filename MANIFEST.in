@@ -1,7 +1,7 @@
-include README.txt
-include swisseph.html
-include doc/*
-include src/*
-include swephelp/*.h
-include pydoc/*
-include cmake/*
+include COPYING.TXT
+include README.TXT
+include debian/*
+include epydoc/*
+include libswe/*
+include swephelp/*
+
