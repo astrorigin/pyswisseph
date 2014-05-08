@@ -63,6 +63,11 @@ use_swephelp = True
 # Compile flags
 cflags = ['-std=gnu99']
 
+# Fix Clang error on OSX
+import sys
+if sys.platform == 'darwin':
+    cflags.append('-Wno-error=unused-command-line-argument-hard-error-in-future') 
+
 # Link flags
 ldflags = []
 
