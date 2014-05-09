@@ -43,6 +43,9 @@
 */
 int swh_geoc2d(const char *coord, double *ret)
 {
+#ifndef WIN32
+    char *saveptr; /* for strtok_r */
+#endif
     int deg, dir, min, sec;
 #ifndef NDEBUG
     int degmax; /* used in asserts only */
@@ -50,7 +53,6 @@ int swh_geoc2d(const char *coord, double *ret)
     char *ptr, buf[12];
     strcpy(buf, coord);
 #ifndef WIN32
-    char *saveptr;
     ptr = strtok_r(buf, ":", &saveptr);
 #else
     ptr = strtok(buf, ":");

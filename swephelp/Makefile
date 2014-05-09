@@ -1,9 +1,9 @@
 # Swephelp makefile
 
 CC = gcc
-CFLAGS += -g -O9 -Wall -std=gnu99
+CFLAGS += -g -O9 -Wall -Werror=declaration-after-statement -std=gnu99
 # path to swisseph
-INCS = -I. -I./libswe
+INCS = -I. -I../libswe
 
 SWHOBJ = swhdatetime.o swhformat.o swhgeo.o swhmisc.o swhraman.o swhsearch.o swhutil.o
 
