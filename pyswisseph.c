@@ -284,7 +284,8 @@ static PyObject * pyswe_fixstar FUNCARGS_KEYWDS
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
         &star, &jd, &flag))
         return NULL;
-    strcpy(st, star);
+    memset(st, 0, 41);
+    strncpy(st, star, 40);
     ret = swe_fixstar(st, jd, flag, val, err);
     if (ret < 0)
     {
@@ -309,7 +310,8 @@ static PyObject * pyswe_fixstar_ut FUNCARGS_KEYWDS
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
         &star, &jd, &flag))
         return NULL;
-    strcpy(st, star);
+    memset(st, 0, 41);
+    strncpy(st, star, 40);
     ret = swe_fixstar_ut(st, jd, flag, val, err);
     if (ret < 0)
     {
@@ -1742,7 +1744,8 @@ static PyObject * pyswe_fixstar_mag FUNCARGS_KEYWDS
     static char *kwlist[] = {"star", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &star))
         return NULL;
-    strcpy( st, star );
+    memset(st, 0, 41);
+    strncpy(st, star, 40);
     ret = swe_fixstar_mag(st, &mag, err);
     if (ret < 0)
     {
