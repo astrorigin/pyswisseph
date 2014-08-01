@@ -139,8 +139,11 @@ function title_ll( tid )
     t.style.borderBottom='1px solid gray';
     t.style.borderRight='1px solid gray';
 }
-function toggle_display( tid, pid, recursive=true )
+function toggle_display( tid, pid, recursive )
 {
+    if(recursive==undefined){
+        recursive=true;
+    }
     var t=document.getElementById(tid)
     var p=document.getElementById(pid);
     if (recursive && activeTitle!=null){
