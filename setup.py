@@ -50,7 +50,7 @@ Standard installation (unixes): ``# python setup.py install``
 VERSION = '2.00.00-2'
 
 # Corresponding swisseph version string
-swe_version = '2.00.00'
+swe_version = '2.01.00'
 
 # libswe-dev detection
 # Set to True to find libswe in system.
