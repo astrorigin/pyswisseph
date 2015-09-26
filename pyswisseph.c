@@ -760,7 +760,7 @@ static PyObject * pyswe_utc_time_zone FUNCARGS_KEYWDS
         &y, &m, &d, &h, &mi, &s, &tz))
         return NULL;
     swe_utc_time_zone(y, m, d, h, mi, s, tz, &y2, &m2, &d2, &h2, &mi2, &s2);
-    return Py_BuildValue("(iiiiii)", y2, m2, d2, h2, mi2, s2);
+    return Py_BuildValue("(iiiiid)", y2, m2, d2, h2, mi2, s2);
 }
 
 /* swisseph.deltat */
