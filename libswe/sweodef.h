@@ -75,6 +75,20 @@
 # define MY_TRUE 1	/* for use in other defines, before TRUE is defined */
 # define MY_FALSE 0	/* for use in other defines, before TRUE is defined */
 
+/* TLS support
+ *
+ * Sun Studio C/C++, IBM XL C/C++, GNU C and Intel C/C++ (Linux systems) -> __thread
+ * Borland, VC++ -> __declspec(thread)
+ */
+#if !defined(TLSOFF) && !defined( __APPLE__ ) && !defined(WIN32) && !defined(DOS32)
+#if defined( __GNUC__ )
+#define TLS     __thread
+#else
+#define TLS     __declspec(thread)
+#endif
+#else
+#define TLS
+#endif
 
 #ifdef _WIN32		/* Microsoft VC 5.0 does not define MSDOS anymore */
 # undef MSDOS
@@ -135,12 +149,10 @@
 #  ifndef TURBO_C
 #    define MS_C	/* assume Microsoft C compiler */
 #  endif
-# define MYFAR far
 # define UNIX_FS MY_FALSE
 #else
 # ifdef MACOS
 #  define HPUNIX MY_FALSE
-#  define MYFAR
 #  define UNIX_FS MY_FALSE
 # else
 #  define MSDOS MY_FALSE
@@ -148,7 +160,6 @@
 #  ifndef _HPUX_SOURCE
 #    define _HPUX_SOURCE
 #  endif
-#  define MYFAR
 #  define UNIX_FS MY_TRUE
 # endif
 #endif
@@ -255,8 +266,12 @@ typedef unsigned char UCHAR;
 
 #define AS_MAXCH 256    /* used for string declarations, allowing 255 char+\0 */
  
+/*
 #define DEGTORAD 0.0174532925199433
 #define RADTODEG 57.2957795130823
+*/
+#define RADTODEG (180.0 / M_PI)
+#define DEGTORAD (M_PI / 180.0)
  
 typedef int32    centisec;       /* centiseconds used for angles and times */
 #define CS	(centisec)	/* use for casting */
@@ -275,8 +290,10 @@ typedef int32    centisec;       /* centiseconds used for angles and times */
 #define DEG270  (270 * DEG)
 #define DEG360  (360 * DEG)
  
-#define CSTORAD  4.84813681109536E-08 /* centisec to rad: pi / 180 /3600/100 */
-#define RADTOCS  2.06264806247096E+07 /* rad to centisec 180*3600*100/pi */
+/* #define CSTORAD  4.84813681109536E-08  centisec to rad: pi / 180 /3600/100 */
+/* #define RADTOCS  2.06264806247096E+07  rad to centisec 180*3600*100/pi */
+#define CSTORAD	(DEGTORAD / 360000.0)
+#define RADTOCS (RADTODEG * 360000.0)
  
 #define CS2DEG	(1.0/360000.0)	/* centisec to degree */
 

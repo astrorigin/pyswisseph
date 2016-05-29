@@ -47,10 +47,10 @@ Standard installation (unixes): ``# python setup.py install``
 # Pyswisseph version string
 # Our version string gets the version of the swisseph library (x.xx.xx)
 # and our increment as suffix (-x).
-VERSION = '2.00.00-2'
+VERSION = '2.05.01-0'
 
 # Corresponding swisseph version string
-swe_version = '2.01.00'
+swe_version = '2.05.01'
 
 # libswe-dev detection
 # Set to True to find libswe in system.
@@ -139,14 +139,13 @@ else: # using internal libswe
         'libswe/swejpl.c',
         'libswe/swemmoon.c',
         'libswe/swemplan.c',
-        #libswe/swemptab.c # included c file goes in depends
         'libswe/swepcalc.c',
         'libswe/sweph.c',
         'libswe/swephlib.c']
     swe_depends = [
         'libswe/swedate.h',
         'libswe/swehouse.h',
-        'libswe/swemptab.c',
+        'libswe/swemptab.h',
         'libswe/swenut2000a.h',
         'libswe/swepcalc.h',
         'libswe/sweph.h',

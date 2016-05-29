@@ -1,16 +1,16 @@
 # $Header$
-# this Makefie creates a SwissEph library and a swetest sample on HP-Unix 10.20
-# It has also been used successfully on Suse Linix 5.3
+# this Makefile creates a SwissEph library and a swetest sample on 64-bit
+# Redhat Enterprise Linux RHEL 6.
 
 # The mode marked as 'Linux' should also work with the GNU C compiler
-# gcc on other systems. It is known to work with gcc on Solaris.
+# gcc on other systems. 
 
 # If you modify this makefile for another compiler, please
 # let us know. We would like to add as many variations as possible.
 # If you get warnings and error messages from your compiler, please
 # let us know. We like to fix the source code so that it compiles
 # free of warnings.
-# send email to swisseph@astro.ch
+# send email to the Swiss Ephemeris mailing list.
 #
 
 CFLAGS = -g -Wall -fPIC  	# for Linux and other gcc systems
@@ -53,7 +53,7 @@ swehouse.o: swephexp.h sweodef.h swedll.h swephlib.h swehouse.h
 swejpl.o: swephexp.h sweodef.h swedll.h sweph.h swejpl.h
 swemini.o: swephexp.h sweodef.h swedll.h
 swemmoon.o: swephexp.h sweodef.h swedll.h sweph.h swephlib.h
-swemplan.o: swephexp.h sweodef.h swedll.h sweph.h swephlib.h swemptab.c
+swemplan.o: swephexp.h sweodef.h swedll.h sweph.h swephlib.h swemptab.h
 swepcalc.o: swepcalc.h swephexp.h sweodef.h swedll.h
 sweph.o: swejpl.h sweodef.h swephexp.h swedll.h sweph.h swephlib.h
 swephlib.o: swephexp.h sweodef.h swedll.h sweph.h swephlib.h

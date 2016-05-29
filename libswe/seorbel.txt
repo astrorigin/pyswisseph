@@ -66,6 +66,14 @@ J1900,JDATE, 170.73, 79.225630, 0, 0, 0, 0, Proserpina #18
 # Neither Swisseph nor Solar fire elements agree with Delphine Jay's ephemeris,
 # which is obviously wrong.
 2414290.95827875,2414290.95827875, 70.3407215 + 109023.2634989 * T, 0.0068400705250028, 0.1587, 8.14049594 + 2393.47417444 * T, 136.24878256 - 1131.71719709 * T, 2.5, Waldemath, geo # 19
+# Colin R. Nicholl's Comet, according to "The Great Christ Comet", p. 223.
+1719500.7, J2000, 0.0, 1190.0, 0.9999, 9.47, 200.08, 178.3, Christ Comet # 20
+# Planet 9, according to: Fienga & alii, Constraints on the location of a
+# possible 9th planet, Astronomy & Astrophysics no. FiengaLaskar2016R5. The
+# authors provide true anomaly 117.8. Mean anomaly derived by D. Koch
+2457388.5,J2000,45.5272966,700,0.6,150,113,30,Planet_9 # 21
+# Comet Halley 12 BCE
+1717323.349, J2000, 0.0, 17.99571, 0.96737, 92.559, 35.904, 163.489, Halley 12BC # 21
 #
 # The following elements are for test only
 # (Selena without T)
