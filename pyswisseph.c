@@ -780,7 +780,7 @@ static PyObject * pyswe_deltat FUNCARGS_KEYWDS
 
 /* swisseph.time_equ */
 static char pyswe_time_equ__doc__[] =
-"Calculate equation of time (ET).\n\n"
+"Calculate equation of time (UT).\n\n"
 "Args: float julday\n"
 "Return: float";
 
