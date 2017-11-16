@@ -10,6 +10,6 @@ It features a collection of functions frequently used in astrology applications.
 Functions for dates and time, geographical information, indian astrology,
 transits search, constant values for aspects, signs, planets...
 
-Stanislas Marquis <smarquis@astrorigin.ch>
+Stanislas Marquis <stan@astrorigin.com>
 
 ..

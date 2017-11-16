@@ -6,7 +6,7 @@ This package contains the Python extension to the Swiss Ephemeris
 (or Pyswisseph, or python-swisseph as you wish), along with the
 SwissEph source code itself, created by AstroDienst.
 
-  - Pyswisseph Homepage:    http://astrorigin.ch/pyswisseph
+  - Pyswisseph Homepage:    https://astrorigin.com/pyswisseph
   - Downloads source:       http://pypi.python.org/pypi/pyswisseph
   - Fork me on GitHub:      https://github.com/astrorigin/pyswisseph
   - AstroDienst:            http://www.astro.com/swisseph
@@ -18,9 +18,9 @@ Linux & Unix-like systems with GCC
 To install in sites-packages, just the usual way:
 
     « python setup.py install »
-  
+
 To build the extension only:
-    
+
     « python setup.py build »
 
 
@@ -52,6 +52,8 @@ Contact
 =======
 
 Any feedback about Pyswisseph is welcome:
-Stanislas Marquis <smarquis@astrorigin.ch>
+Stanislas Marquis <stan@astrorigin.com>
+
+ircs://chat.freenode.net:6697/pyswisseph
 
 ..

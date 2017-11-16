@@ -1,7 +1,7 @@
 /*
     Swephelp
 
-    Copyright 2007-2014 Stanislas Marquis <smarquis@astrorigin.ch>
+    Copyright 2007-2017 Stanislas Marquis <stan@astrorigin.com>
 
     Swephelp is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as

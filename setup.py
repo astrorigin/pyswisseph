@@ -3,7 +3,7 @@
 
 #   This file is part of Pyswisseph.
 #
-#   Copyright (c) 2007-2014 Stanislas Marquis <smarquis@astrorigin.ch>
+#   Copyright (c) 2007-2017 Stanislas Marquis <stan@astrorigin.com>
 #
 #   Pyswisseph is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ cflags = ['-std=gnu99']
 # Fix Clang error on OSX
 import sys
 if sys.platform == 'darwin':
-    cflags.append('-Wno-error=unused-command-line-argument-hard-error-in-future') 
+    cflags.append('-Wno-error=unused-command-line-argument-hard-error-in-future')
 
 # Link flags
 ldflags = []
@@ -203,7 +203,7 @@ swemodule = Extension(
     extra_link_args = ldflags,
     include_dirs = includes,
     libraries = swe_libs,
-    sources = sources 
+    sources = sources
     )
 
 setup(
@@ -212,8 +212,8 @@ setup(
     description = 'Python extension to the Swiss Ephemeris',
     long_description = __doc__,
     author = 'Stanislas Marquis',
-    author_email = 'smarquis@astrorigin.ch',
-    url = 'http://astrorigin.ch/pyswisseph',
+    author_email = 'stan@astrorigin.com',
+    url = 'https://astrorigin.com/pyswisseph',
     download_url = 'http://pypi.python.org/pypi/pyswisseph',
     classifiers = [
         'Development Status :: 5 - Production/Stable',

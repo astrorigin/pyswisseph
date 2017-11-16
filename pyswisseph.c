@@ -1,7 +1,7 @@
 /*
     This file is part of Pyswisseph.
 
-    Copyright (c) 2007-2014 Stanislas Marquis <smarquis@astrorigin.ch>
+    Copyright (c) 2007-2017 Stanislas Marquis <stan@astrorigin.com>
 
     Pyswisseph is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
  *
  *  Python extension to the Swiss Ephemeris
  *
- *  Author/maintainer: Stanislas Marquis <smarquis@astrorigin.ch>
- *  Homepage: http://astrorigin.ch/pyswisseph
+ *  Author/maintainer: Stanislas Marquis <stan@astrorigin.com>
+ *  Homepage: https://astrorigin.com/pyswisseph
  *
  *  Swisseph authors: Alois Treindl, Dieter Koch (et al.)
  *  Swisseph homepage: http://www.astro.com/swisseph
@@ -4329,7 +4329,7 @@ static char pyswe_module_documentation[] =
 " to \"" PYSWE_DEFAULT_EPHE_PATH "\".\n\n"
 #endif
 "Extended documentation can be found on AstroDienst website.\n\n"
-"    Pyswisseph homepage: http://astrorigin.ch/pyswisseph/\n"
+"    Pyswisseph homepage: https://astrorigin.com/pyswisseph/\n"
 "    AstroDienst: http://www.astro.com/swisseph/\n"
 "    PyPI: http://pypi.python.org/pypi/pyswisseph/";
 
