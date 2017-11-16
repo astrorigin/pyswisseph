@@ -17,6 +17,8 @@ doc
 epydoc/*
 make.py
 manifest
+pyswisseph.egg-info/*
+setup.cfg
 src
 swe_unix_src*
 swisseph.*.so
