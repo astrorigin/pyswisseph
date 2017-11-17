@@ -21,13 +21,15 @@
 ** @brief swephelp windowz specific header
 */
 
-/* define WIN32 for MSVC compilers */
-#ifdef _WIN32
-#define WIN32
-#endif
-
 #ifndef SWHWIN_H
 #define SWHWIN_H
+
+/* define WIN32 for MSVC compilers */
+#ifdef _WIN32
+#ifndef WIN32
+#define WIN32
+#endif
+#endif
 
 #ifdef WIN32
 
