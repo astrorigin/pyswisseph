@@ -1,0 +1,34 @@
+﻿==========
+Pyswisseph
+==========
+
+-----------------------------------------------
+Python extension to AstroDienst Swiss Ephemeris
+-----------------------------------------------
+
+License
+-------
+
+  - Either `GNU Public License`_ v2 or later
+  - or `Swiss Ephemeris Professional License`_
+
+Download
+--------
+
+  - Sources are at the `Python Package Index`_
+  - Latest development version on `GitHub`_
+
+Links
+-----
+
+  - Online `API documentation`_
+  - `AstroDienst`_
+
+.. _`GNU Public License`: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+.. _`Swiss Ephemeris Professional License`: http://www.astro.com/swisseph/
+.. _`Python Package Index`: http://pypi.python.org/pypi/pyswisseph
+.. _`GitHub`: https://github.com/astrorigin/pyswisseph
+.. _`API documentation`: ./pydoc/index.html
+.. _`AstroDienst`: http://www.astro.com
+
+.. rst2html5.py --title=Pyswisseph index.txt index.html
