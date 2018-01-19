@@ -12,35 +12,6 @@ SwissEph source code itself, created by AstroDienst.
   - AstroDienst:            http://www.astro.com/swisseph
 
 
-Linux & Unix-like systems with GCC
-==================================
-
-To install in sites-packages, just the usual way:
-
-    « python setup.py install »
-
-To build the extension only:
-
-    « python setup.py build »
-
-
-Windows
-=======
-
-With Windows, it is recommended to use MSVC 201x or MinGW, with help of
-the CMake build system.
-
-    -> CMake website: http://cmake.org/
-
-Please note:
-
-MinGW: directory separator of PYSWE_DEFAULT_EPHE_PATH must be entered as a
-triple backslash: "\\\".   Eg: C:\\\swisseph\\\ephe
-
-MSVC: directory separator of PYSWE_DEFAULT_EPHE_PATH must be entered as a
-double backslash: "\\".   Eg: C:\\swisseph\\ephe
-
-
 Licensing
 =========
 
