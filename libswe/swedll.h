@@ -81,8 +81,17 @@ extern "C" {
 # endif
 #endif
 
+/* DLL defines
+  Define UNDECO_DLL for un-decorated dll
+  verify compiler option __cdecl for un-decorated and __stdcall for decorated */
+/*#define UNDECO_DLL */
+
 #if defined (PASCAL) || defined(__stdcall)
-  #define CALL_CONV_IMP __stdcall 
+  #if defined UNDECO_DLL
+    #define CALL_CONV_IMP __cdecl
+  #else
+    #define CALL_CONV_IMP __stdcall
+  #endif 
 #else
   #define CALL_CONV_IMP 
 #endif
@@ -120,6 +129,19 @@ DllImport int32 CALL_CONV_IMP swe_fixstar_ut(
         char *serr);
 
 DllImport int32 CALL_CONV_IMP swe_fixstar_mag(
+        char *star, double *xx, char *serr);
+
+DllImport int32 CALL_CONV_IMP swe_fixstar2(
+        char *star, double tjd, int32 iflag, 
+        double *xx,
+        char *serr);
+
+DllImport int32 CALL_CONV_IMP swe_fixstar2_ut(
+        char *star, double tjd_ut, int32 iflag, 
+        double *xx,
+        char *serr);
+
+DllImport int32 CALL_CONV_IMP swe_fixstar2_mag(
         char *star, double *xx, char *serr);
 
 DllImport double CALL_CONV_IMP swe_sidtime0(double tjd_ut, double ecl, double nut);
@@ -214,7 +236,8 @@ DllImport void  CALL_CONV_IMP swe_cotrans_sp(double *xpo, double *xpn, double ep
 
 DllImport void  CALL_CONV_IMP swe_set_topo(double geolon, double geolat, double height);
 
-DllImport void  CALL_CONV_IMP swe_set_astro_models(int32 *imodel);
+DllImport void CALL_CONV_IMP swe_set_astro_models(char *samod, int32 iflag);
+DllImport void CALL_CONV_IMP swe_get_astro_models(char *samod, char *sdet, int32 iflag);
 
 /**************************** 
  * from swecl.c 
@@ -347,6 +370,8 @@ DllImport char * CALL_CONV_IMP swe_cs2timestr(CSEC t, int sep, AS_BOOL suppressZ
 DllImport char * CALL_CONV_IMP swe_cs2lonlatstr(CSEC t, char pchar, char mchar, char *s);
 
 DllImport char * CALL_CONV_IMP swe_cs2degstr(CSEC t, char *a);
+
+DllImport void CALL_CONV_IMP swe_set_interpolate_nut(AS_BOOL do_interpolate);
 
 
 /* additional functions for antiquated GFA basic DLL interface.

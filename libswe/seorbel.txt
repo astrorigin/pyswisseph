@@ -73,7 +73,9 @@ J1900,JDATE, 170.73, 79.225630, 0, 0, 0, 0, Proserpina #18
 # authors provide true anomaly 117.8. Mean anomaly derived by D. Koch
 2457388.5,J2000,45.5272966,700,0.6,150,113,30,Planet_9 # 21
 # Comet Halley 12 BCE
-1717323.349, J2000, 0.0, 17.99571, 0.96737, 92.559, 35.904, 163.489, Halley 12BC # 21
+1717323.349, J2000, 0.0, 17.99571, 0.96737, 92.559, 35.904, 163.489, Halley 12BC # 22
+# 2015 RR245
+2457600.5,J2000,322.50413,81.2891975,0.5852663,261.41753,211.67680,7.57643,2015 RR245 # 23
 #
 # The following elements are for test only
 # (Selena without T)
