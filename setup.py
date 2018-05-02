@@ -47,10 +47,10 @@ Standard installation (unixes): ``# python setup.py install``
 # Pyswisseph version string
 # Our version string gets the version of the swisseph library (x.xx.xx)
 # and our increment as suffix (-x).
-VERSION = '2.05.01-0'
+VERSION = '2.07.01-0'
 
 # Corresponding swisseph version string
-swe_version = '2.05.01'
+swe_version = '2.07.01'
 
 # libswe-dev detection
 # Set to True to find libswe in system.
