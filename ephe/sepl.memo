@@ -1,0 +1,15 @@
+sepl.memo
+
+22-nov-1998
+
+What we must do to prepare the release of Swiss Ephemeris Free Edition:
+
+- add copyright notice to every source file
+- define published package
+- publish make files for compiling 
+  - the 32 bit DLL
+  - the 16 bit DLL
+  - a 16 bit MSDOS linkable libary
+  - a 32 bit linkable library
+- extend the documentation with a source description and some
+  build information
