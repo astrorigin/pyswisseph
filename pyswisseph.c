@@ -4496,6 +4496,19 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "SIDM_SS_CITRA", SE_SIDM_SS_CITRA);
     PyModule_AddIntConstant(m, "SIDM_TRUE_CITRA", SE_SIDM_TRUE_CITRA);
     PyModule_AddIntConstant(m, "SIDM_TRUE_REVATI", SE_SIDM_TRUE_REVATI);
+    // Chistabo added - sidereal modes [29 onward]
+    PyModule_AddIntConstant(m, "SIDM_TRUE_PUSHYA", SE_SIDM_TRUE_PUSHYA);
+    PyModule_AddIntConstant(m, "SIDM_GALCENT_RGBRAND", SE_SIDM_GALCENT_RGBRAND);
+    PyModule_AddIntConstant(m, "SIDM_GALEQU_IAU1958", SE_SIDM_GALEQU_IAU1958);
+    PyModule_AddIntConstant(m, "SIDM_GALEQU_TRUE", SE_SIDM_GALEQU_TRUE);
+    PyModule_AddIntConstant(m, "SIDM_GALEQU_MULA", SE_SIDM_GALEQU_MULA);
+    PyModule_AddIntConstant(m, "SIDM_GALALIGN_MARDYKS", SE_SIDM_GALALIGN_MARDYKS);
+    PyModule_AddIntConstant(m, "SIDM_TRUE_MULA", SE_SIDM_TRUE_MULA);
+    PyModule_AddIntConstant(m, "SIDM_GALCENT_MULA_WILHELM", SE_SIDM_GALCENT_MULA_WILHELM);
+    PyModule_AddIntConstant(m, "SIDM_ARYABHATA_522", SE_SIDM_ARYABHATA_522);
+    PyModule_AddIntConstant(m, "SIDM_BABYL_BRITTON", SE_SIDM_BABYL_BRITTON);
+
+    // Chistabo added - sidereal modes end
     PyModule_AddIntConstant(m, "SIDM_USER", SE_SIDM_USER);
 
     PyModule_AddIntConstant(m, "NSIDM_PREDEF", SE_NSIDM_PREDEF);

@@ -2,20 +2,20 @@
 /*******************************************************
 $Header: /home/dieter/sweph/RCS/swehouse.c,v 1.76 2016/02/23 09:48:03 dieter Exp $
 module swehouse.c
-house and (simple) aspect calculation 
+house and (simple) aspect calculation
 
 ************************************************************/
 /* Copyright (C) 1997 - 2008 Astrodienst AG, Switzerland.  All rights reserved.
-  
+
   License conditions
   ------------------
 
   This file is part of Swiss Ephemeris.
-  
+
   Swiss Ephemeris is distributed with NO WARRANTY OF ANY KIND.  No author
   or distributor accepts any responsibility for the consequences of using it,
   or for whether it serves any particular purpose or works at all, unless he
-  or she says so in writing.  
+  or she says so in writing.
 
   Swiss Ephemeris is made available by its authors under a dual licensing
   system. The software developer, who uses any part of Swiss Ephemeris
@@ -23,7 +23,7 @@ house and (simple) aspect calculation
   which are
   a) GNU public license version 2 or later
   b) Swiss Ephemeris Professional License
-  
+
   The choice must be made before the software developer distributes software
   containing parts of Swiss Ephemeris to others, and before any public
   service using the developed software is activated.
@@ -34,7 +34,7 @@ house and (simple) aspect calculation
   See http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
   If the developer choses the Swiss Ephemeris Professional license,
-  he must follow the instructions as found in http://www.astro.com/swisseph/ 
+  he must follow the instructions as found in http://www.astro.com/swisseph/
   and purchase the Swiss Ephemeris Professional Edition from Astrodienst
   and sign the corresponding license contract.
 
@@ -71,31 +71,31 @@ house and (simple) aspect calculation
 static double Asc1(double, double, double, double);
 static double Asc2(double, double, double, double);
 static int CalcH(
-	double th, double fi, double ekl, char hsy, 
+	double th, double fi, double ekl, char hsy,
 	int iteration_count, struct houses *hsp);
-static int sidereal_houses_ecl_t0(double tjde, 
-                           double armc, 
-                           double eps, 
-                           double *nutlo, 
-                           double lat, 
-			   int hsys, 
-                           double *cusp, 
+static int sidereal_houses_ecl_t0(double tjde,
+                           double armc,
+                           double eps,
+                           double *nutlo,
+                           double lat,
+			   int hsys,
+                           double *cusp,
                            double *ascmc);
-static int sidereal_houses_trad(double tjde, 
-                           double armc, 
-                           double eps, 
-                           double nutl, 
-                           double lat, 
-			   int hsys, 
-                           double *cusp, 
+static int sidereal_houses_trad(double tjde,
+                           double armc,
+                           double eps,
+                           double nutl,
+                           double lat,
+			   int hsys,
+                           double *cusp,
                            double *ascmc);
-static int sidereal_houses_ssypl(double tjde, 
-                           double armc, 
-                           double eps, 
-                           double *nutlo, 
+static int sidereal_houses_ssypl(double tjde,
+                           double armc,
+                           double eps,
+                           double *nutlo,
                            double lat,
 			   int hsys, 
-                           double *cusp, 
+                           double *cusp,
                            double *ascmc);
 static int sunshine_solution_makransky(double ramc, double lat, double ecl, struct houses *hsp);
 static int sunshine_solution_treindl(double ramc, double lat, double ecl, struct houses *hsp);
@@ -103,7 +103,7 @@ static int sunshine_solution_treindl(double ramc, double lat, double ecl, struct
 static void test_Asc1();
 #endif
 
-/* housasp.c 
+/* housasp.c
  * cusps are returned in double cusp[13],
  *                           or cusp[37] with house system 'G'.
  * cusp[1...12]	houses 1 - 12
@@ -160,7 +160,7 @@ int CALL_CONV swe_houses(double tjd_ut,
   return retc;
 }
 
-/* housasp.c 
+/* housasp.c
  * cusps are returned in double cusp[13],
  *                           or cusp[37] with house system 'G'.
  * cusp[1...12]	houses 1 - 12
@@ -175,7 +175,7 @@ int CALL_CONV swe_houses(double tjd_ut,
  * ascmc[7] = polasc		* "polar ascendant" (M. Munkasey) *
  */
 int CALL_CONV swe_houses_ex(double tjd_ut,
-                                int32 iflag, 
+                                int32 iflag,
 				double geolat,
 				double geolon,
 				int hsys,
@@ -224,7 +224,7 @@ int CALL_CONV swe_houses_ex(double tjd_ut,
     if (result < 0) return ERR;
     ascmc[9] = xp[1];	// declination in ascmc[9];
   }
-  if (iflag & SEFLG_SIDEREAL) { 
+  if (iflag & SEFLG_SIDEREAL) {
     if (sip->sid_mode & SE_SIDBIT_ECL_T0)
       retc = sidereal_houses_ecl_t0(tjde, armc, eps_mean + nutlo[1], nutlo, geolat, hsys, cusp, ascmc);
     else if (sip->sid_mode & SE_SIDBIT_SSY_PLANE)
@@ -246,7 +246,7 @@ int CALL_CONV swe_houses_ex(double tjd_ut,
 /*
  * houses to sidereal
  * ------------------
- * there are two methods: 
+ * there are two methods:
  * a) the traditional one
  *    houses are computed tropically, then nutation and the ayanamsa
  *    are subtracted.
@@ -254,12 +254,12 @@ int CALL_CONV swe_houses_ex(double tjd_ut,
  *    The house computation is then as follows:
  *
  * Be t the birth date and t0 the epoch at which ayanamsa = 0.
- * 1. Compute the angle between the mean ecliptic at t0 and 
+ * 1. Compute the angle between the mean ecliptic at t0 and
  *    the true equator at t.
- *    The intersection point of these two circles we call the 
- *    "auxiliary vernal point", and the angle between them the 
+ *    The intersection point of these two circles we call the
+ *    "auxiliary vernal point", and the angle between them the
  *    "auxiliary obliquity".
- * 2. Compute the distance of the auxiliary vernal point from the 
+ * 2. Compute the distance of the auxiliary vernal point from the
  *    vernal point at t. (this is a section on the equator)
  * 3. subtract this value from the armc of t = aux. armc.
  * 4. Compute the axes and houses for this aux. armc and aux. obliquity.
@@ -269,13 +269,13 @@ int CALL_CONV swe_houses_ex(double tjd_ut,
  * 6. subtract this distance from all house cusps.
  * 7. subtract ayanamsa_t0 from all house cusps.
  */
-static int sidereal_houses_ecl_t0(double tjde, 
-                           double armc, 
-                           double eps, 
-                           double *nutlo, 
-                           double lat, 
-			   int hsys, 
-                           double *cusp, 
+static int sidereal_houses_ecl_t0(double tjde,
+                           double armc,
+                           double eps,
+                           double *nutlo,
+                           double lat,
+			   int hsys,
+                           double *cusp,
                            double *ascmc)
 {
   int i, j, retc = OK;
@@ -292,7 +292,7 @@ static int sidereal_houses_ecl_t0(double tjde,
   epst0 = swi_epsiln(sip->t0, 0);
   /* cartesian coordinates of an imaginary moving body on the
    * the mean ecliptic of t0; we take the vernal point: */
-  x[0] = x[4] = 1; 
+  x[0] = x[4] = 1;
   x[1] = x[2] = x[3] = x[5] = 0;
   /* to equator */
   swi_coortrf(x, x, -epst0);
@@ -325,7 +325,7 @@ static int sidereal_houses_ecl_t0(double tjde,
   sgn = x[5] / fabs(x[5]);
   for (j = 0; j <= 2; j++)
     xvpx[j] = (x[j] - fac * x[j+3]) * sgn;      /* 1b */
-  /* distance of the auxiliary vernal point from 
+  /* distance of the auxiliary vernal point from
    * the zero point at tjd_et (a section on the equator): */
   swi_cartpol(xvpx, x2);
   dvpx = x2[0] * RADTODEG;                      /* 2 */
@@ -347,12 +347,12 @@ static int sidereal_houses_ecl_t0(double tjde,
 
 /*
  * Be t the birth date and t0 the epoch at which ayanamsa = 0.
- * 1. Compute the angle between the solar system rotation plane and 
+ * 1. Compute the angle between the solar system rotation plane and
  *    the true equator at t.
- *    The intersection point of these two circles we call the 
- *    "auxiliary vernal point", and the angle between them the 
+ *    The intersection point of these two circles we call the
+ *    "auxiliary vernal point", and the angle between them the
  *    "auxiliary obliquity".
- * 2. Compute the distance of the auxiliary vernal point from the 
+ * 2. Compute the distance of the auxiliary vernal point from the
  *    zero point at t. (this is a section on the equator)
  * 3. subtract this value from the armc of t = aux. armc.
  * 4. Compute the axes and houses for this aux. armc and aux. obliquity.
@@ -360,18 +360,18 @@ static int sidereal_houses_ecl_t0(double tjde,
  *    and the zero point of the solar system plane J2000
  *    (a section measured on the solar system plane)
  * 6. subtract this distance from all house cusps.
- * 7. compute the ayanamsa of J2000 on the solar system plane, 
+ * 7. compute the ayanamsa of J2000 on the solar system plane,
  *    referred to t0
  * 8. subtract ayanamsa_t0 from all house cusps.
  * 9. subtract ayanamsa_2000 from all house cusps.
  */
-static int sidereal_houses_ssypl(double tjde, 
-                           double armc, 
-                           double eps, 
-                           double *nutlo, 
-                           double lat, 
-			   int hsys, 
-                           double *cusp, 
+static int sidereal_houses_ssypl(double tjde,
+                           double armc,
+                           double eps,
+                           double *nutlo,
+                           double lat,
+			   int hsys,
+                           double *cusp,
                            double *ascmc)
 {
   int i, j, retc = OK;
@@ -387,7 +387,7 @@ static int sidereal_houses_ssypl(double tjde,
   eps2000 = swi_epsiln(J2000, 0);
   /* cartesian coordinates of the zero point on the
    * the solar system rotation plane */
-  x[0] = x[4] = 1; 
+  x[0] = x[4] = 1;
   x[1] = x[2] = x[3] = x[5] = 0;
   /* to ecliptic 2000 */
   swi_coortrf(x, x, -SSY_PLANE_INCL);
@@ -424,7 +424,7 @@ static int sidereal_houses_ssypl(double tjde,
   sgn = x[5] / fabs(x[5]);
   for (j = 0; j <= 2; j++)
     xvpx[j] = (x[j] - fac * x[j+3]) * sgn;      /* 1b */
-  /* distance of the auxiliary vernal point from 
+  /* distance of the auxiliary vernal point from
    * mean vernal point at tjd_et (a section on the equator): */
   swi_cartpol(xvpx, x2);
   dvpx = x2[0] * RADTODEG;                      /* 2 */
@@ -435,21 +435,21 @@ static int sidereal_houses_ssypl(double tjde,
   /* distance between the auxiliary vernal point at t and
    * the sidereal zero point of 2000 at t
    * (a section on the sidereal plane).
-   */ 
+   */
   dvpxe = acos(swi_dot_prod_unit(x, xvpx)) * RADTODEG;  /* 5 */
                 /* (always positive for dates after 5400 bc) */
   dvpxe -= SSY_PLANE_NODE * RADTODEG;
   /* ayanamsa between t0 and J2000, measured on solar system plane: */
   /* position of zero point of t0 */
-  x0[0] = 1; 
-  x0[1] = x0[2] = 0; 
+  x0[0] = 1;
+  x0[1] = x0[2] = 0;
   /* zero point of t0 in J2000 system */
   if (sip->t0 != J2000)
     swi_precess(x0, sip->t0, 0, J_TO_J2000);
   /* zero point to ecliptic 2000 */
   swi_coortrf(x0, x0, eps2000);
   /* to solar system plane */
-  swi_cartpol(x0, x0); 
+  swi_cartpol(x0, x0);
   x0[0] -= SSY_PLANE_NODE_E2000;
   swi_polcart(x0, x0);
   swi_coortrf(x0, x0, SSY_PLANE_INCL);
@@ -465,13 +465,13 @@ static int sidereal_houses_ssypl(double tjde,
 
 /* common simplified procedure */
 static int sidereal_houses_trad(double tjde,
-                           double armc, 
-                           double eps, 
-                           double nutl, 
-                           double lat, 
-			   int hsys, 
-                           double *cusp, 
-                           double *ascmc) 
+                           double armc,
+                           double eps,
+                           double nutl,
+                           double lat,
+			   int hsys,
+                           double *cusp,
+                           double *ascmc)
 {
   int i, retc = OK;
   double ay;
@@ -504,7 +504,7 @@ static int sidereal_houses_trad(double tjde,
   return retc;
 }
 
-/* 
+/*
  * this function is required for very special computations
  * where no date is given for house calculation,
  * e.g. for composite charts or progressive charts.
@@ -552,9 +552,9 @@ int CALL_CONV swe_houses_armc(
   for (i = 1; i <= ito; i++) {
     cusp[i] = h.cusp[i];
   }
-  ascmc[0] = h.ac;        /* Asc */    
-  ascmc[1] = h.mc;        /* Mid */    
-  ascmc[2] = armc;   
+  ascmc[0] = h.ac;        /* Asc */
+  ascmc[1] = h.mc;        /* Mid */
+  ascmc[2] = armc;
   ascmc[3] = h.vertex;
   ascmc[4] = h.equasc;
   ascmc[5] = h.coasc1;	/* "co-ascendant" (W. Koch) */
@@ -596,8 +596,8 @@ int CALL_CONV swe_houses_armc(
     }
   }
 #endif
-#if 0 
-/* for test of swe_house_pos(). 
+#if 0
+/* for test of swe_house_pos().
  * 1st house will be 0, second 30, etc. */
 for (i = 1; i <=12; i++) {
   double x[6];
@@ -610,7 +610,7 @@ for (i = 1; i <=12; i++) {
 
 /* for APC houses */
 /* n  number of house
- * ph geographic latitude 
+ * ph geographic latitude
  * e  ecliptic obliquity
  * az armc
  */
@@ -644,7 +644,7 @@ static double apc_sector(int n, double ph, double e, double az)
      k = n - 13;
    }
    /* az + PI/2 + kv = armc + 90 + asc. diff. = right ascension of ascendant
-    * PI/2 +- kv = semi-diurnal or seminocturnal arc of ascendant 
+    * PI/2 +- kv = semi-diurnal or seminocturnal arc of ascendant
     * a = right ascension of house cusp on apc circle (ascendant-parallel
     * circle), with declination dasc */
    if (is_below_hor) {
@@ -825,9 +825,9 @@ static int CalcH(
       hsp->ac = swe_degnorm(hsp->ac + 180);
     }
     hsp->cusp[10] = hsp->mc;
-    for (i = 11; i <= 12; i++) 
+    for (i = 11; i <= 12; i++)
       hsp->cusp[i] = swe_degnorm(hsp->cusp[10] + (i-10) * 30);
-    for (i = 1; i <= 9; i++) 
+    for (i = 1; i <= 9; i++)
       hsp->cusp[i] = swe_degnorm(hsp->cusp[10] + (i + 2) * 30);
     break;
   case 'C': /* Campanus houses and Horizon or Azimut system */
@@ -843,13 +843,13 @@ static int CalcH(
           fi = -90 + VERY_SMALL;
         else
 	  fi = 90 - VERY_SMALL;
-      } 
+      }
       th = swe_degnorm(th + 180);
     }
     fh1 = asind(sind (fi) / 2);
     fh2 = asind(sqrt (3.0) / 2 * sind(fi));
     cosfi = cosd(fi);
-    if (fabs(cosfi) == 0) {	/* '==' should be save! */ 
+    if (fabs(cosfi) == 0) {	/* '==' should be save! */
       if (fi > 0)
 	xh1 = xh2 = 90; /* cosfi = VERY_SMALL; */
       else
@@ -860,13 +860,13 @@ static int CalcH(
     }
     hsp->cusp[11] = Asc1(th + 90 - xh1, fh1, sine, cose);
     hsp->cusp[12] = Asc1(th + 90 - xh2, fh2, sine, cose);
-    if (hsy == 'H') 
+    if (hsy == 'H')
       hsp->cusp[1] = Asc1(th + 90, fi, sine, cose);
     hsp->cusp[2] = Asc1(th + 90 + xh2, fh2, sine, cose);
     hsp->cusp[3] = Asc1(th + 90 + xh1, fh1, sine, cose);
-    /* within polar circle, when mc sinks below horizon and 
+    /* within polar circle, when mc sinks below horizon and
 	 * ascendant changes to western hemisphere, all cusps
-     * must be added 180 degrees. 
+     * must be added 180 degrees.
      * houses will be in clockwise direction */
     if (fabs(fi) >= 90 - ekl) {  /* within polar circle */
       acmc = swe_difdeg2n(hsp->ac, hsp->mc);
@@ -916,7 +916,7 @@ static int CalcH(
       retc = sunshine_solution_makransky(th, fi, ekl, hsp);
     }
     if (retc == ERR) {	// only Makransky version does this
-      strcpy(hsp->serr, "within polar circle, switched to Porphyry"); 
+      strcpy(hsp->serr, "within polar circle, switched to Porphyry");
       hsy = 'O';
       goto porphyry;
     }
@@ -924,7 +924,7 @@ static int CalcH(
   case 'K': /* Koch houses */
     if (fabs(fi) >= 90 - ekl) {  /* within polar circle */
       retc = ERR;
-      strcpy(hsp->serr, "within polar circle, switched to Porphyry"); 
+      strcpy(hsp->serr, "within polar circle, switched to Porphyry");
       goto porphyry;
     }
     sina = sind(hsp->mc) * sine / cosd(fi);
@@ -947,7 +947,7 @@ static int CalcH(
 	hsp->ac = swe_degnorm(hsp->ac + 180);
 	hsp->cusp[1] = hsp->ac;
 	acmc = swe_difdeg2n(hsp->ac, hsp->mc);
-      } 
+      }
       q1 = 180 - acmc;
       d = (acmc - 90) / 4.0;
       if (acmc <= 30) {	// is quadrant <= 30, house 11 = zero width.
@@ -971,7 +971,7 @@ static int CalcH(
       /* within polar circle we swap AC/DC if AC is on wrong side */
       hsp->ac = swe_degnorm(hsp->ac + 180);
     }
-    for (i = 1; i <= 12; i++) 
+    for (i = 1; i <= 12; i++)
       hsp->cusp[i] = (i - 1) * 30.0;
     break;
   case 'O':	/* Porphyry houses */
@@ -1035,11 +1035,11 @@ porphyry:
   case 'R':	/* Regiomontanus houses */
     fh1 = atand (tanfi * 0.5);
     fh2 = atand (tanfi * cosd(30));
-    hsp->cusp[11] = Asc1(30 + th, fh1, sine, cose); 
-    hsp->cusp[12] = Asc1(60 + th, fh2, sine, cose); 
+    hsp->cusp[11] = Asc1(30 + th, fh1, sine, cose);
+    hsp->cusp[12] = Asc1(60 + th, fh2, sine, cose);
     hsp->cusp[2] = Asc1(120 + th, fh2, sine, cose);
-    hsp->cusp[3] = Asc1(150 + th, fh1, sine, cose); 
-    /* within polar circle, when mc sinks below horizon and 
+    hsp->cusp[3] = Asc1(150 + th, fh1, sine, cose);
+    /* within polar circle, when mc sinks below horizon and
      * ascendant changes to western hemisphere, all cusps
      * must be added 180 degrees.
      * houses will be in clockwise direction */
@@ -1079,11 +1079,11 @@ porphyry:
   case 'T':	/* 'topocentric' houses */
     fh1 = atand (tanfi / 3.0);
     fh2 = atand (tanfi * 2.0 / 3.0);
-    hsp->cusp[11] =  Asc1(30 + th, fh1, sine, cose); 
+    hsp->cusp[11] =  Asc1(30 + th, fh1, sine, cose);
     hsp->cusp[12] =  Asc1(60 + th, fh2, sine, cose);
-    hsp->cusp[2] =  Asc1(120 + th, fh2, sine, cose); 
+    hsp->cusp[2] =  Asc1(120 + th, fh2, sine, cose);
     hsp->cusp[3] =  Asc1(150 + th, fh1, sine, cose);
-    /* within polar circle, when mc sinks below horizon and 
+    /* within polar circle, when mc sinks below horizon and
      * ascendant changes to western hemisphere, all cusps
      * must be added 180 degrees.
 	 * houses will be in clockwise direction */
@@ -1135,12 +1135,12 @@ porphyry:
         && fabs(a - 270) > VERY_SMALL) {
         tant = tand(a);
         hsp->cusp[j] = atand(tant / cose);
-        if (a > 90 && a <= 270) 
+        if (a > 90 && a <= 270)
           hsp->cusp[j] = swe_degnorm(hsp->cusp[j] + 180);
       } else {
         if (fabs(a - 90) <= VERY_SMALL)
           hsp->cusp[j] = 90;
-        else 
+        else
 		  hsp->cusp[j] = 270;
       } /*  if */
 	  hsp->cusp[j] = swe_degnorm(hsp->cusp[j]);
@@ -1151,7 +1151,7 @@ porphyry:
     }
     break; }
   case 'M': {
-    /* 
+    /*
      * Morinus
      * points of the equator (armc + n * 30) are transformed
      * into the ecliptic coordinate system
@@ -1174,11 +1174,11 @@ porphyry:
     }
     break; }
   case 'F': {
-    /* 
+    /*
     * Carter poli-equatorial
     * Rectascension a of ascendant is the starting point.
     * house cusps nh on the ecliptic are the points where
-    * great circles through points of the equator (a + (nh -1) * 30) 
+    * great circles through points of the equator (a + (nh -1) * 30)
     * and the poles intersect it.
     */
     double a, ra;
@@ -1200,12 +1200,12 @@ porphyry:
 	  && fabs(ra - 270) > VERY_SMALL) {
 	  tant = tand(ra);
 	  hsp->cusp[i] = atand(tant / cose);
-	  if (ra > 90 && ra <= 270) 
+	  if (ra > 90 && ra <= 270)
 	    hsp->cusp[i] = swe_degnorm(hsp->cusp[i] + 180);
 	} else {
 	  if (fabs(ra - 90) <= VERY_SMALL)
 	    hsp->cusp[i] = 90;
-	  else 
+	  else
 	    hsp->cusp[i] = 270;
 	} /*  if */
 	hsp->cusp[i] = swe_degnorm(hsp->cusp[i]);
@@ -1254,7 +1254,7 @@ porphyry:
     }
     if (fabs(fi) >= 90 - ekl) {  /* within polar circle */
       retc = ERR;
-      strcpy(hsp->serr, "within polar circle, switched to Porphyry"); 
+      strcpy(hsp->serr, "within polar circle, switched to Porphyry");
       goto porphyry;
     }
     /*************** forth/second quarter ***************/
@@ -1320,31 +1320,31 @@ porphyry:
      * bogdan@astrologia.pl
      *
      * Definition:
-     * "Krusinski - house system based on the great circle passing through 
-     * ascendant and zenith. This circle is divided into 12 equal parts 
-     * (1st cusp is ascendent, 10th cusp is zenith), then the resulting 
+     * "Krusinski - house system based on the great circle passing through
+     * ascendant and zenith. This circle is divided into 12 equal parts
+     * (1st cusp is ascendent, 10th cusp is zenith), then the resulting
      * points are projected onto the ecliptic through meridian circles.
      * The house cusps in space are half-circles perpendicular to the equator
      * and running from the north to the south celestial pole through the
-     * resulting cusp points on the house circle. The points where they 
+     * resulting cusp points on the house circle. The points where they
      * cross the ecliptic mark the ecliptic house cusps."
      *
      * Description of the algorithm:
-     * Transform into great circle running through Asc and zenit (where arc 
-     * between Asc and zenith is always 90 deg), and then return with 
-     * house cusps into ecliptic. Eg. solve trigonometrical triangle 
-     * with three transformations and two rotations starting from ecliptic. 
-     * House cusps in space are meridian circles. 
+     * Transform into great circle running through Asc and zenit (where arc
+     * between Asc and zenith is always 90 deg), and then return with
+     * house cusps into ecliptic. Eg. solve trigonometrical triangle
+     * with three transformations and two rotations starting from ecliptic.
+     * House cusps in space are meridian circles.
      *
      * Notes:
      * 1. In this definition we assume MC on ecliptic as point where
      *    half-meridian (from north to south pole) cuts ecliptic,
      *    so MC may be below horizon in arctic regions.
-     * 2. Houses could be calculated in all latitudes except the poles 
-     *    themselves (-90,90) and points on arctic circle in cases where 
-     *    ecliptic is equal to horizon and then ascendant is undefined. 
-     *    But ascendant when 'horizon=ecliptic' could be deduced as limes 
-     *    from both sides of that point and houses with that provision can 
+     * 2. Houses could be calculated in all latitudes except the poles
+     *    themselves (-90,90) and points on arctic circle in cases where
+     *    ecliptic is equal to horizon and then ascendant is undefined.
+     *    But ascendant when 'horizon=ecliptic' could be deduced as limes
+     *    from both sides of that point and houses with that provision can
      *    be computed also there.
      *
      * Starting values for calculations:
@@ -1371,8 +1371,8 @@ porphyry:
     swe_cotrans(x, x, -90);       /* A5. Transform into this house system great circle (asc-zenith) */
     /* As it is house circle now, simple add 30 deg increments... */
     for(i = 0; i < 6; i++) {
-      /* B0. Set 'n-th' house cusp. 
-       *     Note that IC/MC are also calculated here to check 
+      /* B0. Set 'n-th' house cusp.
+       *     Note that IC/MC are also calculated here to check
        *     if really this is the asc-zenith great circle. */
       x[0] = 30.0*i;
       x[1] = 0.0;
@@ -1398,9 +1398,9 @@ porphyry:
     /* note the MC provided by apc_sector() near latitude 90 is not accurate */
     hsp->cusp[10] = hsp->mc;
     hsp->cusp[4] = swe_degnorm(hsp->mc + 180);
-    /* within polar circle, when mc sinks below horizon and 
+    /* within polar circle, when mc sinks below horizon and
      * ascendant changes to western hemisphere, all cusps
-     * must be added 180 degrees. 
+     * must be added 180 degrees.
      * houses will be in clockwise direction */
     if (fabs(fi) >= 90 - ekl) {  /* within polar circle */
       acmc = swe_difdeg2n(hsp->ac, hsp->mc);
@@ -1415,9 +1415,9 @@ porphyry:
   default:	/* Placidus houses */
     if (fabs(fi) >= 90 - ekl) {  /* within polar circle */
       retc = ERR;
-      strcpy(hsp->serr, "within polar circle, switched to Porphyry"); 
+      strcpy(hsp->serr, "within polar circle, switched to Porphyry");
       goto porphyry;
-    } 
+    }
     a = asind(tand(fi) * tane);
     fh1 = atand(sind(a / 3) / tane);
     fh2 = atand(sind(a * 2 / 3) / tane);
@@ -1428,7 +1428,7 @@ porphyry:
       hsp->cusp[11] = rectasc;
     } else {
       /* pole height */
-      f = atand(sind(asind(tanfi * tant) / 3)  /tant);  
+      f = atand(sind(asind(tanfi * tant) / 3)  /tant);
       hsp->cusp[11] = Asc1(rectasc, f, sine, cose);
       for (i = 1; i <= iteration_count; i++) {
 	tant = tand(asind(sine * sind(hsp->cusp[11])));
@@ -1447,7 +1447,7 @@ porphyry:
     if (fabs(tant) < VERY_SMALL) {
       hsp->cusp[12] = rectasc;
     } else {
-      f = atand(sind(asind(tanfi * tant) / 1.5) / tant);  
+      f = atand(sind(asind(tanfi * tant) / 1.5) / tant);
       /*  pole height */
       hsp->cusp[12] = Asc1(rectasc, f, sine, cose);
       for (i = 1; i <= iteration_count; i++) {
@@ -1456,7 +1456,7 @@ porphyry:
 	  hsp->cusp[12] = rectasc;
 	  break;
 	}
-	f = atand(sind(asind(tanfi * tant) / 1.5) / tant);  
+	f = atand(sind(asind(tanfi * tant) / 1.5) / tant);
 	/*  pole height */
 	hsp->cusp[12] = Asc1(rectasc, f, sine, cose);
       }
@@ -1487,7 +1487,7 @@ porphyry:
     if (fabs(tant) < VERY_SMALL) {
       hsp->cusp[3] = rectasc;
     } else {
-      f = atand(sind(asind(tanfi * tant) / 3) / tant);  
+      f = atand(sind(asind(tanfi * tant) / 3) / tant);
       /*  pole height */
       hsp->cusp[3] = Asc1(rectasc, f, sine, cose);
       for (i = 1; i <= iteration_count; i++) {
@@ -1517,7 +1517,7 @@ porphyry:
   else
     f = -90 - fi;
   hsp->vertex = Asc1(th - 90, f, sine, cose);
-  /* with tropical latitudes, the vertex behaves strange, 
+  /* with tropical latitudes, the vertex behaves strange,
    * in a similar way as the ascendant within the polar
    * circle. we keep it always on the western hemisphere.*/
   if (fabs(fi) <= ekl) {
@@ -1525,7 +1525,7 @@ porphyry:
     if (vemc > 0)
       hsp->vertex = swe_degnorm(hsp->vertex + 180);
   }
-  /* 
+  /*
    * some strange points:
    */
   /* equasc (equatorial ascendant) */
@@ -1559,8 +1559,8 @@ porphyry:
 } /* procedure houses */
 
 /******************************/
-static double Asc1(double x1, double f, double sine, double cose) 
-{ 
+static double Asc1(double x1, double f, double sine, double cose)
+{
   int n;
   double ass;
   x1 = swe_degnorm(x1);
@@ -1573,7 +1573,7 @@ static double Asc1(double x1, double f, double sine, double cose)
   }
   if (n == 1)
     ass = ( Asc2(x1, f, sine, cose));
-  else if (n == 2) 
+  else if (n == 2)
     ass = (180 - Asc2(180 - x1, - f, sine, cose));
   else if (n == 3)
     ass = (180 + Asc2(x1 - 180, - f, sine, cose));
@@ -1593,8 +1593,8 @@ static double Asc1(double x1, double f, double sine, double cose)
 
 #if 0
 /******************************/
-static double Asc1_old(double x1, double f, double sine, double cose) 
-{ 
+static double Asc1_old(double x1, double f, double sine, double cose)
+{
   int n;
   double ass;
   if (f == -90) f += VERY_SMALL / 1000;        // avoid exact pole 90, as tan() goes infinite
@@ -1603,7 +1603,7 @@ static double Asc1_old(double x1, double f, double sine, double cose)
   n  = (int) ((x1 / 90) + 1);
   if (n == 1)
     ass = ( Asc2(x1, f, sine, cose));
-  else if (n == 2) 
+  else if (n == 2)
     ass = (180 - Asc2(180 - x1, - f, sine, cose));
   else if (n == 3)
     ass = (180 + Asc2(x1 - 180, - f, sine, cose));
@@ -1622,15 +1622,15 @@ static double Asc1_old(double x1, double f, double sine, double cose)
 }  /* Asc1 */
 
 /******************************/
-static double Asc1_old_old (double x1, double f, double sine, double cose) 
-{ 
+static double Asc1_old_old (double x1, double f, double sine, double cose)
+{
   int n;
   double ass;
   x1 = swe_degnorm(x1);
   n  = (int) ((x1 / 90) + 1);
   if (n == 1)
     ass = ( Asc2 (x1, f, sine, cose));
-  else if (n == 2) 
+  else if (n == 2)
     ass = (180 - Asc2 (180 - x1, - f, sine, cose));
   else if (n == 3)
     ass = (180 + Asc2 (x1 - 180, - f, sine, cose));
@@ -1671,7 +1671,7 @@ static void test_Asc1()
  * f in range -90 .. +90
  * sine, cose around e=23°
  */
-static double Asc2(double x, double f, double sine, double cose) 
+static double Asc2(double x, double f, double sine, double cose)
 {
   double ass, sinx;
   ass = - tand(f) * sine + cose * cosd(x);
@@ -1739,11 +1739,11 @@ static double fix_asc_polar(double asc, double armc, double eps, double geolat)
  * serr		error message area
  *
  * House position is returned by function.
- * Currently, geometrically correct house positions are provided 
+ * Currently, geometrically correct house positions are provided
  * for the following house methods:
  * A/E Equal, V Vehlow, W Whole Signs, D Equal/MC, N Equal/Zodiac,
  * O Porphyry, B Alcabitius, X Meridian, F Carter, M Morinus,
- * P Placidus, K Koch, C Campanus, R Regiomontanus, U Krusinski, 
+ * P Placidus, K Koch, C Campanus, R Regiomontanus, U Krusinski,
  * T Topocentric, H Horizon, G Gauquelin.
  *
  * A simplified house position (distance_from_cusp / house_size)
@@ -1754,16 +1754,16 @@ static double fix_asc_polar(double asc, double armc, double eps, double geolat)
  *
  * IMPORTANT: This function should NOT be used for sidereal astrology.
  * If you cannot avoid doing so, please note:
- * - The input longitudes (xpin) MUST always be tropical, even if you 
+ * - The input longitudes (xpin) MUST always be tropical, even if you
  *   are a siderealist.
  * - Sidereal and tropical house positions are identical for most house
- *   systems, if a traditional definition of the sidereal zodiac is used 
+ *   systems, if a traditional definition of the sidereal zodiac is used
  *   (sid = trop - ayanamsa).
  * - The function does NOT provide correct positions for Whole Sign houses.
- * - The function does NOT provide correct positions, if you use a 
- *   non-traditional sidereal method (where the sidereal plane is not 
- *   identical to the ecliptic of date) with a house system whose definition 
- *   is dependent on the ecliptic, such as: 
+ * - The function does NOT provide correct positions, if you use a
+ *   non-traditional sidereal method (where the sidereal plane is not
+ *   identical to the ecliptic of date) with a house system whose definition
+ *   is dependent on the ecliptic, such as:
  *   equal, Porphyry, Alcabitius, Koch, Krusinski (all others should work).
  * The Swiss Ephemeris currently does not handle these cases.
  */
@@ -1864,12 +1864,12 @@ double CALL_CONV swe_house_pos(
 	sda = acos(r) * RADTODEG;	/* semidiurnal arc, measured on equator */
 	sna = 180 - sda;		/* complement, seminocturnal arc */
 	if (mdd > 0) {
-	  if (mdd < sda) 
+	  if (mdd < sda)
 	    hpos = mdd * 90 / sda;
 	  else
 	    hpos = 90 + (mdd - sda) * 90 / sna;
 	} else {
-	  if (mdd > -sna) 
+	  if (mdd > -sna)
 	    hpos = 360 + mdd * 90 / sna;
 	  else
 	    hpos = 270 + (mdd + sna) * 90 / sda;
@@ -1894,12 +1894,12 @@ double CALL_CONV swe_house_pos(
         && fabs(a - 270) > VERY_SMALL) {
         tant = tand(a);
 	hpos = atand(tant / cose);
-        if (a > 90 && a <= 270) 
+        if (a > 90 && a <= 270)
           hpos = swe_degnorm(hpos + 180);
       } else {
 	if (fabs(a - 90) <= VERY_SMALL)
           hpos = 90;
-        else 
+        else
           hpos = 270;
       } /*  if */
       hpos = swe_degnorm(hpos - armc - 90);
@@ -1940,7 +1940,7 @@ double CALL_CONV swe_house_pos(
     /* version of Koch method: do calculations within circumpolar circle,
      * if possible; make sure house positions 4 - 9 only appear on western
      * hemisphere */
-    case 'K': 
+    case 'K':
       demc = atand(sind(armc) * tand(eps));
       is_invalid = FALSE;
       is_circumpolar = FALSE;
@@ -2027,16 +2027,16 @@ double CALL_CONV swe_house_pos(
        * Input data: ramc, geolat, asc.
        */
       asc = Asc1(swe_degnorm(armc + 90), geolat, sine, cose);
-      /* while MC is always south, 
+      /* while MC is always south,
        * Asc must always be in eastern hemisphere */
       asc = fix_asc_polar(asc, armc, eps, geolat);
       /*
-       * Descr: find the house plane 'asc-zenith' - where it intersects 
-       * with equator and at what angle, and then simple find arc 
-       * from asc on that plane to planet's meridian intersection 
+       * Descr: find the house plane 'asc-zenith' - where it intersects
+       * with equator and at what angle, and then simple find arc
+       * from asc on that plane to planet's meridian intersection
        * with this plane.
        */
-      /* I. find plane of 'asc-zenith' great circle relative to equator: 
+      /* I. find plane of 'asc-zenith' great circle relative to equator:
        *   solve spherical triangle 'EP-asc-intersection of house circle with equator' */
       /* Ia. Find intersection of house plane with equator: */
       x[0] = asc; x[1] = 0.0; x[2] = 1.0;          /* 1. Start with ascendent on ecliptic     */
@@ -2052,19 +2052,19 @@ double CALL_CONV swe_house_pos(
       }
       if (x[0] > 90 && x[0] <= 270)
 	xtemp = swe_degnorm(xtemp + 180);
-      x[0] = swe_degnorm(xtemp);        
+      x[0] = swe_degnorm(xtemp);
       raaz = swe_degnorm(raep - x[0]); /* result: RA of intersection 'asc-zenith' great circle with equator */
       /* Ib. Find obliquity to equator of 'asc-zenith' house plane: */
-      x[0] = raaz; x[1] = 0.0; 
+      x[0] = raaz; x[1] = 0.0;
       x[0] = swe_degnorm(raep - x[0]);  /* 1. Rotate start point relative to EP   */
       swe_cotrans(x, x, -(90-geolat));  /* 2. Transform into horizontal coords    */
       x[1] = x[1] + 90;                 /* 3. Add 90 deg do decl - so get the point on house plane most distant from equ. */
       swe_cotrans(x, x, 90-geolat);     /* 4. Rotate back to equator              */
       oblaz = x[1];                     /* 5. Obliquity of house plane to equator */
-      /* II. Next find asc and planet position on house plane, 
-       *     so to find relative distance of planet from 
+      /* II. Next find asc and planet position on house plane,
+       *     so to find relative distance of planet from
        *     coords beginning. */
-      /* IIa. Asc on house plane relative to intersection 
+      /* IIa. Asc on house plane relative to intersection
        *      of equator with 'asc-zenith' plane. */
       xasc[0] = asc; xasc[1] = 0.0; xasc[2] = 1.0;
       swe_cotrans(xasc, xasc, -eps);
@@ -2073,7 +2073,7 @@ double CALL_CONV swe_house_pos(
       if (xasc[0] > 90 && xasc[0] <= 270)
           xtemp = swe_degnorm(xtemp + 180);
       xasc[0] = swe_degnorm(xtemp);
-      /* IIb. Planet on house plane relative to intersection 
+      /* IIb. Planet on house plane relative to intersection
        *      of equator with 'asc-zenith' plane */
       xp[0] = swe_degnorm(xeq[0] - raaz);        /* Rotate on equator  */
       xtemp = atand(tand(xp[0])/cosd(oblaz));    /* Find arc on house plane from equator */
@@ -2103,7 +2103,7 @@ double CALL_CONV swe_house_pos(
       if (fabs(mdd) < VERY_SMALL)
 	xp[0] = 270;
       else if (180 - fabs(mdd) < VERY_SMALL)
-        xp[0] = 90; 
+        xp[0] = 90;
       else {
         if (90 - fabs(geolat) < VERY_SMALL) {
           if (geolat > 0)
@@ -2125,7 +2125,7 @@ double CALL_CONV swe_house_pos(
 	/* to make sure that a call with a house cusp position returns
 	 * a value within the house, 0.001" is added */
         xp[0] = swe_degnorm(xp[0] + MILLIARCSEC);
-      }  
+      }
       hpos = xp[0] / 30.0 + 1;
       break;
     case 'T':
@@ -2146,7 +2146,7 @@ double CALL_CONV swe_house_pos(
 	de = -de;
 	mdd = swe_degnorm(mdd + 180);
       }
-      /* mirror everything on western hemisphere to eastern hemisphere */  
+      /* mirror everything on western hemisphere to eastern hemisphere */
       if (mdd > 180) {
 	ra = swe_degnorm(armc - mdd);
       }
@@ -2182,7 +2182,7 @@ double CALL_CONV swe_house_pos(
     case 'G':
        /* circumpolar region */
       if (90 - fabs(de) <= fabs(geolat)) {
-        if (de * geolat < 0)  
+        if (de * geolat < 0)
           xp[0] = swe_degnorm(90 + mdn / 2);
         else
           xp[0] = swe_degnorm(270 + mdd / 2);
@@ -2222,9 +2222,9 @@ double CALL_CONV swe_house_pos(
       d = swe_degnorm(xpin[0] - hcusp[1]);
       for (i = 1; i <= 12; i++) {
 	j = i + 1;
-	if (j > 12) 
+	if (j > 12)
 	  c2 = 360;
-	else 
+	else
 	  c2 = swe_degnorm(hcusp[j] - hcusp[1]);
 	if (d < c2) break;
       }
@@ -2233,9 +2233,9 @@ double CALL_CONV swe_house_pos(
       d = swe_degnorm(hcusp[1] - xpin[0]);
       for (i = 1; i <= 12; i++) {
 	j = i + 1;
-	if (j > 12) 
+	if (j > 12)
 	  c2 = 360;
-	else 
+	else
 	  c2 = swe_degnorm(hcusp[1] - hcusp[j]);
 	if (d < c2) break;
       }
@@ -2264,9 +2264,9 @@ int sunshine_init(double lat, double dec, double xh[])
     ad = 90 - VERY_SMALL;
   } else if (arg <= -1) {
     ad = -90 + VERY_SMALL;
-  } else {         
+  } else {
     ad = asind(arg);
-  } 
+  }
   nsa = 90 - ad;
   dsa = 90 + ad;
   xh[2] = -2 * nsa / 3;
@@ -2324,7 +2324,7 @@ static int sunshine_solution_makransky(double ramc, double lat, double ecl, stru
       // CP = east point (or west point),
       // HP is on meridian east point - north pole
       // use triangle CP - HP - XP with long side dec
-      // and angle 90 - lat. 
+      // and angle 90 - lat.
       // use tan b = cos alph tan c = sin lat tan dec
       zd = 90.0 - atand(sinlat * tandec);
     } else {
@@ -2423,7 +2423,7 @@ static int sunshine_solution_makransky(double ramc, double lat, double ecl, stru
         cu = swe_degnorm(cu + 180);
     }
     hsp->cusp[ih] = cu;
-  } 
+  }
   return OK;
 }
 
@@ -2446,7 +2446,7 @@ static int sunshine_solution_treindl(double ramc, double lat, double ecl, struct
   tandec = tand(dec);
   sinecl = sind(ecl);
   cosecl = cosd(ecl);
-  sunshine_init(lat, dec, xh); 
+  sunshine_init(lat, dec, xh);
   // find out if MC under horizon
   mcdec = atand(sind(ramc) * tand(ecl));
   mc_under_horizon = fabs(lat - mcdec) > 90;
@@ -2470,7 +2470,7 @@ static int sunshine_solution_treindl(double ramc, double lat, double ecl, struct
     // compute triangle north pole - mp0 -hp
     // we have two sides 90 - dec, base xhs, ange at pole x
     // derive from cosine rule
-    cosa = tandec * tand(xhs / 2); 
+    cosa = tandec * tand(xhs / 2);
     alph = acosd(cosa);
     // compute triangle south point - mp0 - hp
     // we have: side x', side b = 90 - lat + dec, angle alpha2 between the sides.
@@ -2497,7 +2497,7 @@ static int sunshine_solution_treindl(double ramc, double lat, double ecl, struct
     }
     sinzd = sind(xhs) * sind(alpha2) / sind(c);
     zd = asind(sinzd);
-    // compute intersection house circle with equator, point rax 
+    // compute intersection house circle with equator, point rax
     // day side triangle south point - meridian point - EP
     // night side: triangle north point
     // sides: 90 - lat, angle zd

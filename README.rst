@@ -28,3 +28,4 @@ Stanislas Marquis <stan@astrorigin.com>
 ircs://chat.freenode.net:6697/pyswisseph
 
 ..
+chi: https://github.com/Chistabo/pyswisseph.git
