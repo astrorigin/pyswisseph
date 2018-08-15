@@ -29,7 +29,9 @@
  *  Swisseph homepage: http://www.astro.com/swisseph
  *
  *  Swisseph version: 2.01.00
+ *  Swisseph version: 2.05.01 [Chistabo]
  *  Last revision: 30.04.2015
+ *  Last revision: xx.xx.2017 [Chistabo]
  */
 
 #define PYSWISSEPH_VERSION      20150430
@@ -644,7 +646,7 @@ static PyObject * pyswe_julday FUNCARGS_KEYWDS
 
 /* swisseph.date_conversion */
 static char pyswe_date_conversion__doc__[] =
-"Calculate Julian day number with check wether date is correct.\n\n"
+"Calculate Julian day number with check whether date is correct.\n\n"
 "Args: int year, int month, int day, float hour=12.0, char cal='g'\n"
 "Return: tuple (int result, float jd)";
 
@@ -4496,7 +4498,7 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "SIDM_SS_CITRA", SE_SIDM_SS_CITRA);
     PyModule_AddIntConstant(m, "SIDM_TRUE_CITRA", SE_SIDM_TRUE_CITRA);
     PyModule_AddIntConstant(m, "SIDM_TRUE_REVATI", SE_SIDM_TRUE_REVATI);
-    // Chistabo added - sidereal modes [29 onward]
+    // Chistabo added - sidereal modes [29 - 38]
     PyModule_AddIntConstant(m, "SIDM_TRUE_PUSHYA", SE_SIDM_TRUE_PUSHYA);
     PyModule_AddIntConstant(m, "SIDM_GALCENT_RGBRAND", SE_SIDM_GALCENT_RGBRAND);
     PyModule_AddIntConstant(m, "SIDM_GALEQU_IAU1958", SE_SIDM_GALEQU_IAU1958);
@@ -4507,7 +4509,6 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "SIDM_GALCENT_MULA_WILHELM", SE_SIDM_GALCENT_MULA_WILHELM);
     PyModule_AddIntConstant(m, "SIDM_ARYABHATA_522", SE_SIDM_ARYABHATA_522);
     PyModule_AddIntConstant(m, "SIDM_BABYL_BRITTON", SE_SIDM_BABYL_BRITTON);
-
     // Chistabo added - sidereal modes end
     PyModule_AddIntConstant(m, "SIDM_USER", SE_SIDM_USER);
 
