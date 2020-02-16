@@ -188,7 +188,7 @@ static PyObject * pyswe_get_ayanamsa_name FUNCARGS_KEYWDS
     static char *kwlist[] = {"sidmode", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &mode))
         return NULL;
-    name = swe_get_ayanamsa_name(mode);
+    name = (char*) swe_get_ayanamsa_name(mode);
     return Py_BuildValue("s", name);
 }
 
@@ -4603,7 +4603,7 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "HELFLAG_AVKIND", SE_HELFLAG_AVKIND);
     PyModule_AddObject(m, "TJD_INVALID", Py_BuildValue("f", TJD_INVALID));
     PyModule_AddIntConstant(m, "SIMULATE_VICTORVB", SIMULATE_VICTORVB);
-
+#if 0 /* Unused */
     PyModule_AddIntConstant(m, "HELIACAL_LONG_SEARCH", SE_HELIACAL_LONG_SEARCH);
     PyModule_AddIntConstant(m, "HELIACAL_HIGH_PRECISION", SE_HELIACAL_HIGH_PRECISION);
     PyModule_AddIntConstant(m, "HELIACAL_OPTICAL_PARAMS", SE_HELIACAL_OPTICAL_PARAMS);
@@ -4617,7 +4617,7 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "HELIACAL_AVKIND_MIN7", SE_HELIACAL_AVKIND_MIN7);
     PyModule_AddIntConstant(m, "HELIACAL_AVKIND_MIN9", SE_HELIACAL_AVKIND_MIN9);
     PyModule_AddIntConstant(m, "HELIACAL_AVKIND", SE_HELIACAL_AVKIND);
-
+#endif
     PyModule_AddIntConstant(m, "PHOTOPIC_FLAG", SE_PHOTOPIC_FLAG);
     PyModule_AddIntConstant(m, "SCOTOPIC_FLAG", SE_SCOTOPIC_FLAG);
     PyModule_AddIntConstant(m, "MIXEDOPIC_FLAG", SE_MIXEDOPIC_FLAG);
