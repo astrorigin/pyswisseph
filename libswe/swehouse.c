@@ -59,7 +59,7 @@ house and (simple) aspect calculation
   for promoting such software, products or services.
 */
 
-#include "sweodef.h"
+//#include "sweodef.h"
 #include "swephexp.h"
 #include "sweph.h"
 #include "swephlib.h"
@@ -82,6 +82,7 @@ static int sidereal_houses_ecl_t0(double tjde,
                            double *cusp, 
                            double *ascmc);
 static int sidereal_houses_trad(double tjde, 
+			   int32 iflag,
                            double armc, 
                            double eps, 
                            double nutl, 
@@ -186,6 +187,7 @@ int CALL_CONV swe_houses_ex(double tjd_ut,
   double armc, eps_mean, nutlo[2];
   double tjde = tjd_ut + swe_deltat_ex(tjd_ut, iflag, NULL);
   struct sid_data *sip = &swed.sidd;
+  double xp[6];
   int ito;
   if (toupper(hsys) == 'G')
     ito = 36;
@@ -197,6 +199,10 @@ int CALL_CONV swe_houses_ex(double tjd_ut,
   swi_nutation(tjde, 0, nutlo);
   for (i = 0; i < 2; i++)
     nutlo[i] *= RADTODEG;
+  if (iflag & SEFLG_NONUT) {
+    for (i = 0; i < 2; i++)
+      nutlo[i] = 0;
+  }
 #ifdef TRACE
   swi_open_trace(NULL);
   if (swi_trace_count <= TRACE_COUNT_MAX) {
@@ -217,9 +223,9 @@ int CALL_CONV swe_houses_ex(double tjd_ut,
 #endif
     /*houses_to_sidereal(tjde, geolat, hsys, eps, cusp, ascmc, iflag);*/
   armc = swe_degnorm(swe_sidtime0(tjd_ut, eps_mean + nutlo[1], nutlo[0]) * 15 + geolon);
+//fprintf(stderr, "armc=%f, iflag=%d\n", armc, iflag);
   if (toupper(hsys) ==  'I') {	// compute sun declination for sunshine houses
     int flags = SEFLG_SPEED| SEFLG_EQUATORIAL;
-    double xp[6];
     int result = swe_calc_ut(tjd_ut, SE_SUN, flags, xp, NULL);
     if (result < 0) return ERR;
     ascmc[9] = xp[1];	// declination in ascmc[9];
@@ -230,9 +236,11 @@ int CALL_CONV swe_houses_ex(double tjd_ut,
     else if (sip->sid_mode & SE_SIDBIT_SSY_PLANE)
       retc = sidereal_houses_ssypl(tjde, armc, eps_mean + nutlo[1], nutlo, geolat, hsys, cusp, ascmc);
     else
-      retc = sidereal_houses_trad(tjde, armc, eps_mean + nutlo[1], nutlo[0], geolat, hsys, cusp, ascmc);
+      retc = sidereal_houses_trad(tjde, iflag, armc, eps_mean + nutlo[1], nutlo[0], geolat, hsys, cusp, ascmc);
   } else {
     retc = swe_houses_armc(armc, geolat, eps_mean + nutlo[1], hsys, cusp, ascmc);
+    if (toupper(hsys) ==  'I') 	// compute sun declination for sunshine houses
+      ascmc[9] = xp[1];	// declination in ascmc[9];
   }
   if (iflag & SEFLG_RADIANS) {
     for (i = 1; i <= ito; i++)
@@ -340,8 +348,16 @@ static int sidereal_houses_ecl_t0(double tjde,
     dvpxe = -dvpxe;
   for (i = 1; i <= ito; i++)                     /* 6, 7 */
     cusp[i] = swe_degnorm(cusp[i] - dvpxe - sip->ayan_t0);
-  for (i = 0; i <= SE_NASCMC; i++)
+  for (i = 0; i <= SE_NASCMC; i++) {
+    if (i == 2)	/* armc */
+      continue;
     ascmc[i] = swe_degnorm(ascmc[i] - dvpxe - sip->ayan_t0);
+  }
+  if (hsys == 'N') { /* 1 = 0° Aries */
+    for (i = 1; i <= ito; i++) {
+      cusp[i] = (i - 1) * 30;
+    }
+  }
   return retc;
 }
 
@@ -458,13 +474,22 @@ static int sidereal_houses_ssypl(double tjde,
   x00 = x0[0] * RADTODEG;                       /* 7 */
   for (i = 1; i <= ito; i++)                     /* 6, 8, 9 */
     cusp[i] = swe_degnorm(cusp[i] - dvpxe - sip->ayan_t0 - x00);
-  for (i = 0; i <= SE_NASCMC; i++)
+  for (i = 0; i <= SE_NASCMC; i++) {
+    if (i == 2)	/* armc */
+      continue;
     ascmc[i] = swe_degnorm(ascmc[i] - dvpxe - sip->ayan_t0 - x00);
+  }
+  if (hsys == 'N') { /* 1 = 0° Aries */
+    for (i = 1; i <= ito; i++) {
+      cusp[i] = (i - 1) * 30;
+    }
+  }
   return retc;
 }
 
 /* common simplified procedure */
 static int sidereal_houses_trad(double tjde,
+			   int32 iflag,
                            double armc, 
                            double eps, 
                            double nutl, 
@@ -478,16 +503,24 @@ static int sidereal_houses_trad(double tjde,
   int ito;
   int ihs = toupper(hsys);
   int ihs2 = ihs;
-  ay = swe_get_ayanamsa(tjde);
+// ay = swe_get_ayanamsa(tjde);
+//fprintf(stderr, "ay=%f\n", ay);
+  retc = swe_get_ayanamsa_ex(tjde, iflag, &ay, NULL);
+//fprintf(stderr, "ay=%f\n", ay);
+//fprintf(stderr, "nutl=%f\n", nutl);
   if (ihs == 'G')
     ito = 36;
   else
     ito = 12;
   if (ihs == 'W')  /* whole sign houses: treat as 'E' and fix later */
     ihs2 = 'E';
+//fprintf(stderr, "armc=%f\n", armc);
+//if (hsys == 'P') fprintf(stderr, "ay=%f, t=%f %c", ay, tjde, (char) hsys);
   retc = swe_houses_armc(armc, lat, eps, ihs2, cusp, ascmc);
+//if (hsys == 'P') fprintf(stderr, "  h1=%f", cusp[1]);
   for (i = 1; i <= ito; i++) {
-    cusp[i] = swe_degnorm(cusp[i] - ay - nutl);
+    //cusp[i] = swe_degnorm(cusp[i] - ay - nutl);
+    cusp[i] = swe_degnorm(cusp[i] - ay);
     if (ihs == 'W') /* whole sign houses */
       cusp[i] -= fmod(cusp[i], 30);
   }
@@ -499,8 +532,10 @@ static int sidereal_houses_trad(double tjde,
   for (i = 0; i < SE_NASCMC; i++) {
     if (i == 2)	/* armc */
       continue;
-    ascmc[i] = swe_degnorm(ascmc[i] - ay - nutl);
+    //ascmc[i] = swe_degnorm(ascmc[i] - ay - nutl);
+    ascmc[i] = swe_degnorm(ascmc[i] - ay);
   }
+//if (hsys == 'P') fprintf(stderr, " => %f\n", cusp[1]);
   return retc;
 }
 
@@ -562,6 +597,8 @@ int CALL_CONV swe_houses_armc(
   ascmc[7] = h.polasc;	/* "polar ascendant" (M. Munkasey) */
   for (i = SE_NASCMC; i < 10; i++)
     ascmc[i] = 0;
+  if (toupper(hsys) ==  'I') 	// declination for sunshine houses
+    ascmc[9] = h.sundec ;
 #ifdef TRACE
   swi_open_trace(NULL);
   if (swi_trace_count <= TRACE_COUNT_MAX) {
@@ -1003,7 +1040,7 @@ porphyry:
       q = acmc;
       if (q > 90) q = 180 - q;
       if (q < 1e-30) {    // degenerate case of quadrant = zer0
-	r = INFINITY;
+	// r = INFINITY;
 	x = xr = xr3 = 0;
 	xr4 = 180;
       } else {
@@ -1750,8 +1787,6 @@ static double fix_asc_polar(double asc, double armc, double eps, double geolat)
  * is currently provided for the following house methods:
  * Y APC houses, L Pullen SD, Q Pullen SR, I Sunshine, S Sripati.
  *
- * For the following house methods only a simplified calcul
- *
  * IMPORTANT: This function should NOT be used for sidereal astrology.
  * If you cannot avoid doing so, please note:
  * - The input longitudes (xpin) MUST always be tropical, even if you 
@@ -1771,28 +1806,63 @@ double CALL_CONV swe_house_pos(
 	double armc, double geolat, double eps, int hsys, double *xpin, char *serr)
 {
   double xp[6], xeq[6], ra, de, mdd, mdn, sad, san;
-  double hpos, sinad, ad, a, admc, adp, samc, demc, asc, mc, acmc, tant;
+  double hpos, sinad, ad, a, admc, adp, samc, asc, mc, acmc, tant;
+  //double demc;
   double fh, ra0, tanfi, fac, dfac, tanx;
   double x[3], xasc[3], raep, raaz, oblaz, xtemp; /* BK 21.02.2006 */
   double hcusp[36], ascmc[10];
   double sine = sind(eps);
   double cose = cosd(eps);
   double c1, c2, d, hsize;
-  int i, j;
-  ascmc[9] = 99;	// dirty hack. Sunshine house system needs sun declination
-  			// which we do not know. If it sees ascmc[9] == 99, it uses
-			// the one is saved from last call. can lead to bugs, but can also
-			// solve many problems.
+  int i, j, nloop;
+  double dsun = 0, darmc, harmc, y, sinpsi, sa;
+  AS_BOOL is_western_half = FALSE;
+  hsys = toupper(hsys);
+if (1) {
+  /* input is a house position: no calculation is required */
+  ascmc[9] = 99;// dirty hack. Sunshine house system needs sun declination
+  		// which we do not know. If it sees ascmc[9] == 99, it uses
+		// the one is saved from last call. can lead to bugs, but can 
+		// also solve many problems.
+  if (swe_houses_armc(armc, geolat, eps, hsys, hcusp, ascmc) == ERR) {
+    if (serr != NULL)
+      sprintf(serr, "swe_house_pos(): failed for system %c", hsys);
+  } else {
+    hpos = 0;
+    for (i = 1; i <= 12; i++) {
+      if (fabs(swe_difdeg2n(xpin[0], hcusp[i])) < MILLIARCSEC && xpin[1] == 0) {
+	hpos = (double) i;
+      }
+    }
+    for (i = 1; i <= 12; i += 3) {
+      if (fabs(swe_difdeg2n(xpin[0], hcusp[i])) < MILLIARCSEC && xpin[1] == 0) {
+	xp[0] = (double) i;
+      }
+    }
+    if (hpos > 0)
+      return hpos;
+    // for Sunshine houses: declination of Sun
+    if (hsys == 'I')
+      dsun = ascmc[9];  
+    // for APC houses: declination of ascendant into dsun
+    if (hsys == 'Y') {
+      xeq[0] = ascmc[0];
+      xeq[1] = 0;
+      xeq[2] = 1;
+      swe_cotrans(xeq, xeq, -eps);
+      dsun = xeq[1]; 
+    }
+  }
+}
   AS_BOOL is_above_hor = FALSE;
   AS_BOOL is_invalid = FALSE;
   AS_BOOL is_circumpolar = FALSE;
   if (serr != NULL)
     *serr = '\0';
-  hsys = toupper(hsys);
   xeq[0] = xpin[0];
   xeq[1] = xpin[1];
   xeq[2] = 1;
-  swe_cotrans(xpin, xeq, -eps);
+  swe_cotrans(xeq, xeq, -eps);
   ra = xeq[0];
   de = xeq[1];
   mdd = swe_degnorm(ra - armc);
@@ -1803,15 +1873,15 @@ double CALL_CONV swe_house_pos(
     mdn -= 360;
   /* xp[0] will contain the house position, a value between 0 and 360 */
   switch(hsys) {
-    case 'N':
+    case 'N': // equal (1=Aries)
       xp[0] = xpin[0];
       hpos = xp[0] / 30.0 + 1;
       break;
-    case 'A':
-    case 'E':
-    case 'D':
-    case 'V':
-    case 'W':
+    case 'A': // equal
+    case 'E': // equal
+    case 'D': // equal (MC)
+    case 'V': // Vehlow
+    case 'W': // whole signs
       asc = Asc1(swe_degnorm(armc + 90), geolat, sine, cose);
       mc = armc_to_mc(armc, eps);
       asc = fix_asc_polar(asc, armc, eps, geolat);
@@ -1829,13 +1899,14 @@ double CALL_CONV swe_house_pos(
       break;
     case 'O':  /* Porphyry */
     case 'B':  /* Alcabitius */
+    case 'S':  /* Sripati */
       asc = Asc1(swe_degnorm(armc + 90), geolat, sine, cose);
       /* mc */
       mc = armc_to_mc(armc, eps);
       /* while MC is always south,
        * Asc must always be in eastern hemisphere */
       asc = fix_asc_polar(asc, armc, eps, geolat);
-      if (hsys ==  'O') {
+      if (hsys ==  'O' || hsys == 'S') {
 	xp[0] = swe_degnorm(xpin[0] - asc);
 	/* to make sure that a call with a house cusp position returns
 	 * a value within the house, 0.001" is added */
@@ -1851,6 +1922,10 @@ double CALL_CONV swe_house_pos(
 	  hpos += xp[0] * 3 / (180 - acmc);
 	else
 	  hpos += 3 + (xp[0] - 180 + acmc) * 3 / acmc;
+        if (hsys == 'S') {
+	  hpos += 0.5;
+	  if (hpos > 12) hpos = 1;
+	}
       } else { /* Alcabitius */
 	double dek, r, sna, sda;
 	dek = asind(sind(asc) * sine);	/* declination of Ascendant */
@@ -1940,8 +2015,8 @@ double CALL_CONV swe_house_pos(
     /* version of Koch method: do calculations within circumpolar circle,
      * if possible; make sure house positions 4 - 9 only appear on western
      * hemisphere */
-    case 'K': 
-      demc = atand(sind(armc) * tand(eps));
+    case 'K': // Koch
+      //demc = atand(sind(armc) * tand(eps));
       is_invalid = FALSE;
       is_circumpolar = FALSE;
       /* object is within a circumpolar circle */
@@ -2010,7 +2085,7 @@ double CALL_CONV swe_house_pos(
        * a value within the house, 0.001" is added */
       hpos = xp[0] / 30.0 + 1;
       break;
-    case 'C':
+    case 'C': // Campanus
       xeq[0] = swe_degnorm(mdd - 90);
       swe_cotrans(xeq, xp, -geolat);
       /* to make sure that a call with a house cusp position returns
@@ -2091,7 +2166,7 @@ double CALL_CONV swe_house_pos(
       xp[0] = swe_degnorm(xp[0] + MILLIARCSEC);
       hpos = xp[0] / 30.0 + 1;
       break;
-    case 'H':
+    case 'H': // horizon / azimuth
       xeq[0] = swe_degnorm(mdd - 90);
       swe_cotrans(xeq, xp, 90 - geolat);
       /* to make sure that a call with a house cusp position returns
@@ -2099,7 +2174,7 @@ double CALL_CONV swe_house_pos(
       xp[0] = swe_degnorm(xp[0] + MILLIARCSEC);
       hpos = xp[0] / 30.0 + 1;
       break;
-    case 'R':
+    case 'R': // Regiomontanus
       if (fabs(mdd) < VERY_SMALL)
 	xp[0] = 270;
       else if (180 - fabs(mdd) < VERY_SMALL)
@@ -2128,14 +2203,122 @@ double CALL_CONV swe_house_pos(
       }  
       hpos = xp[0] / 30.0 + 1;
       break;
-    case 'T':
+    /* with Sunshine and APC houses, the method is the same,
+     * except that Sunshine users dsun = (declination of Sun),
+     * whereas APC uses dsun = (declination of ascendant). 
+     * The Sunshine method has more problems within the polar
+     * circles, if the Sun is circumpolar. The ascendant is never
+     * circumpolar except if it coincides with the MC or the IC.
+     */
+    case 'I': case 'i': // sunshine houses (Makransky)
+    case 'Y': // APC houses (Knegt)
+      if (geolat > 90 - MILLIARCSEC)
+        geolat = 90 - MILLIARCSEC;
+      if (geolat < -90 + MILLIARCSEC)
+        geolat = -90 + MILLIARCSEC;
+//fprintf(stdout, "in=%f, mdd=%f\n", xpin[0], mdd);
+      if (90 - fabs(de) < VERY_SMALL) {
+	if (de > 0)
+	  de = 90 - VERY_SMALL;
+	else
+	  de = -90 + VERY_SMALL;
+      }
+      a = tand(geolat) * tand(de) + cosd(mdd);
+      xp[0] = swe_degnorm(atand(-a / sind(mdd)));
+      if (mdd < 0)
+	xp[0] += 180;
+      xp[0] = swe_degnorm(xp[0]); // house position with hsys = 'R'
+      /* is object above horizon? */
+      sinad = tand(de) * tand(geolat);
+      a = sinad + cosd(mdd);
+      if (a >= 0)    
+	is_above_hor = TRUE;
+      /* height of armc above horizon */
+      harmc = 90 - geolat;    
+      if (geolat < 0)
+	harmc = 90 + geolat;
+      /* meridian distance of crossing of house position line with equator */
+      darmc = swe_degnorm(xp[0] - 270);
+      if (darmc > 180) {
+	is_western_half = TRUE;
+	darmc = (360 - darmc);
+      }
+      /* semi-diurnal arc of sun */
+      sinad = tand(dsun) * tand(geolat);
+      if (sinad >= 1) 
+	ad = 90;
+	//ad = 90 - VERY_SMALL;
+      else if (sinad <= -1)
+	ad = -90;
+	//ad = -(90 - VERY_SMALL);
+      else 
+	ad = asind(sinad);
+      sad = 90 + ad;
+      san = 90 - ad;
+      //fprintf(stdout, "in=%f, above=%d, sad=%f, san=%f, sinad=%f\n", xpin[0], (int) is_above_hor, sad, san, sinad);
+      /* circumpolar sun has diurnal arc = 0 and object is above the horizon:
+       * house position = 10 (270°) */
+      if (sad == 0 && is_above_hor) {
+	xp[0] = 270;
+      /* circumpolar sun has nocturnal arc = 0 and object is below the horizon:
+       * house position = 4 (90°) */
+      } else if (san == 0 && !is_above_hor) {
+	xp[0] = 90;
+      /* otherwise we can calculate the house position */
+      } else {
+	sa = sad;
+	if (!is_above_hor) {
+	  dsun = -dsun;
+	  sa = san;
+	  darmc = 180 - darmc;
+	  is_western_half = !is_western_half;
+	}
+	/* length of position line between south point and equator */
+	a = acosd(cosd(harmc) * cosd(darmc));
+	if (a < VERY_SMALL) 
+	  a = VERY_SMALL;
+	/* sine of angle between position line and equator */
+	sinpsi = sind(harmc) / sind(a);
+	if (sinpsi > 1) sinpsi = 1;
+	if (sinpsi < -1) sinpsi = -1;
+	/* meridian distance of crossing of house position line with solar diurnal arc */
+	y = sind(dsun) / sinpsi;
+	if (y > 1)
+	  y = 90 - VERY_SMALL;
+	else if (y < -1)
+	  y = - (90 - VERY_SMALL);
+	else
+	  y = asind(y);
+	d = acosd(cosd(y) / cosd(dsun));
+	if (dsun < 0) d = -d;
+	if (geolat < 0) d = -d;
+	darmc += d;
+	if (is_western_half) 
+	  xp[0] = 270 - (darmc / sa) * 90;
+	else
+	  xp[0] = 270 + (darmc / sa) * 90;
+	if (!is_above_hor)
+	  xp[0] = swe_degnorm(xp[0] + 180);
+      }
+      /* to make sure that a call with a house cusp position returns
+       * a value within the house, 0.001" is added */
+      xp[0] = swe_degnorm(xp[0] + MILLIARCSEC);
+      hpos = xp[0] / 30.0 + 1;
+      break;
+    case 'T': // Polich-Page ("topocentric")
+      fh = geolat;
+      if (fh > 89.999)
+	fh = 89.999;
+      if (fh < -89.999)
+	fh = -89.999;
       mdd = swe_degnorm(mdd);
       if (de > 90 - VERY_SMALL)
 	de = 90 - VERY_SMALL;
       if (de < -90 + VERY_SMALL)
 	de = -90 + VERY_SMALL;
-      sinad = tand(de) * tand(geolat);
-      ad = asind(sinad);
+      sinad = tand(de) * tand(fh);
+      if (sinad > 1.0) sinad = 1.0;
+      if (sinad < -1.0) sinad = -1.0;
       a = sinad + cosd(mdd);
       if (a >= 0)
         is_above_hor = TRUE;
@@ -2151,13 +2334,13 @@ double CALL_CONV swe_house_pos(
 	ra = swe_degnorm(armc - mdd);
       }
       /* binary search for "topocentric" position line of body */
-      tanfi = tand(geolat);
-      fh = geolat;
+      tanfi = tand(fh);
       ra0 = swe_degnorm(armc + 90);
       xp[1] = 1;
       xeq[1] = de;
       fac = 2;
-      while (fabs(xp[1]) > 0.000001) {
+      nloop = 0;
+      while (fabs(xp[1]) > 0.000001 && nloop < 1000) {
 	if (xp[1] > 0) {
 	  fh = atand(tand(fh) - tanfi / fac);
 	  ra0 -= 90 / fac;
@@ -2168,6 +2351,7 @@ double CALL_CONV swe_house_pos(
 	xeq[0] = swe_degnorm(ra - ra0);
         swe_cotrans(xeq, xp, 90 - fh);
 	fac *= 2;
+	nloop++;
       }
       hpos = swe_degnorm(ra0 - armc);
       /* mirror back to west */
@@ -2178,8 +2362,8 @@ double CALL_CONV swe_house_pos(
 	hpos = swe_degnorm(hpos + 180);
       hpos = swe_degnorm(hpos - 90) / 30 + 1;
       break;
-    case 'P':
-    case 'G':
+    case 'P': // Placidus
+    case 'G': // Gauquelin
        /* circumpolar region */
       if (90 - fabs(de) <= fabs(geolat)) {
         if (de * geolat < 0)  
@@ -2254,7 +2438,7 @@ double CALL_CONV swe_house_pos(
   return hpos;
 }
 
-int sunshine_init(double lat, double dec, double xh[])
+static int sunshine_init(double lat, double dec, double xh[])
 {
   double ad, nsa, dsa, arg;
   // ascensional difference: sin ad = tan dec tan lat
@@ -2287,17 +2471,14 @@ static int sunshine_solution_makransky(double ramc, double lat, double ecl, stru
   double xh[13];
   double md;
   double zd;	// zenith distance of house circle, along prime vertical
-  double pole, q, w, a, b, c, f, cu, r, rah;
-  double sinlat, coslat, tanlat, sindec, cosdec, tandec, sinecl, cosecl;
+  double pole, q, w, a, b, c, f, cu, r = 0, rah;
+  double sinlat, coslat, tanlat, tandec, sinecl;
   double dec = hsp->sundec;
   sinlat = sind(lat);
   coslat = cosd(lat);
   tanlat = tand(lat);
-  sindec = sind(dec);
-  cosdec = cosd(dec);
   tandec = tand(dec);
   sinecl = sind(ecl);
-  cosecl = cosd(ecl);
   int ih;
   // if (90 - fabs(lat) <= ecl) {
   //   strcpy(hsp->serr, "Sunshine in polar circle not allowed");
@@ -2430,8 +2611,8 @@ static int sunshine_solution_makransky(double ramc, double lat, double ecl, stru
 static int sunshine_solution_treindl(double ramc, double lat, double ecl, struct houses *hsp)
 {
   double xh[13];
-  double mcdec, sinlat, coslat, sindec, cosdec, tandec, sinecl, cosecl;
-  double xhs, pole, a, cosa, alph, alpha2, c, cosc, b, sinzd, zd, rax, equa, hc;
+  double mcdec, sinlat, coslat, cosdec, tandec, sinecl, cosecl;
+  double xhs, pole, a, cosa, alph, alpha2, c, cosc, b, sinzd, zd, rax, hc;
   int ih, retval = OK;
   AS_BOOL mc_under_horizon;
   double dec = hsp->sundec;
@@ -2441,7 +2622,6 @@ static int sunshine_solution_treindl(double ramc, double lat, double ecl, struct
   // }
   sinlat = sind(lat);
   coslat = cosd(lat);
-  sindec = sind(dec);
   cosdec = cosd(dec);
   tandec = tand(dec);
   sinecl = sind(ecl);
@@ -2502,7 +2682,6 @@ static int sunshine_solution_treindl(double ramc, double lat, double ecl, struct
     // night side: triangle north point
     // sides: 90 - lat, angle zd
     rax = atand(coslat * tand(zd));
-    equa = acosd(sinlat * sinzd);	// not used
     // compute pole height (distance of house circle pole from equator
     // with triangle at west point
     pole = asind(sinzd * sinlat);

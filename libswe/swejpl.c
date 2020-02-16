@@ -75,10 +75,11 @@
 #include "swejpl.h"
 
 #if MSDOS
-  typedef __int64 off_t;
+  typedef __int64 off_t64;
   #define FSEEK _fseeki64
   #define FTELL _ftelli64
 #else
+  typedef off_t off_t64;
   #define FSEEK fseeko
   #define FTELL ftello
 #endif
@@ -190,6 +191,7 @@ static int32 fsizer(char *serr)
   int i, kmx, khi, nd;
   int32 ksize, lpt[3];
   char ttl[6*14*3];	
+  size_t nrd; /* unused, removes compile warnings */
   if ((js->jplfptr = swi_fopen(SEI_FILE_PLANET, js->jplfname, js->jplfpath, serr)) == NULL) {
     return NOT_AVAILABLE;
   }
@@ -197,13 +199,16 @@ static int32 fsizer(char *serr)
    * "JPL Planetary Ephemeris DE404/LE404
    *  Start Epoch: JED=   625296.5-3001 DEC 21 00:00:00
    *  Final Epoch: JED=  2817168.5 3001 JAN 17 00:00:00c */
-  fread((void *) &ttl[0], 1, 252, js->jplfptr);
+  nrd = fread((void *) &ttl[0], 1, 252, js->jplfptr);
+  if (nrd != 252) return NOT_AVAILABLE;
   /* cnam = names of constants */
-  fread((void *) js->ch_cnam, 1, 6*400, js->jplfptr);
+  nrd = fread((void *) js->ch_cnam, 1, 6*400, js->jplfptr);
+  if (nrd != 6*400) return NOT_AVAILABLE;
   /* ss[0] = start epoch of ephemeris
    * ss[1] = end epoch
    * ss[2] = segment size in days */
-  fread((void *) &ss[0], sizeof(double), 3, js->jplfptr);
+  nrd = fread((void *) &ss[0], sizeof(double), 3, js->jplfptr);
+  if (nrd != 3) return NOT_AVAILABLE;
   /* reorder ? */
   if (ss[2] < 1 || ss[2] > 200) 
     js->do_reorder = TRUE;
@@ -225,29 +230,35 @@ static int32 fsizer(char *serr)
     return(NOT_AVAILABLE);
   }
   /* ncon = number of constants */
-  fread((void *) &ncon, sizeof(int32), 1, js->jplfptr);
+  nrd = fread((void *) &ncon, sizeof(int32), 1, js->jplfptr);
+  if (nrd != 1) return NOT_AVAILABLE;
   if (js->do_reorder)
     reorder((char *) &ncon, sizeof(int32), 1);
   /* au = astronomical unit */
-  fread((void *) &au, sizeof(double), 1, js->jplfptr);
+  nrd = fread((void *) &au, sizeof(double), 1, js->jplfptr);
+  if (nrd != 1) return NOT_AVAILABLE;
   if (js->do_reorder)
     reorder((char *) &au, sizeof(double), 1);
   /* emrat = earth moon mass ratio */
-  fread((void *) &emrat, sizeof(double), 1, js->jplfptr);
+  nrd = fread((void *) &emrat, sizeof(double), 1, js->jplfptr);
+  if (nrd != 1) return NOT_AVAILABLE;
   if (js->do_reorder)
     reorder((char *) &emrat, sizeof(double), 1);
   /* ipt[i+0]: coefficients of planet i start at buf[ipt[i+0]-1] 
    * ipt[i+1]: number of coefficients (interpolation order - 1)
    * ipt[i+2]: number of intervals in segment */
-  fread((void *) &js->eh_ipt[0], sizeof(int32), 36, js->jplfptr);
+  nrd = fread((void *) &js->eh_ipt[0], sizeof(int32), 36, js->jplfptr);
+  if (nrd != 36) return NOT_AVAILABLE;
   if (js->do_reorder)
     reorder((char *) &js->eh_ipt[0], sizeof(int32), 36);
   /* numde = number of jpl ephemeris "404" with de404 */
-  fread((void *) &numde, sizeof(int32), 1, js->jplfptr);
+  nrd = fread((void *) &numde, sizeof(int32), 1, js->jplfptr);
+  if (nrd != 1) return NOT_AVAILABLE;
   if (js->do_reorder)
     reorder((char *) &numde, sizeof(int32), 1);
   /* read librations */
-  fread(&lpt[0], sizeof(int32), 3, js->jplfptr);
+  nrd = fread(&lpt[0], sizeof(int32), 3, js->jplfptr);
+  if (nrd != 3) return NOT_AVAILABLE;
   if (js->do_reorder)
     reorder((char *) &lpt[0], sizeof(int32), 3);
   /* fill librations into eh_ipt[36]..[38] */
@@ -638,7 +649,7 @@ static int state(double et, int32 *list, int do_bary,
 {
   int i, j, k;
   int32 nseg;
-  off_t flen, nb;
+  off_t64 flen, nb;
   double *buf = js->buf;
   double aufac, s, t, intv, ts[4];
   int32 nrecl, ksize;
@@ -648,6 +659,7 @@ static int state(double et, int32 *list, int do_bary,
   char ch_ttl[252];
   static TLS int32 irecsz;
   static TLS int32 nrl, lpt[3], ncoeffs;
+  size_t nrd; /* unused, removes compile warnings */
   if (js->jplfptr == NULL) {
     ksize = fsizer(serr); /* the number of single precision words in a record */
     nrecl = 4;
@@ -659,43 +671,53 @@ static int state(double et, int32 *list, int do_bary,
      * "JPL Planetary Ephemeris DE404/LE404
      *  Start Epoch: JED=   625296.5-3001 DEC 21 00:00:00
      *  Final Epoch: JED=  2817168.5 3001 JAN 17 00:00:00c */
-    fread((void *) ch_ttl, 1, 252, js->jplfptr);
+    nrd = fread((void *) ch_ttl, 1, 252, js->jplfptr);
+    if (nrd != 252) return NOT_AVAILABLE;
     /* cnam = names of constants */
-    fread((void *) js->ch_cnam, 1, 2400, js->jplfptr);
+    nrd = fread((void *) js->ch_cnam, 1, 2400, js->jplfptr);
+    if (nrd != 2400) return NOT_AVAILABLE;
     /* ss[0] = start epoch of ephemeris
      * ss[1] = end epoch
      * ss[2] = segment size in days */
-    fread((void *) &js->eh_ss[0], sizeof(double), 3, js->jplfptr);
+    nrd = fread((void *) &js->eh_ss[0], sizeof(double), 3, js->jplfptr);
+    if (nrd != 3) return NOT_AVAILABLE;
     if (js->do_reorder)
       reorder((char *) &js->eh_ss[0], sizeof(double), 3);
     /* ncon = number of constants */
-    fread((void *) &js->eh_ncon, sizeof(int32), 1, js->jplfptr);
+    nrd = fread((void *) &js->eh_ncon, sizeof(int32), 1, js->jplfptr);
+    if (nrd != 1) return NOT_AVAILABLE;
     if (js->do_reorder)
       reorder((char *) &js->eh_ncon, sizeof(int32), 1);
     /* au = astronomical unit */
-    fread((void *) &js->eh_au, sizeof(double), 1, js->jplfptr);
+    nrd = fread((void *) &js->eh_au, sizeof(double), 1, js->jplfptr);
+    if (nrd != 1) return NOT_AVAILABLE;
     if (js->do_reorder)
       reorder((char *) &js->eh_au, sizeof(double), 1);
     /* emrat = earth moon mass ratio */
-    fread((void *) &js->eh_emrat, sizeof(double), 1, js->jplfptr);
+    nrd = fread((void *) &js->eh_emrat, sizeof(double), 1, js->jplfptr);
+    if (nrd != 1) return NOT_AVAILABLE;
     if (js->do_reorder)
       reorder((char *) &js->eh_emrat, sizeof(double), 1);
     /* ipt[i+0]: coefficients of planet i start at buf[ipt[i+0]-1] 
      * ipt[i+1]: number of coefficients (interpolation order - 1)
      * ipt[i+2]: number of intervals in segment */
-    fread((void *) &ipt[0], sizeof(int32), 36, js->jplfptr);
+    nrd = fread((void *) &ipt[0], sizeof(int32), 36, js->jplfptr);
+    if (nrd != 36) return NOT_AVAILABLE;
     if (js->do_reorder)
       reorder((char *) &ipt[0], sizeof(int32), 36);
     /* numde = number of jpl ephemeris "404" with de404 */
-    fread((void *) &js->eh_denum, sizeof(int32), 1, js->jplfptr);
+    nrd = fread((void *) &js->eh_denum, sizeof(int32), 1, js->jplfptr);
+    if (nrd != 1) return NOT_AVAILABLE;
     if (js->do_reorder)
       reorder((char *) &js->eh_denum, sizeof(int32), 1);
-    fread((void *) &lpt[0], sizeof(int32), 3, js->jplfptr);
+    nrd = fread((void *) &lpt[0], sizeof(int32), 3, js->jplfptr);
+    if (nrd != 3) return NOT_AVAILABLE;
     if (js->do_reorder)
       reorder((char *) &lpt[0], sizeof(int32), 3);
     /* cval[]:  other constants in next record */
-    FSEEK(js->jplfptr, (off_t) (1L * irecsz), 0);
-    fread((void *) &js->eh_cval[0], sizeof(double), 400, js->jplfptr);
+    FSEEK(js->jplfptr, (off_t64) (1L * irecsz), 0);
+    nrd = fread((void *) &js->eh_cval[0], sizeof(double), 400, js->jplfptr);
+    if (nrd != 400) return NOT_AVAILABLE;
     if (js->do_reorder)
       reorder((char *) &js->eh_cval[0], sizeof(double), 400);
     /* new 26-aug-2008: verify correct block size */
@@ -704,7 +726,7 @@ static int state(double et, int32 *list, int do_bary,
     nrl = 0;
     /* is file length correct? */
     /* file length */
-    FSEEK(js->jplfptr, (off_t) 0L, SEEK_END);
+    FSEEK(js->jplfptr, (off_t64) 0L, SEEK_END);
     flen = FTELL(js->jplfptr);
     /* # of segments in file */
     nseg = (int32) ((js->eh_ss[1] - js->eh_ss[0]) / js->eh_ss[2]);	
@@ -735,12 +757,14 @@ static int state(double et, int32 *list, int do_bary,
     }
     /* check if start and end dates in segments are the same as in 
      * file header */
-    FSEEK(js->jplfptr, (off_t) (2L * irecsz), 0);
-    fread((void *) &ts[0], sizeof(double), 2, js->jplfptr);
+    FSEEK(js->jplfptr, (off_t64) (2L * irecsz), 0);
+    nrd = fread((void *) &ts[0], sizeof(double), 2, js->jplfptr);
+    if (nrd != 2) return NOT_AVAILABLE;
     if (js->do_reorder)
       reorder((char *) &ts[0], sizeof(double), 2);
-    FSEEK(js->jplfptr, (off_t) ((nseg + 2 - 1) * ((off_t) irecsz)), 0);
-    fread((void *) &ts[2], sizeof(double), 2, js->jplfptr);
+    FSEEK(js->jplfptr, (off_t64) ((nseg + 2 - 1) * ((off_t64) irecsz)), 0);
+    nrd = fread((void *) &ts[2], sizeof(double), 2, js->jplfptr);
+    if (nrd != 2) return NOT_AVAILABLE;
     if (js->do_reorder)
       reorder((char *) &ts[2], sizeof(double), 2);
     if (ts[0] != js->eh_ss[0] || ts[3] != js->eh_ss[1]) {
@@ -769,7 +793,7 @@ static int state(double et, int32 *list, int do_bary,
   /* read correct record if not in core */
   if (nr != nrl) {
     nrl = nr;
-    if (FSEEK(js->jplfptr, (off_t) (nr * ((off_t) irecsz)), 0) != 0) {
+    if (FSEEK(js->jplfptr, (off_t64) (nr * ((off_t64) irecsz)), 0) != 0) {
       if (serr != NULL) 
 	sprintf(serr, "Read error in JPL eph. at %f\n", et);
       return NOT_AVAILABLE;
@@ -899,8 +923,8 @@ int swi_open_jpl_file(double *ss, char *fname, char *fpath, char *serr)
   if (js != NULL && js->jplfptr != NULL)
     return OK;
   if ((js = (struct jpl_save *) CALLOC(1, sizeof(struct jpl_save))) == NULL
-    || (js->jplfname = MALLOC(strlen(fname)+1)) == NULL
-    || (js->jplfpath = MALLOC(strlen(fpath)+1)) == NULL
+    || (js->jplfname = (char *) MALLOC(strlen(fname)+1)) == NULL
+    || (js->jplfpath = (char *) MALLOC(strlen(fpath)+1)) == NULL
     ) {
     if (serr != NULL)
       strcpy(serr, "error in malloc() with JPL ephemeris.");

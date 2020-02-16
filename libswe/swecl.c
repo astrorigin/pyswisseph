@@ -107,6 +107,11 @@ static int32 calc_planet_star(double tjd_et, int32 ipl, char *starname, int32 if
 
 struct saros_data {int series_no; double tstart;};
 
+// Saros cycle numbers of solar eclipses with date of initial 
+// eclipse. Table was derived from the table of the Nasa Eclipse Web Site:
+// https://eclipse.gsfc.nasa.gov/SEsaros/SEsaros0-180.html
+// Note, for eclipse dates =< 15 Feb -1604 and eclipse dates
+// >= 2 Sep 2666, Saros cycle numbers cannot always be given.
 #define SAROS_CYCLE  6585.3213
 #define NSAROS_SOLAR 181
 struct saros_data saros_data_solar[NSAROS_SOLAR] = {
@@ -293,6 +298,11 @@ struct saros_data saros_data_solar[NSAROS_SOLAR] = {
 {180, 2729226.5}, /* 08 Apr 2760 */
 };
 
+// Saros cycle numbers of lunar eclipses with date of initial 
+// eclipse. Table was derived from the table of the Nasa Eclipse Web Site:
+// https://eclipse.gsfc.nasa.gov/LEsaros/LEsaroscat.html
+// Note, for eclipse dates =< 29 April -1337 and eclipse dates
+// >= 10 Aug 2892, Saros cycle numbers cannot always be given.
 #define NSAROS_LUNAR 180
 struct saros_data saros_data_lunar[NSAROS_LUNAR] = {
 {1, 782437.5}, /* 14 Mar -2570 */
@@ -568,6 +578,28 @@ int32 CALL_CONV swe_sol_eclipse_where(
   return retflag;
 }
 
+/*
+  double tjd_ut,       time, Jul. day UT 
+  int32 ipl,           planet number 
+  char* starname,      star name, must be NULL or ”” if not a star 
+  int32 ifl,           ephemeris flag 
+  double *geopos,      return array, 2 doubles, geo. long. and lat.
+		       eastern longitude is positive,
+		       western longitude is negative,
+		       northern latitude is positive,
+  double *attr,        return array, 20 doubles, see below 
+  char *serr           return error string 
+
+  array attr:
+  attr[0]              fraction of object's diameter covered by moon (magnitude)
+  attr[1]              ratio of lunar diameter to object's diameter
+  attr[2]              fraction of object's disc covered by moon (obscuration)
+  attr[3]              diameter of core shadow in km
+  attr[4]              azimuth of object at tjd
+  attr[5]              true altitude of object above horizon at tjd
+  attr[6]              apparent altitude of object above horizon at tjd
+  attr[7]              angular distance of moon from object in degrees
+ */
 int32 CALL_CONV swe_lun_occult_where(
 		double tjd_ut, 
                 int32 ipl,
@@ -852,23 +884,11 @@ iter_where:
 
 static int32 calc_planet_star(double tjd_et, int32 ipl, char *starname, int32 iflag, double *x, char *serr)
 {
-  int i;
   int retc = OK;
   if (starname == NULL || *starname == '\0') {
     retc = swe_calc(tjd_et, ipl, iflag, x, serr);
   } else {
-    if ((retc = swe_fixstar(starname, tjd_et, iflag, x, serr)) == OK) {
-      /* fixstars have the standard distance 1. 
-       * in the occultation routines, this might lead to errors 
-       * if interpreted as AU distance. To avoid this, we make it very high.
-       */
-      if (iflag & SEFLG_XYZ) {
-	for (i = 0; i < 3; i++)
-	  x[i] *= 1000000000;
-      } else {
-	x[2] *= 1000000000;
-      }
-    }
+    retc = swe_fixstar(starname, tjd_et, iflag, x, serr);
   }
   return retc;
 }
@@ -903,9 +923,11 @@ int32 CALL_CONV swe_sol_eclipse_how(
           double *attr, 
           char *serr)
 {
-  int32 retflag, retflag2;
+  int32 retflag, retflag2, i;
   double dcore[10], ls[6], xaz[6];
   double geopos2[20];
+  for (i = 0; i <= 10; i++)
+    attr[i] = 0;
   if (geopos[2] < SEI_ECL_GEOALT_MIN || geopos[2] > SEI_ECL_GEOALT_MAX) {
     if (serr != NULL)
       sprintf(serr, "location for eclipses must be between %.0f and %.0f m above sea", SEI_ECL_GEOALT_MIN, SEI_ECL_GEOALT_MAX);
@@ -929,6 +951,12 @@ int32 CALL_CONV swe_sol_eclipse_how(
   attr[6] = xaz[2];
   if (xaz[2] <= 0)
     retflag = 0;
+  if (retflag == 0) {
+    for (i = 0; i <= 3; i++)
+      attr[i] = 0;
+    for (i = 8; i <= 10; i++)
+      attr[i] = 0;
+  }
   return retflag;
 }
 
@@ -1096,6 +1124,7 @@ static int32 eclipse_how( double tjd_ut, int32 ipl, char *starname, int32 ifl,
     /* saros series and member */
     for (i = 0; i < NSAROS_SOLAR; i++) {
       d = (tjd_ut - saros_data_solar[i].tstart) / SAROS_CYCLE;
+      if (d < 0 && d * SAROS_CYCLE > -2) d = 0.0000001;
       if (d < 0) continue;
       j = (int) d;
       if ((d - j) * SAROS_CYCLE < 2) {
@@ -2396,7 +2425,7 @@ static int32 occult_when_loc(
   double dt1 = 0, dt2 = 0, dtdiv, dtstart;
   double dadd2 = 1;
   double drad, dl;
-  AS_BOOL is_partial = FALSE;
+  //AS_BOOL is_partial = FALSE;
   int32 iflag = SEFLG_TOPOCTR | ifl;
   int32 iflaggeo = iflag & ~SEFLG_TOPOCTR;
   int32 iflagcart = iflag | SEFLG_XYZ;
@@ -2413,7 +2442,7 @@ static int32 occult_when_loc(
   t = tjd_start;
   tjd = tjd_start;
 next_try:
-  is_partial = FALSE;
+  //is_partial = FALSE;
   if (calc_planet_star(t, ipl, starname, iflaggeo, ls, serr) == ERR)
       return ERR;
   /* fixed stars with an ecliptic latitude > 7  or < -7 cannot have 
@@ -2549,7 +2578,7 @@ next_try:
   /* contacts 2 and 3 */
   if (dctr > fabs(rsminusrm)) {  /* partial, no 2nd and 3rd contact */
     tret[2] = tret[3] = 0;
-    is_partial = TRUE;
+    //is_partial = TRUE;
   } else {
     dc[1] = fabs(rsminusrm) - dctrmin;
     for (i = 0, t = tjd - twomin; i <= 2; i += 2, t = tjd + twomin) {
@@ -2605,7 +2634,7 @@ next_try:
     }
     tret[2] -= swe_deltat_ex(tret[2], ifl, serr);
     tret[3] -= swe_deltat_ex(tret[3], ifl, serr);
-    is_partial = FALSE;
+    //is_partial = FALSE;
   }
   /* contacts 1 and 4 */
   dc[1] = rsplusrm - dctrmin;
@@ -2849,8 +2878,8 @@ void CALL_CONV swe_azalt_rev(
  * double inalt;        * altitude of object in degrees *
  * double atpress;      * millibars (hectopascal) *
  * double attemp;       * degrees C *
- * int32  calc_flag;	* either SE_CALC_APP_TO_TRUE or 
- *                      *        SE_CALC_TRUE_TO_APP
+ * int32  calc_flag;	* either SE_APP_TO_TRUE or 
+ *                      *        SE_TRUE_TO_APP
  */
 double CALL_CONV swe_refrac(double inalt, double atpress, double attemp, int32 calc_flag)
 {
@@ -2975,10 +3004,19 @@ void CALL_CONV swe_set_lapse_rate(double lapse_rate)
  * double atpress;      * millibars (hectopascal) *
  * double lapse_rate;    * (dT/dh) [deg K/m]
  * double attemp;       * degrees C *
- * int32  calc_flag;    * either SE_CALC_APP_TO_TRUE or
- *                      *        SE_CALC_TRUE_TO_APP
+ * int32  calc_flag;    * either SE_APP_TO_TRUE or
+ *                      *        SE_TRUE_TO_APP
  *
  * function returns:
+ * function returns:
+ * double *dret;        * array of 4 doubles; declare 20 doubles !
+ * - dret[0] true altitude, if possible; otherwise input value
+ * - dret[1] apparent altitude, if possible; otherwise input value
+ * - dret[2] refraction
+ * - dret[3] dip of the horizon
+ * 
+ * The body is above the horizon if the dret[0] != dret[1]
+ *
  * case 1, conversion from true altitude to apparent altitude
  * - apparent altitude, if body appears above is observable above ideal horizon
  * - true altitude (the input value), otherwise
@@ -2989,12 +3027,6 @@ void CALL_CONV swe_set_lapse_rate(double lapse_rate)
  *   is a plausible apparent altitude, i.e. if it is a position above the ideal
  *   horizon
  * - the input altitude otherwise
- *
- * in addition the array dret[] is given the following values
- * - dret[0] true altitude, if possible; otherwise input value
- * - dret[1] apparent altitude, if possible; otherwise input value
- * - dret[2] refraction
- * - dret[3] dip of the horizon
  *
  * The body is above the horizon if the dret[0] != dret[1]
  */
@@ -3302,6 +3334,7 @@ static int32 lun_eclipse_how(
   /* saros series and member */
   for (i = 0; i < NSAROS_LUNAR; i++) {
     d = (tjd_ut - saros_data_lunar[i].tstart) / SAROS_CYCLE;
+    if (d < 0 && d * SAROS_CYCLE > -2) d = 0.0000001;
     if (d < 0) continue;
     j = (int) d;
     if ((d - j) * SAROS_CYCLE < 2) {
@@ -3755,7 +3788,7 @@ int32 CALL_CONV swe_pheno(double tjd, int32 ipl, int32 iflag, double *attr, char
   double fac;
   double T, in, om, sinB, u1, u2, du;
   double ph1, ph2, me[2];
-  int32 iflagp, epheflag;
+  int32 iflagp, epheflag, retflag, epheflag2;
   char serr2[AS_MAXCH];
   *serr2 = '\0';
   iflag &= ~(SEFLG_JPLHOR | SEFLG_JPLHOR_APPROX);
@@ -3785,16 +3818,26 @@ int32 CALL_CONV swe_pheno(double tjd, int32 ipl, int32 iflag, double *attr, char
   /*  
    * geocentric planet
    */
-  if (swe_calc(tjd, (int) ipl, iflag | SEFLG_XYZ, xx, serr) == ERR)
+  if ((retflag = swe_calc(tjd, (int) ipl, iflag | SEFLG_XYZ, xx, serr)) == ERR)
     /* int cast can be removed when swe_calc() gets int32 ipl definition */
     return ERR;
+  // check epheflag and adjust iflag
+  epheflag2 = retflag & SEFLG_EPHMASK;
+  if (epheflag != epheflag2) {
+    iflag &= ~epheflag;
+    iflagp &= ~epheflag;
+    iflag |= epheflag2;
+    iflagp |= epheflag2;
+    epheflag = epheflag2;
+  }
   if (swe_calc(tjd, (int) ipl, iflag, lbr, serr) == ERR)
     /* int cast can be removed when swe_calc() gets int32 ipl definition */
     return ERR;
   /* if moon, we need sun as well, for magnitude */
-  if (ipl == SE_MOON)
+  if (ipl == SE_MOON) {
     if (swe_calc(tjd, SE_SUN, iflag | SEFLG_XYZ, xxs, serr) == ERR)
       return ERR;
+  }
   if (ipl != SE_SUN && ipl != SE_EARTH &&
     ipl != SE_MEAN_NODE && ipl != SE_TRUE_NODE &&
     ipl != SE_MEAN_APOG && ipl != SE_OSCU_APOG) {
@@ -3847,7 +3890,8 @@ int32 CALL_CONV swe_pheno(double tjd, int32 ipl, int32 iflag, double *attr, char
     } else if (ipl == SE_MOON) {
       /* formula according to Allen, C.W., 1976, Astrophysical Quantities */
       /*attr[4] = -21.62 + 5 * log10(384410497.8 / EARTH_RADIUS) / log10(10) + 0.026 * fabs(attr[0]) + 0.000000004 * pow(attr[0], 4);*/
-      attr[4] = -21.62 + 5 * log10(lbr[2] * AUNIT / EARTH_RADIUS) / log10(10) + 0.026 * fabs(attr[0]) + 0.000000004 * pow(attr[0], 4);
+      //attr[4] = -21.62 + 5 * log10(lbr[2] * AUNIT / EARTH_RADIUS) / log10(10) + 0.026 * fabs(attr[0]) + 0.000000004 * pow(attr[0], 4);
+      attr[4] = -21.62 + 5 * log10(lbr[2] * AUNIT / EARTH_RADIUS) + 0.026 * fabs(attr[0]) + 0.000000004 * pow(attr[0], 4);
 #if 0
       /* ratio apparent diameter : average diameter */
       fac = attr[3] / (asin(pla_diam[SE_MOON] / 2.0 / 384400000.0) * 2 * RADTODEG);
@@ -3982,7 +4026,7 @@ int32 CALL_CONV swe_pheno(double tjd, int32 ipl, int32 iflag, double *attr, char
   }
   if (*serr2 != '\0' && serr != NULL)
     strcpy(serr, serr2);
-  return OK;
+  return iflag;
 }
 
 int32 CALL_CONV swe_pheno_ut(double tjd_ut, int32 ipl, int32 iflag, double *attr, char *serr)
@@ -4047,6 +4091,156 @@ double rdi_twilight(int32 rsmi)
   return rdi;
 }
 
+static double get_sun_rad_plus_refr(int32 ipl, double dd, int32 rsmi, double refr) 
+{
+  double rdi = 0;
+  if (rsmi & SE_BIT_FIXED_DISC_SIZE) {
+    if (ipl == SE_SUN)
+      dd = 1.0;
+    else if (ipl == SE_MOON)
+      dd = 0.00257;
+  }
+  /* apparent radius of disc */
+  if (!(rsmi & SE_BIT_DISC_CENTER)) 
+    rdi = asin( pla_diam[ipl] / 2.0 / AUNIT / dd) * RADTODEG;
+  if (rsmi & SE_BIT_DISC_BOTTOM) 
+    rdi = -rdi;
+  if (!(rsmi & SE_BIT_NO_REFRACTION)) {
+    rdi += refr; // (34.5 / 60.0);
+  }
+  return rdi;
+}
+
+/* Simple fast algorithm for risings and settings of 
+ * - planets Sun, Moon, Mercury - Pluto + Lunar Nodes and Fixed stars
+ * Does not work well for geographic latitudes
+ * > 65 N/S for the Sun
+ * > 60 N/S for the Moon and the planets
+ * and is called only for latitudes smaller than this.
+ */
+static int32 rise_set_fast(
+               double tjd_ut, int32 ipl,
+	       int32 epheflag, int32 rsmi,
+               double *dgeo, 
+	       double atpress, double attemp,
+               double *tret,
+               char *serr)
+{
+  int i;
+  double xx[6], xaz[6], xaz2[6];
+  double dd, dt, refr;
+  double dtsum = 0;
+  int32 iflag = epheflag & (SEFLG_JPLEPH|SEFLG_SWIEPH|SEFLG_MOSEPH); 
+  int32 iflagtopo = iflag | SEFLG_EQUATORIAL;
+  double sda, armc, md, dmd, mdrise, rdi, tr, dalt;
+  double decl;
+  double tjd_ut0 = tjd_ut;
+  int32 facrise = 1;
+  int32 tohor_flag = SE_EQU2HOR;
+  AS_BOOL is_second_run = FALSE;
+  int nloop = 2;
+  *tret = 0;
+  if (ipl == SE_MOON)
+    nloop = 4; 
+  if (rsmi & SE_CALC_SET)
+    facrise = -1;
+  if (!(rsmi & SE_BIT_GEOCTR_NO_ECL_LAT)) {
+    iflagtopo |= SEFLG_TOPOCTR;
+    swe_set_topo(dgeo[0], dgeo[1], dgeo[2]);
+  }
+run_rise_again:
+  if (swe_calc_ut(tjd_ut, ipl, iflagtopo, xx, serr) == ERR) 
+    return ERR;
+  /* the diurnal arc is a bit fuzzy, 
+   * - because the object changes declination during the day
+   * - because there is refraction of light
+   * nevertheless this works well as soon as the object is not
+   * circumpolar or near-circumpolar
+   */
+  decl = xx[1];
+  // semi-diurnal arcs
+  sda = -tan(dgeo[1] * DEGTORAD) * tan(decl * DEGTORAD);
+  if (sda >= 1) {
+    sda = 10;  // actually sda = 0°, but we give it a value of 10° 
+               // to account for refraction. value 0 would cause
+               // problems
+  } else if (sda <= -1) {
+    sda = 180;
+  } else {
+    sda = acos(sda) * RADTODEG;
+  }
+  // sidereal time at tjd_start
+  armc = swe_degnorm(swe_sidtime(tjd_ut) * 15 + dgeo[0]); 
+  // meridian distance of object
+  md = swe_degnorm(xx[0] - armc);
+  mdrise = swe_degnorm(sda * facrise);
+  //dmd = swe_degnorm(md - mdrise - 1);
+  dmd = swe_degnorm(md - mdrise);
+  // Avoid the risk of getting the event of next day:
+#if 0
+  if (dmd > 358) {
+    tjd_ut -= 0.1;
+    goto run_rise_again;
+  }
+#else
+  if (dmd > 358) {
+    dmd -= 360;
+  }
+#endif
+  // rough subsequent rising/setting time
+  tr = tjd_ut + dmd / 360;
+  /* if object is sun or moon and rising of upper limb is required,
+   * calculate apparent radius of disk (ignoring refraction);
+   * with other objects disk diameter is ignored. */
+  rdi = 0;
+  /* true altitude of sun, when it appears at the horizon; 
+   * refraction for a body visible at the horizon at 0m above sea,
+   */
+  if (atpress == 0) {
+    /* estimate atmospheric pressure */
+    atpress = 1013.25 * pow(1 - 0.0065 * dgeo[2] / 288, 5.255);
+  } 
+  swe_refrac_extended(0.000001, 0, atpress, attemp, const_lapse_rate, SE_APP_TO_TRUE, xx);
+  refr = xx[1] - xx[0];
+//fprintf(stderr, "refr=%f, %f, %f\n", refr, xx[0], xx[1]);
+  if (rsmi & SE_BIT_GEOCTR_NO_ECL_LAT) {
+    tohor_flag = SE_ECL2HOR;
+    iflagtopo = iflag;
+  } else {
+    tohor_flag = SE_EQU2HOR; // this is more efficient
+    iflagtopo = iflag | SEFLG_EQUATORIAL;
+    iflagtopo |= SEFLG_TOPOCTR;
+    swe_set_topo(dgeo[0], dgeo[1], dgeo[2]);
+  }
+  for (i = 0; i < nloop; i++) {
+    if (swe_calc_ut(tr, ipl, iflagtopo, xx, serr) == ERR)
+      return ERR;
+    if (rsmi & SE_BIT_GEOCTR_NO_ECL_LAT)
+      xx[1] = 0;
+    rdi = get_sun_rad_plus_refr(ipl, xx[2], rsmi, refr); 
+    swe_azalt(tr, tohor_flag, dgeo, atpress, attemp, xx, xaz);
+    swe_azalt(tr + 0.001, tohor_flag, dgeo, atpress, attemp, xx, xaz2);
+    dd = (xaz2[1] - xaz[1]);
+    dalt = xaz[1] + rdi;
+    dt = dalt / dd / 1000.0;
+    if (dt > 0.1) dt = 0.1;
+    else if (dt < -0.1) dt = -0.1;
+    dtsum += dt;
+    if (0 && fabs(dt) > 5.0 / 86400.0 && nloop < 20)
+      nloop++;
+    tr -= dt;
+  }
+//fprintf(stderr, "tr-tjd=%f tin=%f tout=%f\n", tr - tjd_ut0, tjd_ut0, tr);
+  // if the event found is before input time, we search next event.
+  if (tr < tjd_ut0 && !is_second_run) {
+    tjd_ut += 0.5;
+    is_second_run = TRUE;
+    goto run_rise_again;
+  }
+  *tret = tr;
+  return OK;
+}
+
 /* rise, set, and meridian transits of sun, moon, planets, and stars
  *
  * tjd_ut	universal time from when on search ought to start
@@ -4055,10 +4249,17 @@ double rdi_twilight(int32 rsmi)
  *              wanted, starname must be NULL or ""
  * epheflag	used for ephemeris only
  * rsmi		SE_CALC_RISE, SE_CALC_SET, SE_CALC_MTRANSIT, SE_CALC_ITRANSIT
- *              | SE_BIT_DISC_CENTER      for rises of disc center of body
- *              | SE_BIT_DISC_BOTTOM    for rises of disc bottom of body
- *              | SE_BIT_NO_REFRACTION    to neglect refraction
- *              | SE_BIT_FIXED_DISC_SIZE  neglect the effect of distance on disc size
+ *              | SE_BIT_DISC_CENTER       for rises of disc center of body
+ *              | SE_BIT_DISC_BOTTOM       for rises of disc bottom of body
+ *              | SE_BIT_GEOCTR_NO_ECL_LAT use geocentric position of object
+ *                                         and ignore ecliptic latitude
+ *              | SE_BIT_NO_REFRACTION     to neglect refraction
+ *              | SE_BIT_CIVIL_TWILIGHT    calculate civil twilight
+ *              | SE_BIT_NAUTIC_TWILIGHT   calculate nautical twilight
+ *              | SE_BIT_ASTRO_TWILIGHT    calculate astronomical twilight 
+ *              | SE_BIT_FIXED_DISC_SIZE   neglect the effect of distance on disc size
+ *              | SE_BIT_HINDU_RISING      risings according to Hindu astrology 
+ *                                         = (SE_BIT_DISC_CENTER|SE_BIT_NO_REFRACTION|SE_BIT_GEOCTR_NO_ECL_LAT)
  * geopos	array of doubles for geogr. long., lat. and height above sea
  * atpress	atmospheric pressure
  * attemp	atmospheric temperature
@@ -4076,6 +4277,23 @@ int32 CALL_CONV swe_rise_trans(
                double *tret,
                char *serr)
 {
+  int32 retval = 0;
+  /* Simple fast algorithm for risings and settings of 
+   * - planets Sun, Moon, Mercury - Pluto + Lunar Nodes and Fixed stars
+   * Does not work well for geographic latitudes
+   * > 65 N/S for the Sun
+   * > 60 N/S for the Moon and the planets
+   * Beyond these limits, some risings or settings may be missed.
+   */
+  if (1 && (rsmi & (SE_CALC_RISE|SE_CALC_SET)) 
+    && !(rsmi & SE_BIT_FORCE_SLOW_METHOD)
+    && !(rsmi & (SE_BIT_CIVIL_TWILIGHT|SE_BIT_NAUTIC_TWILIGHT|SE_BIT_ASTRO_TWILIGHT))
+    && (ipl >= SE_SUN && ipl <= SE_TRUE_NODE)
+    && (fabs(geopos[1]) <= 60 || (ipl == SE_SUN && fabs(geopos[1]) <= 65))
+    ) {
+      retval = rise_set_fast(tjd_ut, ipl, epheflag, rsmi, geopos, atpress, attemp, tret, serr);
+      return retval;
+  }
   return swe_rise_trans_true_hor(tjd_ut, ipl, starname, epheflag, rsmi, geopos, atpress, attemp, 0, tret, serr);
 }
 
@@ -4098,6 +4316,9 @@ int32 CALL_CONV swe_rise_trans_true_hor(
   int jmax = 14;
   double t, te, tt, dt, twohrs = 1.0 / 12.0;
   double curdist;
+  int32 tohor_flag = SE_EQU2HOR;
+int nazalt = 0;
+int ncalc = 0;
   AS_BOOL do_fixstar = (starname != NULL && *starname != '\0');
   if (geopos[2] < SEI_ECL_GEOALT_MIN || geopos[2] > SEI_ECL_GEOALT_MAX) {
     if (serr != NULL)
@@ -4113,8 +4334,14 @@ int32 CALL_CONV swe_rise_trans_true_hor(
   /* allowing SEFLG_NONUT and SEFLG_TRUEPOS speeds it up */
   iflag &= (SEFLG_EPHMASK | SEFLG_NONUT | SEFLG_TRUEPOS);
   *tret = 0;
-  iflag |= (SEFLG_EQUATORIAL | SEFLG_TOPOCTR);
-  swe_set_topo(geopos[0], geopos[1], geopos[2]);
+  if (rsmi & SE_BIT_GEOCTR_NO_ECL_LAT) {
+    tohor_flag = SE_ECL2HOR;
+  } else {
+    tohor_flag = SE_EQU2HOR;
+    iflag |= SEFLG_EQUATORIAL;
+    iflag |= SEFLG_TOPOCTR;
+    swe_set_topo(geopos[0], geopos[1], geopos[2]);
+  }
   if (rsmi & (SE_CALC_MTRANSIT | SE_CALC_ITRANSIT))
     return calc_mer_trans(tjd_ut, ipl, epheflag, rsmi, 
 		geopos, starname, tret, serr);
@@ -4145,7 +4372,10 @@ int32 CALL_CONV swe_rise_trans_true_hor(
       te = t + swe_deltat_ex(t, epheflag, serr);
       if (swe_calc(te, ipl, iflag, xc, serr) == ERR)
         return ERR;
+ncalc++;
     }
+    if (rsmi & SE_BIT_GEOCTR_NO_ECL_LAT)
+      xc[1] = 0;
     /* diameter of object in km */
     if (ii == 0) {
       if (do_fixstar) 
@@ -4170,7 +4400,8 @@ int32 CALL_CONV swe_rise_trans_true_hor(
     /* apparent radius of disc */
     rdi = asin( dd / 2 / AUNIT / curdist ) * RADTODEG;
     /* true height of center of body */
-    swe_azalt(t, SE_EQU2HOR, geopos, atpress, attemp, xc, xh[ii]);
+    swe_azalt(t, tohor_flag, geopos, atpress, attemp, xc, xh[ii]);
+nazalt++;
     if (rsmi & SE_BIT_DISC_BOTTOM) {
       /* true height of bottom point of body */
       xh[ii][1] -= rdi;
@@ -4184,7 +4415,9 @@ int32 CALL_CONV swe_rise_trans_true_hor(
       h[ii] = xh[ii][1];
     } else {
       swe_azalt_rev(t, SE_HOR2EQU, geopos, xh[ii], xc);
+nazalt++;
       swe_azalt(t, SE_EQU2HOR, geopos, atpress, attemp, xc, xh[ii]);
+nazalt++;
       xh[ii][1] -= horhgt;
       xh[ii][2] -= horhgt;
       h[ii] = xh[ii][2];
@@ -4211,7 +4444,11 @@ int32 CALL_CONV swe_rise_trans_true_hor(
           if (!do_fixstar)
             if (swe_calc(te, ipl, iflag, xc, serr) == ERR)
               return ERR;
-          swe_azalt(tt, SE_EQU2HOR, geopos, atpress, attemp, xc, ah);
+	    if (rsmi & SE_BIT_GEOCTR_NO_ECL_LAT)
+	      xc[1] = 0;
+ncalc++;
+          swe_azalt(tt, tohor_flag, geopos, atpress, attemp, xc, ah);
+nazalt++;
 	  ah[1] -= horhgt;
           dc[i] = ah[1];
         }
@@ -4238,6 +4475,9 @@ int32 CALL_CONV swe_rise_trans_true_hor(
           te = tc[j] + swe_deltat_ex(tc[j], epheflag, serr);
           if (swe_calc(te, ipl, iflag, xc, serr) == ERR)
             return ERR;
+	  if (rsmi & SE_BIT_GEOCTR_NO_ECL_LAT)
+	    xc[1] = 0;
+ncalc++;
         }
         curdist = xc[2];
         if (rsmi & SE_BIT_FIXED_DISC_SIZE) {
@@ -4250,7 +4490,8 @@ int32 CALL_CONV swe_rise_trans_true_hor(
         /* apparent radius of disc */
         rdi = asin( dd / 2 / AUNIT / curdist ) * RADTODEG;
         /* true height of center of body */
-        swe_azalt(tc[j], SE_EQU2HOR, geopos, atpress, attemp, xc, ah);
+        swe_azalt(tc[j], tohor_flag, geopos, atpress, attemp, xc, ah);
+nazalt++;
         if (rsmi & SE_BIT_DISC_BOTTOM) {
           /* true height of bottom point of body */
           ah[1] -= rdi;
@@ -4264,7 +4505,9 @@ int32 CALL_CONV swe_rise_trans_true_hor(
 	  h[j] = ah[1];
 	} else {
 	  swe_azalt_rev(tc[j], SE_HOR2EQU, geopos, ah, xc);
+nazalt++;
 	  swe_azalt(tc[j], SE_EQU2HOR, geopos, atpress, attemp, xc, ah);
+nazalt++;
 	  ah[1] -= horhgt;
 	  ah[2] -= horhgt;
 	  h[j] = ah[2];
@@ -4294,6 +4537,9 @@ int32 CALL_CONV swe_rise_trans_true_hor(
         te = t + swe_deltat_ex(t, epheflag, serr);
         if (swe_calc(te, ipl, iflag, xc, serr) == ERR)
           return ERR;
+	if (rsmi & SE_BIT_GEOCTR_NO_ECL_LAT)
+	  xc[1] = 0;
+ncalc++;
       }
       curdist = xc[2];
       if (rsmi & SE_BIT_FIXED_DISC_SIZE) {
@@ -4306,7 +4552,8 @@ int32 CALL_CONV swe_rise_trans_true_hor(
       /* apparent radius of disc */
       rdi = asin( dd / 2 / AUNIT / curdist ) * RADTODEG;
       /* true height of center of body */
-      swe_azalt(t, SE_EQU2HOR, geopos, atpress, attemp, xc, ah);
+      swe_azalt(t, tohor_flag, geopos, atpress, attemp, xc, ah);
+nazalt++;
       if (rsmi & SE_BIT_DISC_BOTTOM) {
         /* true height of bottom point of body */
         ah[1] -= rdi;
@@ -4320,7 +4567,9 @@ int32 CALL_CONV swe_rise_trans_true_hor(
 	aha = ah[1];
       } else {
 	swe_azalt_rev(t, SE_HOR2EQU, geopos, ah, xc);
+nazalt++;
 	swe_azalt(t, SE_EQU2HOR, geopos, atpress, attemp, xc, ah);
+nazalt++;
 	ah[1] -= horhgt;
 	ah[2] -= horhgt;
 	aha = ah[2];
@@ -4335,6 +4584,8 @@ int32 CALL_CONV swe_rise_trans_true_hor(
     }
     if (t > tjd_ut) {
      *tret = t;
+//  fprintf(stderr, "nazalt=%d\n", nazalt);
+//  fprintf(stderr, "ncalc=%d\n", ncalc);
      return OK;
     }
   }
@@ -4784,8 +5035,9 @@ int32 CALL_CONV swe_nod_aps(double tjd_et, int32 ipl, int32 iflag,
   if (ipl == SE_MEAN_NODE || ipl == SE_TRUE_NODE || 
 	  ipl == SE_MEAN_APOG || ipl == SE_OSCU_APOG || 
 	  ipl < 0 || 
-	  (ipl >= SE_NPLANETS && ipl <= SE_AST_OFFSET)) {
-	  /*(ipl >= SE_FICT_OFFSET && ipl - SE_FICT_OFFSET < SE_NFICT_ELEM)) */
+	  (ipl >= SE_NPLANETS && ipl <= SE_AST_OFFSET)) 
+	  // (ipl >= SE_FICT_OFFSET && ipl - SE_FICT_OFFSET < SE_NFICT_ELEM)) 
+	  {
     if (serr != NULL)
       sprintf(serr, "nodes/apsides for planet %5.0f are not implemented", (double) ipl);
     if (xnasc != NULL)
@@ -5118,6 +5370,7 @@ int32 CALL_CONV swe_nod_aps(double tjd_et, int32 ipl, int32 iflag,
     swi_precess(xp, tjd_et, iflag, J_TO_J2000);
     if (iflag & SEFLG_SPEED)
       swi_precess_speed(xp, tjd_et, iflag, J_TO_J2000);
+//      fprintf(stderr, "%.17f, %.17f, %.17f, %.17f, %.17f, %.17f\n", xp[0], xp[1], xp[2], xp[3], xp[4], xp[5]);
     /*********************
      * to barycenter 
      *********************/
@@ -5241,7 +5494,7 @@ int32 CALL_CONV swe_nod_aps(double tjd_et, int32 ipl, int32 iflag,
       } else {
       /* traditional algorithm */
         swi_cartpol_sp(pldat.xreturn+6, pldat.xreturn); 
-	if (swe_get_ayanamsa_ex(tjd_et, iflag, &daya, serr) == ERR)
+	if (swi_get_ayanamsa_ex(tjd_et, iflag, &daya, serr) == ERR)
 	  return ERR;
         pldat.xreturn[0] -= daya * DEGTORAD;
         swi_polcart_sp(pldat.xreturn, pldat.xreturn+6); 
@@ -5436,7 +5689,6 @@ int32 CALL_CONV swe_get_orbital_elements(
   //int32 iflJ2000 = (iflag & SEFLG_EPHMASK)|SEFLG_J2000|SEFLG_EQUATORIAL|SEFLG_XYZ|SEFLG_TRUEPOS|SEFLG_NONUT|SEFLG_SPEED;
   int32 iflJ2000 = (iflag & SEFLG_EPHMASK)|SEFLG_J2000|SEFLG_XYZ|SEFLG_TRUEPOS|SEFLG_NONUT|SEFLG_SPEED;
   int32 iflJ2000p = (iflag & SEFLG_EPHMASK)|SEFLG_J2000|SEFLG_TRUEPOS|SEFLG_NONUT|SEFLG_SPEED;
-  AS_BOOL ellipse_is_bary = FALSE;
   double Gmsm;
   int32 iflg0 = 0;
   double fac, sgn, rxy, rxyz, c2, cosnode, sinnode;
@@ -5456,12 +5708,10 @@ int32 CALL_CONV swe_get_orbital_elements(
   /* first, we need a heliocentric distance of the planet */
   if (swe_calc(tjd_et, ipl, iflJ2000p, x, serr) == ERR)
     return ERR;
-  ellipse_is_bary = FALSE;
   r =  x[2];
   if (ipl != SE_MOON) {
     if ((iflag & SEFLG_BARYCTR) && r > 6) {
       iflJ2000 |= SEFLG_BARYCTR; /* only planets beyond Jupiter */
-      ellipse_is_bary = TRUE;
     } else {
       iflJ2000 |= SEFLG_HELCTR;
     }
@@ -5675,7 +5925,7 @@ static double get_dist_from_2_vectors(double *x1, double *x2)
 static void osc_iterate_max_dist(double ean, double *pqr, double *xa, double *xb, double *deanopt, double *drmax, AS_BOOL high_prec)
 {
   int i;
-  double r, rmax, eansv, dstep, dstep_min = 1;
+  double r, rmax, eansv = 0, dstep, dstep_min = 1;
   if (high_prec)
     dstep_min = 0.000001;
   ean = 0;
@@ -5711,7 +5961,7 @@ static void osc_iterate_max_dist(double ean, double *pqr, double *xa, double *xb
 static void osc_iterate_min_dist(double ean, double *pqr, double *xa, double *xb, double *deanopt, double *drmin, AS_BOOL high_prec)
 {
   int i;
-  double r, rmin, eansv, dstep, dstep_min = 1;
+  double r, rmin, eansv = 0, dstep, dstep_min = 1;
   if (high_prec)
     dstep_min = 0.000001;
   ean = 0;
@@ -5825,7 +6075,7 @@ int32 CALL_CONV swe_orbit_max_min_true_distance(double tjd_et, int32 ipl, int32 
   double eano, eani;
   double *douter, *dinner;
   double r, rtrue, rmax = 0, rmin = 100000000, rminsv = 0, rmaxsv = 0;
-  double min_eanisv, min_eanosv, max_eanisv, max_eanosv;
+  double min_eanisv = 0, min_eanosv = 0, max_eanisv = 0, max_eanosv = 0;
   int ncnt;
   double dstep;
   double nitermax = 300;
@@ -5866,6 +6116,12 @@ int32 CALL_CONV swe_orbit_max_min_true_distance(double tjd_et, int32 ipl, int32 
    * */
   ncnt = 182;
   dstep = 2;
+  for (i = 0; i < 3; i++) { /* initialisation */
+    max_xouter[i] = 0;
+    max_xinner[i] = 0;
+    min_xouter[i] = 0;
+    min_xinner[i] = 0;
+  }
   for (j = 0; j < ncnt; j++) {
     eano = (double) j * dstep;
     osc_get_ecl_pos(eano, pqro, xouter);
@@ -5947,8 +6203,24 @@ int32 CALL_CONV swe_orbit_max_min_true_distance(double tjd_et, int32 ipl, int32 
  * if a non-zero height above sea is given in geopos, atpress is estimated.
  * dgsect is return area (pointer to a double)
  * serr is pointer to error string, may be NULL
+ *
  */
-int32 CALL_CONV swe_gauquelin_sector(double t_ut, int32 ipl, char *starname, int32 iflag, int32 imeth, double *geopos, double atpress, double attemp, double *dgsect, char *serr) 
+int32 CALL_CONV swe_gauquelin_sector(
+  double t_ut,  /* input time (UT) */
+  int32 ipl,    /* planet number, if planet, or moon;
+                 * ipl is ignored if the following parameter (starname) is set*/
+  char *starname, /* star name, if star; otherwise NULL or empty */
+  int32 iflag,  /* flag for ephemeris and SEFLG_TOPOCTR */
+  int32 imeth,  /* method: 0 = with lat., 1 = without lat., 
+		 *         2 = from rise/set, 3 = from rise/set with refraction */
+  double *geopos, /* array of three doubles containing
+		   * geograph. long., lat., height of observer */
+  double atpress, /* atmospheric pressure, only useful with imeth=3; 
+		   * if 0, default = 1013.25 mbar is used */
+  double attemp,  /* atmospheric temperature in degrees Celsius, 
+                   *only useful with imeth=3 */
+  double *dgsect, /* return address for gauquelin sector position */
+  char *serr)     /* return address for error message */
 {
   AS_BOOL rise_found = TRUE;
   AS_BOOL set_found = TRUE;

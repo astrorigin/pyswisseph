@@ -86,6 +86,10 @@ extern "C" {
  * definitions for use also by non-C programmers
  ***********************************************************/
 
+#define SE_AUNIT_TO_KM        (149597870.700)
+#define SE_AUNIT_TO_LIGHTYEAR (1.0/63241.07708427)
+#define SE_AUNIT_TO_PARSEC    (1.0/206264.8062471) 
+
 /* values for gregflag in swe_julday() and swe_revjul() */
 # define SE_JUL_CAL	0
 # define SE_GREG_CAL	1
@@ -257,10 +261,14 @@ extern "C" {
 #define SE_SIDM_GALCENT_MULA_WILHELM       36
 #define SE_SIDM_ARYABHATA_522   37
 #define SE_SIDM_BABYL_BRITTON   38
-//#define SE_SIDM_MANJULA         38
+#define SE_SIDM_TRUE_SHEORAN  	39
+#define SE_SIDM_GALCENT_COCHRANE   	40
+#define SE_SIDM_GALEQU_FIORENZA 41
+#define SE_SIDM_VALENS_MOON     42
+//#define SE_SIDM_MANJULA         43
 #define SE_SIDM_USER            255 /* user-defined ayanamsha, t0 is TT */
 
-#define SE_NSIDM_PREDEF	        39
+#define SE_NSIDM_PREDEF	        43
 
 /* used for swe_nod_aps(): */
 #define SE_NODBIT_MEAN		1   /* mean nodes/apsides */
@@ -317,15 +325,22 @@ extern "C" {
 #define SE_BIT_DISC_BOTTOM      8192 /* to be or'ed to SE_CALC_RISE/SET,
                                       * if rise or set of lower limb of 
 				      * disc is requried */
+#define SE_BIT_GEOCTR_NO_ECL_LAT 128 /* use geocentric rather than topocentric 
+                                        position of object and 
+					ignore its ecliptic latitude */
 #define SE_BIT_NO_REFRACTION    512 /* to be or'ed to SE_CALC_RISE/SET, 
 				     * if refraction is to be ignored */
 #define SE_BIT_CIVIL_TWILIGHT    1024 /* to be or'ed to SE_CALC_RISE/SET */
 #define SE_BIT_NAUTIC_TWILIGHT   2048 /* to be or'ed to SE_CALC_RISE/SET */
 #define SE_BIT_ASTRO_TWILIGHT    4096 /* to be or'ed to SE_CALC_RISE/SET */
-#define SE_BIT_FIXED_DISC_SIZE (16*1024) /* or'ed to SE_CALC_RISE/SET:
+#define SE_BIT_FIXED_DISC_SIZE  16384 /* or'ed to SE_CALC_RISE/SET:
                                      * neglect the effect of distance on
 				     * disc size */
-
+#define SE_BIT_FORCE_SLOW_METHOD 32768 /* This is only an Astrodienst in-house
+                                        * test flag. It forces the usage
+					* of the old, slow calculation of
+					* risings and settings. */
+#define SE_BIT_HINDU_RISING  (SE_BIT_DISC_CENTER|SE_BIT_NO_REFRACTION|SE_BIT_GEOCTR_NO_ECL_LAT)
 
 /* for swe_azalt() and swe_azalt_rev() */
 #define SE_ECL2HOR		0
@@ -384,6 +399,7 @@ extern "C" {
 # define SE_SPLIT_DEG_ROUND_MIN    2
 # define SE_SPLIT_DEG_ROUND_DEG    4
 # define SE_SPLIT_DEG_ZODIACAL     8
+# define SE_SPLIT_DEG_NAKSHATRA 1024
 # define SE_SPLIT_DEG_KEEP_SIGN   16	/* don't round to next sign, 
 					 * e.g. 29.9999999 will be rounded
 					 * to 29d59'59" (or 29d59' or 29d) */
@@ -421,6 +437,7 @@ extern "C" {
 #define TJD_INVALID		 	99999999.0
 #define SIMULATE_VICTORVB               1
 
+#if 0  // unused and redundant
 #define SE_HELIACAL_LONG_SEARCH 	128
 #define SE_HELIACAL_HIGH_PRECISION 	256
 #define SE_HELIACAL_OPTICAL_PARAMS	512
@@ -434,6 +451,7 @@ extern "C" {
 #define SE_HELIACAL_AVKIND_MIN7 		(1 << 17)
 #define SE_HELIACAL_AVKIND_MIN9 		(1 << 18)
 #define SE_HELIACAL_AVKIND (SE_HELFLAG_AVKIND_VR|SE_HELFLAG_AVKIND_PTO|SE_HELFLAG_AVKIND_MIN7|SE_HELFLAG_AVKIND_MIN9)
+#endif
 
 #define SE_PHOTOPIC_FLAG		0
 #define SE_SCOTOPIC_FLAG		1
@@ -454,6 +472,7 @@ extern "C" {
 #define SE_TIDAL_DE430          (-25.82)   /* JPL Interoffice Memorandum 9-jul-2013 on DE430 Lunar Orbit */
 #define SE_TIDAL_DE431          (-25.80)   /* IPN Progress Report 42-196 • February 15, 2014, p. 15; was (-25.82) in V. 2.00.00 */
 #define SE_TIDAL_26             (-26.0)
+#define SE_TIDAL_STEPHENSON_2016             (-25.85)
 #define SE_TIDAL_DEFAULT        SE_TIDAL_DE431
 #define SE_TIDAL_AUTOMATIC             999999
 #define SE_TIDAL_MOSEPH                SE_TIDAL_DE404
@@ -463,34 +482,37 @@ extern "C" {
 /* for function swe_set_delta_t_userdef() */
 #define SE_DELTAT_AUTOMATIC             (-1E-10)
 
-#define SE_MODEL_PREC_LONGTERM  0
-#define SE_MODEL_PREC_SHORTTERM 1
-#define SE_MODEL_NUT            2
-#define SE_MODEL_SIDT           3
+#define SE_MODEL_DELTAT         0
+#define SE_MODEL_PREC_LONGTERM  1
+#define SE_MODEL_PREC_SHORTTERM 2
+#define SE_MODEL_NUT            3
 #define SE_MODEL_BIAS           4
 #define SE_MODEL_JPLHOR_MODE    5
 #define SE_MODEL_JPLHORA_MODE   6
-#define SE_MODEL_DELTAT         7
+#define SE_MODEL_SIDT           7
+#define NSE_MODELS              8
 
 /* precession models */
+#define SEMOD_NPREC		10
 #define SEMOD_PREC_IAU_1976      1
-#define SEMOD_PREC_IAU_2000      2
-#define SEMOD_PREC_IAU_2006      3
-#define SEMOD_PREC_BRETAGNON_2003      4
-#define SEMOD_PREC_LASKAR_1986   5
-#define SEMOD_PREC_SIMON_1994    6
-#define SEMOD_PREC_WILLIAMS_1994 7
-#define SEMOD_PREC_VONDRAK_2011  8
+#define SEMOD_PREC_LASKAR_1986   2
+#define SEMOD_PREC_WILL_EPS_LASK 3
+#define SEMOD_PREC_WILLIAMS_1994 4
+#define SEMOD_PREC_SIMON_1994    5
+#define SEMOD_PREC_IAU_2000      6
+#define SEMOD_PREC_BRETAGNON_2003      7
+#define SEMOD_PREC_IAU_2006      8
+#define SEMOD_PREC_VONDRAK_2011  9
+#define SEMOD_PREC_OWEN_1990     10
 #define SEMOD_PREC_DEFAULT       SEMOD_PREC_VONDRAK_2011
-/* former implementations of the used 
- * IAU 1976, 2000 and 2006 for a limited time range
- * in combination with a different model for 
- * long term precession. 
-#define SEMOD_PREC_DEFAULT_SHORT SEMOD_PREC_IAU_2000
+/* SE versions before 1.70 used IAU 1976 precession for 
+ * a limited time range of 2 centuries in combination with 
+ * the long-term precession Simon 1994.
  */
 #define SEMOD_PREC_DEFAULT_SHORT SEMOD_PREC_VONDRAK_2011
 
 /* nutation models */
+#define SEMOD_NNUT		4
 #define SEMOD_NUT_IAU_1980          1
 #define SEMOD_NUT_IAU_CORR_1987     2 /* Herring's (1987) corrections to IAU 1980 
 				    * nutation series. AA (1996) neglects them.*/
@@ -499,62 +521,73 @@ extern "C" {
 #define SEMOD_NUT_DEFAULT           SEMOD_NUT_IAU_2000B  /* fast, but precision of milli-arcsec */
 
 /* methods for sidereal time */
-#define SEMOD_SIDT_LONGTERM         1
-#define SEMOD_SIDT_IERS_CONV_2010   2
-#define SEMOD_SIDT_PREC_MODEL       3
-#define SEMOD_SIDT_IAU_1976         4
+#define SEMOD_NSIDT		4
+#define SEMOD_SIDT_IAU_1976         1
+#define SEMOD_SIDT_IAU_2006         2
+#define SEMOD_SIDT_IERS_CONV_2010   3
+#define SEMOD_SIDT_LONGTERM         4
 #define SEMOD_SIDT_DEFAULT          SEMOD_SIDT_LONGTERM
 //#define SEMOD_SIDT_DEFAULT          SEMOD_SIDT_IERS_CONV_2010
 
 /* frame bias methods */
-#define SEMOD_BIAS_IAU2000          1  /* use frame bias matrix IAU 2000 */
-#define SEMOD_BIAS_IAU2006          2  /* use frame bias matrix IAU 2000 */
+#define SEMOD_NBIAS		3
+#define SEMOD_BIAS_NONE             1  /* ignore frame bias */
+#define SEMOD_BIAS_IAU2000          2  /* use frame bias matrix IAU 2000 */
+#define SEMOD_BIAS_IAU2006          3  /* use frame bias matrix IAU 2006 */
 #define SEMOD_BIAS_DEFAULT          SEMOD_BIAS_IAU2006
 
 /* methods of JPL Horizons (iflag & SEFLG_JPLHOR), 
  * using daily dpsi, deps;  see explanations below */
-#define SEMOD_JPLHOR_EXTENDED_1800  1  /* daily dpsi and deps from file are 
+#define SEMOD_NJPLHOR		2
+#define SEMOD_JPLHOR_LONG_AGREEMENT  1  /* daily dpsi and deps from file are 
                                      * limited to 1962 - today. JPL uses the
 				     * first and last value for all  dates 
 				     * beyond this time range. */
-#define SEMOD_JPLHOR_NOT_EXTENDED   2  /* outside the available time range 
-                                     * 1962 - today default to SEFLG_JPLHOR_APROX */
-#define SEMOD_JPLHOR_DEFAULT        SEMOD_JPLHOR_EXTENDED_1800
-/* SEMOD_JPLHOR_EXTENDED_1800, if combined with SEFLG_JPLHOR provides good 
- * agreement with JPL Horizons for 1800 - today. However, Horizons uses
- * correct dpsi and deps only after 20-jan-1962. For all dates before that
- * it uses dpsi and deps of 20-jan-1962, which provides a continuous
- * ephemeris, but does not make sense otherwise.
- * Before 1800, even this option does not provide agreement with Horizons,
- * because Horizons uses a different precession model (Owen 1986)
- * before 1800, which is not included in the Swiss Ephemeris.
- * SEMOD_JPLHOR_NOT_EXTENDED causes the program to default to SEFLG_JPLHOR_APPROX,
- * if the date is outside the time range 1962 - today, where values
- * for dpsi and deps are given.
- * Note that this will result in a non-continuous ephemeris near
- * 20-jan-1962 and current years.
+#define SEMOD_JPLHOR_DEFAULT        SEMOD_JPLHOR_LONG_AGREEMENT
+/* Note, currently this is the only option for SEMOD_JPLHOR..*/
+/* SEMOD_JPLHOR_LONG_AGREEMENT, if combined with SEFLG_JPLHOR provides good 
+ * agreement with JPL Horizons for 9998 BC (-9997) until 9999 CE. 
+ * - After 20-jan-1962 until today, Horizons uses correct dpsi and deps. 
+ * - For dates before that, it uses dpsi and deps of 20-jan-1962, which 
+ *   provides a continuous ephemeris, but does not make sense otherwise.
+ * - Before 1.1.1799 and after 1.1.2202, the precession model Owen 1990
+ *   is used, as in Horizons. 
+ * An agreement with Horizons to a couple of milli arc seconds is achieved 
+ * for the whole time range of Horizons. (BC 9998-Mar-20 to AD 9999-Dec-31 TT.)
  */
 
 /* methods of approximation of JPL Horizons (iflag & SEFLG_JPLHORA), 
  * without dpsi, deps; see explanations below */
+#define SEMOD_NJPLHORA		3
 #define SEMOD_JPLHORA_1     1
 #define SEMOD_JPLHORA_2     2
-#define SEMOD_JPLHORA_DEFAULT     SEMOD_JPLHORA_1
+#define SEMOD_JPLHORA_3     3
+#define SEMOD_JPLHORA_DEFAULT     SEMOD_JPLHORA_3
 /* With SEMOD_JPLHORA_1, planetary positions are always calculated 
  * using a recent precession/nutation model. Frame bias matrix is applied 
- * with some correction to RA and another correction is added to epsilon.
+ * with some correction to RA and another correction added to epsilon.
  * This provides a very good approximation of JPL Horizons positions. 
- * With SEMOD_JPLHORA_2, frame bias as r$ecommended by IERS Conventions 2003 
+ *
+ * With SEMOD_JPLHORA_2, frame bias as recommended by IERS Conventions 2003 
  * and 2010 is *not* applied. Instead, dpsi_bias and deps_bias are added to 
  * nutation. This procedure is found in some older astronomical software.
  * Equatorial apparent positions will be close to JPL Horizons 
- * (within a few mas) beetween 1962 and current years. Ecl. longitude 
+ * (within a few mas) between 1962 and current years. Ecl. longitude 
  * will be good, latitude bad. 
+ *
+ * With SEMOD_JPLHORA_3 works like SEMOD_JPLHORA_3 after 1962, but like
+ * SEFLG_JPLHOR before that. This allows EXTREMELY good agreement with JPL 
+ * Horizons over its whole time range.
  */
 
-#define SEMOD_DELTAT_ESPENAK_MEEUS_2006   1
-#define SEMOD_DELTAT_STEPHENSON_MORRISON_2004   2
-#define SEMOD_DELTAT_DEFAULT   SEMOD_DELTAT_ESPENAK_MEEUS_2006
+#define SEMOD_NDELTAT		5
+#define SEMOD_DELTAT_STEPHENSON_MORRISON_1984   1
+#define SEMOD_DELTAT_STEPHENSON_1997   2
+#define SEMOD_DELTAT_STEPHENSON_MORRISON_2004   3
+#define SEMOD_DELTAT_ESPENAK_MEEUS_2006   4
+#define SEMOD_DELTAT_STEPHENSON_ETC_2016   5
+//#define SEMOD_DELTAT_DEFAULT   SEMOD_DELTAT_ESPENAK_MEEUS_2006
+#define SEMOD_DELTAT_DEFAULT   SEMOD_DELTAT_STEPHENSON_ETC_2016
 
 /**************************************************************
  * here follow some ugly definitions which are only required
@@ -592,30 +625,28 @@ extern HANDLE dllhandle;        // set by swedllst::DllMain,
 #  endif
 #endif
 
-
-/* DLL defines */
+/* DLL defines
+  Define UNDECO_DLL for un-decorated dll
+  verify compiler option __cdecl for un-decorated and __stdcall for decorated */
+/*#define UNDECO_DLL*/
 #ifdef MAKE_DLL
   #if defined (PASCAL) || defined(__stdcall)
-    #define CALL_CONV __stdcall 
+   #if defined UNDECO_DLL
+    #define CALL_CONV __cdecl
+   #else
+    #define CALL_CONV __stdcall
+   #endif 
   #else
     #define CALL_CONV 
   #endif
-  #ifdef MAKE_DLL16 /* 16bit DLL */
-    /* We compiled the 16bit DLL for Windows 3.x using Borland C/C++ Ver:3.x
-       and the -WD or -WDE compiler switch. */
-    #define EXP16 __export 
-    #define EXP32 
-  #else /* 32bit DLL */
-    /* To export symbols in the new DLL model of Win32, Microsoft 
-       recommends the following approach */ 
-    #define EXP16 
-    #define EXP32  __declspec( dllexport )
-  #endif
+  /* To export symbols in the new DLL model of Win32, Microsoft 
+     recommends the following approach */ 
+  #define EXP32  __declspec( dllexport )
 #else 
   #define CALL_CONV 
-  #define EXP16 
   #define EXP32 
 #endif  
+
 
 #ifndef _SWEDLL_H
 
@@ -623,7 +654,7 @@ extern HANDLE dllhandle;        // set by swedllst::DllMain,
  * exported functions
  ***********************************************************/
 
-#define ext_def(x)	extern EXP32 x CALL_CONV EXP16
+#define ext_def(x)	extern EXP32 x CALL_CONV 
 			/* ext_def(x) evaluates to x on Unix */
 
 ext_def(int32) swe_heliacal_ut(double tjdstart_ut, double *geopos, double *datm, double *dobs, char *ObjectName, int32 TypeEvent, int32 iflag, double *dret, char *serr);
@@ -636,7 +667,8 @@ ext_def(int32) swe_topo_arcus_visionis(double tjdut, double *dgeo, double *datm,
 
 /* the following is secret, for Dieter, allows to test old models of
  * precession, nutation, etc. Search for SE_MODEL_... in this file */
-ext_def(void) swe_set_astro_models(int32 *imodel);
+ext_def(void) swe_set_astro_models(char *samod, int32 iflag);
+ext_def(void) swe_get_astro_models(char *samod, char *sdet, int32 iflag);
 
 /**************************** 
  * exports from sweph.c 
@@ -664,6 +696,16 @@ ext_def(int32) swe_fixstar_ut(char *star, double tjd_ut, int32 iflag,
 	double *xx, char *serr);
 
 ext_def(int32) swe_fixstar_mag(char *star, double *mag, char *serr);
+
+ext_def( int32 ) swe_fixstar2(
+        char *star, double tjd, int32 iflag, 
+        double *xx,
+        char *serr);
+
+ext_def(int32) swe_fixstar2_ut(char *star, double tjd_ut, int32 iflag, 
+	double *xx, char *serr);
+
+ext_def(int32) swe_fixstar2_mag(char *star, double *mag, char *serr);
 
 /* close Swiss Ephemeris */
 ext_def( void ) swe_close(void);
@@ -877,6 +919,7 @@ ext_def(int32) swe_lat_to_lmt(double tjd_lat, double geolon, double *tjd_lmt, ch
 /* sidereal time */
 ext_def( double ) swe_sidtime0(double tjd_ut, double eps, double nut);
 ext_def( double ) swe_sidtime(double tjd_ut);
+ext_def( void ) swe_set_interpolate_nut(AS_BOOL do_interpolate);
 
 /* coordinate transformation polar -> polar */
 ext_def( void ) swe_cotrans(double *xpo, double *xpn, double eps);
