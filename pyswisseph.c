@@ -295,6 +295,32 @@ static PyObject * pyswe_fixstar FUNCARGS_KEYWDS
     return Py_BuildValue("(ffffff)",val[0],val[1],val[2],val[3],val[4],val[5]);
 }
 
+/* swisseph.fixstar2 */
+static char pyswe_fixstar2__doc__[] =
+"Calculate fixed star positions (fast) (ET).\n\n"
+"Args: str star, float julday, int flag=FLG_SWIEPH\n"
+"Return: tuple of 6 float";
+
+static PyObject * pyswe_fixstar2 FUNCARGS_KEYWDS
+{
+    char *star, st[41], err[256];
+    double jd, val[6];
+    int ret, flag = SEFLG_SWIEPH;
+    static char *kwlist[] = {"star", "julday", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
+        &star, &jd, &flag))
+        return NULL;
+    memset(st, 0, 41);
+    strncpy(st, star, 40);
+    ret = swe_fixstar2(st, jd, flag, val, err);
+    if (ret < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(ffffff)",val[0],val[1],val[2],val[3],val[4],val[5]);
+}
+
 /* swisseph.fixstar_ut */
 static char pyswe_fixstar_ut__doc__[] =
 "Calculate fixed star positions (UT).\n\n"
@@ -313,6 +339,32 @@ static PyObject * pyswe_fixstar_ut FUNCARGS_KEYWDS
     memset(st, 0, 41);
     strncpy(st, star, 40);
     ret = swe_fixstar_ut(st, jd, flag, val, err);
+    if (ret < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(ffffff)",val[0],val[1],val[2],val[3],val[4],val[5]);
+}
+
+/* swisseph.fixstar2_ut */
+static char pyswe_fixstar2_ut__doc__[] =
+"Calculate fixed star positions (fast) (UT).\n\n"
+"Args: str star, float julday, int flag=FLG_SWIEPH\n"
+"Return: tuple of 6 float";
+
+static PyObject * pyswe_fixstar2_ut FUNCARGS_KEYWDS
+{
+    char *star, st[41], err[256];
+    double jd, val[6];
+    int ret, flag = SEFLG_SWIEPH;
+    static char *kwlist[] = {"star", "julday", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
+        &star, &jd, &flag))
+        return NULL;
+    memset(st, 0, 41);
+    strncpy(st, star, 40);
+    ret = swe_fixstar2_ut(st, jd, flag, val, err);
     if (ret < 0)
     {
         PyErr_SetString(pyswe_Error, err);
@@ -4103,6 +4155,10 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe_fixstar__doc__},
     {"fixstar_ut", (PyCFunction) pyswe_fixstar_ut,
         METH_VARARGS|METH_KEYWORDS, pyswe_fixstar_ut__doc__},
+    {"fixstar2", (PyCFunction) pyswe_fixstar2,
+        METH_VARARGS|METH_KEYWORDS, pyswe_fixstar2__doc__},
+    {"fixstar2_ut", (PyCFunction) pyswe_fixstar2_ut,
+        METH_VARARGS|METH_KEYWORDS, pyswe_fixstar2_ut__doc__},
     {"nod_aps", (PyCFunction) pyswe_nod_aps,
         METH_VARARGS|METH_KEYWORDS, pyswe_nod_aps__doc__},
     {"nod_aps_ut", (PyCFunction) pyswe_nod_aps_ut,
