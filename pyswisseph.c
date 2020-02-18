@@ -1807,6 +1807,31 @@ static PyObject * pyswe_fixstar_mag FUNCARGS_KEYWDS
     return Py_BuildValue("f", mag);
 }
 
+/* swisseph.fixstar2_mag */
+static char pyswe_fixstar2_mag__doc__ [] =
+"Get fixed star magnitude (fast).\n\n"
+"Args: str star\n"
+"Return: float";
+
+static PyObject * pyswe_fixstar2_mag FUNCARGS_KEYWDS
+{
+    char *star, st[41], err[256];
+    int ret;
+    double mag;
+    static char *kwlist[] = {"star", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &star))
+        return NULL;
+    memset(st, 0, 41);
+    strncpy(st, star, 40);
+    ret = swe_fixstar2_mag(st, &mag, err);
+    if (ret < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("f", mag);
+}
+
 /* swisseph.heliacal_ut */
 static char pyswe_heliacal_ut__doc__ [] =
 "Find the Julian day of the next heliacal phenomenon after a given start date.\n"
@@ -4281,6 +4306,8 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe_cs2degstr__doc__},
     {"fixstar_mag", (PyCFunction) pyswe_fixstar_mag,
         METH_VARARGS|METH_KEYWORDS, pyswe_fixstar_mag__doc__},
+    {"fixstar2_mag", (PyCFunction) pyswe_fixstar2_mag,
+        METH_VARARGS|METH_KEYWORDS, pyswe_fixstar2_mag__doc__},
     {"heliacal_ut", (PyCFunction) pyswe_heliacal_ut,
         METH_VARARGS|METH_KEYWORDS, pyswe_heliacal_ut__doc__},
     {"heliacal_pheno_ut", (PyCFunction) pyswe_heliacal_pheno_ut,
