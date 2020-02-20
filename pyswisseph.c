@@ -275,104 +275,104 @@ static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
 static char pyswe_fixstar__doc__[] =
 "Calculate fixed star positions (ET).\n\n"
 "Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float";
+"Return: tuple of 6 float and returned star name";
 
 static PyObject * pyswe_fixstar FUNCARGS_KEYWDS
 {
-    char *star, st[41], err[256];
+    char *star, st[(SE_MAX_STNAME*2)+1], err[256];
     double jd, val[6];
     int ret, flag = SEFLG_SWIEPH;
     static char *kwlist[] = {"star", "julday", "flag", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
         &star, &jd, &flag))
         return NULL;
-    memset(st, 0, 41);
-    strncpy(st, star, 40);
+    memset(st, 0, (SE_MAX_STNAME*2)+1);
+    strncpy(st, star, SE_MAX_STNAME*2);
     ret = swe_fixstar(st, jd, flag, val, err);
     if (ret < 0)
     {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)",val[0],val[1],val[2],val[3],val[4],val[5]);
+    return Py_BuildValue("(ffffffs)",val[0],val[1],val[2],val[3],val[4],val[5],st);
 }
 
 /* swisseph.fixstar2 */
 static char pyswe_fixstar2__doc__[] =
 "Calculate fixed star positions (fast) (ET).\n\n"
 "Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float";
+"Return: tuple of 6 float and returned star name";
 
 static PyObject * pyswe_fixstar2 FUNCARGS_KEYWDS
 {
-    char *star, st[41], err[256];
+    char *star, st[(SE_MAX_STNAME*2)+1], err[256];
     double jd, val[6];
     int ret, flag = SEFLG_SWIEPH;
     static char *kwlist[] = {"star", "julday", "flag", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
         &star, &jd, &flag))
         return NULL;
-    memset(st, 0, 41);
-    strncpy(st, star, 40);
+    memset(st, 0, (SE_MAX_STNAME*2)+1);
+    strncpy(st, star, SE_MAX_STNAME*2);
     ret = swe_fixstar2(st, jd, flag, val, err);
     if (ret < 0)
     {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)",val[0],val[1],val[2],val[3],val[4],val[5]);
+    return Py_BuildValue("(ffffffs)",val[0],val[1],val[2],val[3],val[4],val[5],st);
 }
 
 /* swisseph.fixstar_ut */
 static char pyswe_fixstar_ut__doc__[] =
 "Calculate fixed star positions (UT).\n\n"
 "Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float";
+"Return: tuple of 6 float and returned star name";
 
 static PyObject * pyswe_fixstar_ut FUNCARGS_KEYWDS
 {
-    char *star, st[41], err[256];
+    char *star, st[(SE_MAX_STNAME*2)+1], err[256];
     double jd, val[6];
     int ret, flag = SEFLG_SWIEPH;
     static char *kwlist[] = {"star", "julday", "flag", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
         &star, &jd, &flag))
         return NULL;
-    memset(st, 0, 41);
-    strncpy(st, star, 40);
+    memset(st, 0, (SE_MAX_STNAME*2)+1);
+    strncpy(st, star, SE_MAX_STNAME*2);
     ret = swe_fixstar_ut(st, jd, flag, val, err);
     if (ret < 0)
     {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)",val[0],val[1],val[2],val[3],val[4],val[5]);
+    return Py_BuildValue("(ffffffs)",val[0],val[1],val[2],val[3],val[4],val[5],st);
 }
 
 /* swisseph.fixstar2_ut */
 static char pyswe_fixstar2_ut__doc__[] =
 "Calculate fixed star positions (fast) (UT).\n\n"
 "Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float";
+"Return: tuple of 6 float and returned star name";
 
 static PyObject * pyswe_fixstar2_ut FUNCARGS_KEYWDS
 {
-    char *star, st[41], err[256];
+    char *star, st[(SE_MAX_STNAME*2)+1], err[256];
     double jd, val[6];
     int ret, flag = SEFLG_SWIEPH;
     static char *kwlist[] = {"star", "julday", "flag", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
         &star, &jd, &flag))
         return NULL;
-    memset(st, 0, 41);
-    strncpy(st, star, 40);
+    memset(st, 0, (SE_MAX_STNAME*2)+1);
+    strncpy(st, star, SE_MAX_STNAME*2);
     ret = swe_fixstar2_ut(st, jd, flag, val, err);
     if (ret < 0)
     {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)",val[0],val[1],val[2],val[3],val[4],val[5]);
+    return Py_BuildValue("(ffffffs)",val[0],val[1],val[2],val[3],val[4],val[5],st);
 }
 
 /* swisseph.nod_aps */
