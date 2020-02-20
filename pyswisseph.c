@@ -72,6 +72,8 @@
 /* Macros */
 #define FUNCARGS_SELF       (PyObject *self)
 #define FUNCARGS_KEYWDS     (PyObject *self, PyObject *args, PyObject *keywds)
+#define PyModule_AddFloatConstant(m, nam, f) \
+        PyModule_AddObject(m, nam, Py_BuildValue("f", f))
 
 /* swisseph.Error (module exception type) */
 static PyObject * pyswe_Error;
@@ -4451,6 +4453,10 @@ PyMODINIT_FUNC initswisseph(void)
 
     /* Constants */
 
+    PyModule_AddFloatConstant(m, "AUNIT_TO_KM", SE_AUNIT_TO_KM);
+    PyModule_AddFloatConstant(m, "AUNIT_TO_LIGHTYEAR", SE_AUNIT_TO_LIGHTYEAR);
+    PyModule_AddFloatConstant(m, "AUNIT_TO_PARSEC", SE_AUNIT_TO_PARSEC);
+
     PyModule_AddIntConstant(m, "JUL_CAL", SE_JUL_CAL);
     PyModule_AddIntConstant(m, "GREG_CAL", SE_GREG_CAL);
 
@@ -4535,11 +4541,13 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "FLG_SPEED", SEFLG_SPEED);
     PyModule_AddIntConstant(m, "FLG_NOGDEFL", SEFLG_NOGDEFL);
     PyModule_AddIntConstant(m, "FLG_NOABERR", SEFLG_NOABERR);
+    PyModule_AddIntConstant(m, "FLG_ASTROMETRIC", SEFLG_ASTROMETRIC);
     PyModule_AddIntConstant(m, "FLG_EQUATORIAL", SEFLG_EQUATORIAL);
     PyModule_AddIntConstant(m, "FLG_XYZ", SEFLG_XYZ);
     PyModule_AddIntConstant(m, "FLG_RADIANS", SEFLG_RADIANS);
     PyModule_AddIntConstant(m, "FLG_BARYCTR", SEFLG_BARYCTR);
     PyModule_AddIntConstant(m, "FLG_TOPOCTR", SEFLG_TOPOCTR);
+    PyModule_AddIntConstant(m, "FLG_ORBEL_AA", SEFLG_ORBEL_AA);
     PyModule_AddIntConstant(m, "FLG_SIDEREAL", SEFLG_SIDEREAL);
     PyModule_AddIntConstant(m, "FLG_ICRS", SEFLG_ICRS);
     PyModule_AddIntConstant(m, "FLG_DPSIDEPS_1980", SEFLG_DPSIDEPS_1980);
@@ -4549,6 +4557,7 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "SIDBITS", SE_SIDBITS);
     PyModule_AddIntConstant(m, "SIDBIT_ECL_T0", SE_SIDBIT_ECL_T0);
     PyModule_AddIntConstant(m, "SIDBIT_SSY_PLANE", SE_SIDBIT_SSY_PLANE);
+    PyModule_AddIntConstant(m, "SIDBIT_USER_UT", SE_SIDBIT_USER_UT);
 
     PyModule_AddIntConstant(m, "SIDM_FAGAN_BRADLEY", SE_SIDM_FAGAN_BRADLEY);
     PyModule_AddIntConstant(m, "SIDM_LAHIRI", SE_SIDM_LAHIRI);
@@ -4579,6 +4588,20 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "SIDM_SS_CITRA", SE_SIDM_SS_CITRA);
     PyModule_AddIntConstant(m, "SIDM_TRUE_CITRA", SE_SIDM_TRUE_CITRA);
     PyModule_AddIntConstant(m, "SIDM_TRUE_REVATI", SE_SIDM_TRUE_REVATI);
+    PyModule_AddIntConstant(m, "SIDM_TRUE_PUSHYA", SE_SIDM_TRUE_PUSHYA);
+    PyModule_AddIntConstant(m, "SIDM_GALCENT_RGILBRAND", SE_SIDM_GALCENT_RGILBRAND);
+    PyModule_AddIntConstant(m, "SIDM_GALEQU_IAU1958", SE_SIDM_GALEQU_IAU1958);
+    PyModule_AddIntConstant(m, "SIDM_GALEQU_TRUE", SE_SIDM_GALEQU_TRUE);
+    PyModule_AddIntConstant(m, "SIDM_GALEQU_MULA", SE_SIDM_GALEQU_MULA);
+    PyModule_AddIntConstant(m, "SIDM_GALALIGN_MARDYKS", SE_SIDM_GALALIGN_MARDYKS);
+    PyModule_AddIntConstant(m, "SIDM_TRUE_MULA", SE_SIDM_TRUE_MULA);
+    PyModule_AddIntConstant(m, "SIDM_GALCENT_MULA_WILHELM", SE_SIDM_GALCENT_MULA_WILHELM);
+    PyModule_AddIntConstant(m, "SIDM_ARYABHATA_522", SE_SIDM_ARYABHATA_522);
+    PyModule_AddIntConstant(m, "SIDM_BABYL_BRITTON", SE_SIDM_BABYL_BRITTON);
+    PyModule_AddIntConstant(m, "SIDM_TRUE_SHEORAN", SE_SIDM_TRUE_SHEORAN);
+    PyModule_AddIntConstant(m, "SIDM_GALCENT_COCHRANE", SE_SIDM_GALCENT_COCHRANE);
+    PyModule_AddIntConstant(m, "SIDM_GALEQU_FIORENZA", SE_SIDM_GALEQU_FIORENZA);
+    PyModule_AddIntConstant(m, "SIDM_VALENS_MOON", SE_SIDM_VALENS_MOON);
     PyModule_AddIntConstant(m, "SIDM_USER", SE_SIDM_USER);
 
     PyModule_AddIntConstant(m, "NSIDM_PREDEF", SE_NSIDM_PREDEF);
