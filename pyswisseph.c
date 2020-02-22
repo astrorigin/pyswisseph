@@ -4651,6 +4651,8 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "BIT_NAUTIC_TWILIGHT", SE_BIT_NAUTIC_TWILIGHT);
     PyModule_AddIntConstant(m, "BIT_ASTRO_TWILIGHT", SE_BIT_ASTRO_TWILIGHT);
     PyModule_AddIntConstant(m, "BIT_FIXED_DISC_SIZE", SE_BIT_FIXED_DISC_SIZE);
+    PyModule_AddIntConstant(m, "BIT_FORCE_SLOW_METHOD", SE_BIT_FORCE_SLOW_METHOD);
+    PyModule_AddIntConstant(m, "BIT_HINDU_RISING", SE_BIT_HINDU_RISING);
 
     PyModule_AddIntConstant(m, "ECL2HOR", SE_ECL2HOR);
     PyModule_AddIntConstant(m, "EQU2HOR", SE_EQU2HOR);
@@ -4727,6 +4729,78 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "PHOTOPIC_FLAG", SE_PHOTOPIC_FLAG);
     PyModule_AddIntConstant(m, "SCOTOPIC_FLAG", SE_SCOTOPIC_FLAG);
     PyModule_AddIntConstant(m, "MIXEDOPIC_FLAG", SE_MIXEDOPIC_FLAG);
+
+    PyModule_AddFloatConstant(m, "TIDAL_DE200", SE_TIDAL_DE200);
+    PyModule_AddFloatConstant(m, "TIDAL_DE403", SE_TIDAL_DE403);
+    PyModule_AddFloatConstant(m, "TIDAL_DE404", SE_TIDAL_DE404);
+    PyModule_AddFloatConstant(m, "TIDAL_DE405", SE_TIDAL_DE405);
+    PyModule_AddFloatConstant(m, "TIDAL_DE406", SE_TIDAL_DE406);
+    PyModule_AddFloatConstant(m, "TIDAL_DE421", SE_TIDAL_DE421);
+    PyModule_AddFloatConstant(m, "TIDAL_DE422", SE_TIDAL_DE422);
+    PyModule_AddFloatConstant(m, "TIDAL_DE430", SE_TIDAL_DE430);
+    PyModule_AddFloatConstant(m, "TIDAL_DE431", SE_TIDAL_DE431);
+    PyModule_AddFloatConstant(m, "TIDAL_26", SE_TIDAL_26);
+    PyModule_AddFloatConstant(m, "TIDAL_STEPHENSON_2016", SE_TIDAL_STEPHENSON_2016);
+    PyModule_AddFloatConstant(m, "TIDAL_DEFAULT", SE_TIDAL_DEFAULT);
+    PyModule_AddIntConstant(m, "TIDAL_AUTOMATIC", SE_TIDAL_AUTOMATIC);
+    PyModule_AddFloatConstant(m, "TIDAL_MOSEPH", SE_TIDAL_MOSEPH);
+    PyModule_AddFloatConstant(m, "TIDAL_SWIEPH", SE_TIDAL_SWIEPH);
+    PyModule_AddFloatConstant(m, "TIDAL_JPLEPH", SE_TIDAL_JPLEPH);
+
+    PyModule_AddFloatConstant(m, "DELTAT_AUTOMATIC", SE_DELTAT_AUTOMATIC);
+    PyModule_AddIntConstant(m, "MODEL_DELTAT", SE_MODEL_DELTAT);
+    PyModule_AddIntConstant(m, "MODEL_PREC_LONGTERM", SE_MODEL_PREC_LONGTERM);
+    PyModule_AddIntConstant(m, "MODEL_PREC_SHORTTERM", SE_MODEL_PREC_SHORTTERM);
+    PyModule_AddIntConstant(m, "MODEL_NUT", SE_MODEL_NUT);
+    PyModule_AddIntConstant(m, "MODEL_BIAS", SE_MODEL_BIAS);
+    PyModule_AddIntConstant(m, "MODEL_JPLHOR_MODE", SE_MODEL_JPLHOR_MODE);
+    PyModule_AddIntConstant(m, "MODEL_JPLHORA_MODE", SE_MODEL_JPLHORA_MODE);
+    PyModule_AddIntConstant(m, "MODEL_SIDT", SE_MODEL_SIDT);
+    PyModule_AddIntConstant(m, "NSE_MODELS", NSE_MODELS);
+
+    PyModule_AddIntConstant(m, "MOD_NPREC", SEMOD_NPREC);
+    PyModule_AddIntConstant(m, "MOD_PREC_IAU_1976", SEMOD_PREC_IAU_1976);
+    PyModule_AddIntConstant(m, "MOD_PREC_LASKAR_1986", SEMOD_PREC_LASKAR_1986);
+    PyModule_AddIntConstant(m, "MOD_PREC_WILL_EPS_LASK", SEMOD_PREC_WILL_EPS_LASK);
+    PyModule_AddIntConstant(m, "MOD_PREC_WILLIAMS_1994",SEMOD_PREC_WILLIAMS_1994);
+    PyModule_AddIntConstant(m, "MOD_PREC_SIMON_1994",SEMOD_PREC_SIMON_1994);
+    PyModule_AddIntConstant(m, "MOD_PREC_IAU_2000", SEMOD_PREC_IAU_2000);
+    PyModule_AddIntConstant(m, "MOD_PREC_BRETAGNON_2003", SEMOD_PREC_BRETAGNON_2003);
+    PyModule_AddIntConstant(m, "MOD_PREC_IAU_2006", SEMOD_PREC_IAU_2006);
+    PyModule_AddIntConstant(m, "MOD_PREC_VONDRAK_2011", SEMOD_PREC_VONDRAK_2011);
+    PyModule_AddIntConstant(m, "MOD_PREC_OWEN_1990", SEMOD_PREC_OWEN_1990);
+    PyModule_AddIntConstant(m, "MOD_PREC_DEFAULT", SEMOD_PREC_DEFAULT);
+    PyModule_AddIntConstant(m, "MOD_PREC_DEFAULT_SHORT", SEMOD_PREC_DEFAULT_SHORT);
+
+    PyModule_AddIntConstant(m, "MOD_NNUT", SEMOD_NNUT);
+    PyModule_AddIntConstant(m, "MOD_NUT_IAU_1980", SEMOD_NUT_IAU_1980);
+    PyModule_AddIntConstant(m, "MOD_NUT_IAU_CORR_1987", SEMOD_NUT_IAU_CORR_1987);
+    PyModule_AddIntConstant(m, "MOD_NUT_IAU_2000A", SEMOD_NUT_IAU_2000A);
+    PyModule_AddIntConstant(m, "MOD_NUT_IAU_2000B", SEMOD_NUT_IAU_2000B);
+    PyModule_AddIntConstant(m, "MOD_NUT_DEFAULT", SEMOD_NUT_DEFAULT);
+
+    PyModule_AddIntConstant(m, "MOD_NBIAS", SEMOD_NBIAS);
+    PyModule_AddIntConstant(m, "MOD_BIAS_NONE", SEMOD_BIAS_NONE);
+    PyModule_AddIntConstant(m, "MOD_BIAS_IAU2000", SEMOD_BIAS_IAU2000);
+    PyModule_AddIntConstant(m, "MOD_BIAS_IAU2006", SEMOD_BIAS_IAU2006);
+    PyModule_AddIntConstant(m, "MOD_BIAS_DEFAULT", SEMOD_BIAS_DEFAULT);
+
+    PyModule_AddIntConstant(m, "MOD_NJPLHOR", SEMOD_NJPLHOR);
+    PyModule_AddIntConstant(m, "MOD_JPLHOR_LONG_AGREEMENT", SEMOD_JPLHOR_LONG_AGREEMENT);
+    PyModule_AddIntConstant(m, "MOD_JPLHOR_DEFAULT", SEMOD_JPLHOR_DEFAULT);
+    PyModule_AddIntConstant(m, "MOD_NJPLHORA", SEMOD_NJPLHORA);
+    PyModule_AddIntConstant(m, "MOD_JPLHORA_1", SEMOD_JPLHORA_1);
+    PyModule_AddIntConstant(m, "MOD_JPLHORA_2", SEMOD_JPLHORA_2);
+    PyModule_AddIntConstant(m, "MOD_JPLHORA_3", SEMOD_JPLHORA_3);
+    PyModule_AddIntConstant(m, "MOD_JPLHORA_DEFAULT", SEMOD_JPLHORA_DEFAULT);
+
+    PyModule_AddIntConstant(m, "MOD_NDELTAT", SEMOD_NDELTAT);
+    PyModule_AddIntConstant(m, "MOD_DELTAT_STEPHENSON_MORRISON_1984", SEMOD_DELTAT_STEPHENSON_MORRISON_1984);
+    PyModule_AddIntConstant(m, "MOD_DELTAT_STEPHENSON_1997", SEMOD_DELTAT_STEPHENSON_1997);
+    PyModule_AddIntConstant(m, "MOD_DELTAT_STEPHENSON_MORRISON_2004", SEMOD_DELTAT_STEPHENSON_MORRISON_2004);
+    PyModule_AddIntConstant(m, "MOD_DELTAT_ESPENAK_MEEUS_2006", SEMOD_DELTAT_ESPENAK_MEEUS_2006);
+    PyModule_AddIntConstant(m, "MOD_DELTAT_STEPHENSON_ETC_2016", SEMOD_DELTAT_STEPHENSON_ETC_2016);
+    PyModule_AddIntConstant(m, "MOD_DELTAT_DEFAULT", SEMOD_DELTAT_DEFAULT);
 
 #if PYSWE_USE_SWEPHELP
     /* *** Additional constants -- not swiss ephemeris ***/
