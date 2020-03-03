@@ -227,7 +227,7 @@ static PyObject * pyswe_get_planet_name FUNCARGS_KEYWDS
 static char pyswe_calc__doc__[] =
 "Calculate body positions (ET).\n\n"
 "Args: float julday, int planet, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: tuple of 6 float";
+"Return: tuple of 6 float, and returned flags";
 
 static PyObject * pyswe_calc FUNCARGS_KEYWDS
 {
@@ -244,14 +244,14 @@ static PyObject * pyswe_calc FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)",val[0],val[1],val[2],val[3],val[4],val[5]);
+    return Py_BuildValue("(ffffff)i",val[0],val[1],val[2],val[3],val[4],val[5],ret);
 }
 
 /* swisseph.calc_ut */
 static char pyswe_calc_ut__doc__[] =
 "Calculate body positions (UT).\n\n"
 "Args: float julday, int planet, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: tuple of 6 float";
+"Return: tuple of 6 float, and returned flags";
 
 static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
 {
@@ -268,14 +268,14 @@ static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)",val[0],val[1],val[2],val[3],val[4],val[5]);
+    return Py_BuildValue("(ffffff)i",val[0],val[1],val[2],val[3],val[4],val[5],ret);
 }
 
 /* swisseph.fixstar */
 static char pyswe_fixstar__doc__[] =
 "Calculate fixed star positions (ET).\n\n"
 "Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float and returned star name";
+"Return: tuple of 6 float, returned star name, and returned flags";
 
 static PyObject * pyswe_fixstar FUNCARGS_KEYWDS
 {
@@ -294,14 +294,14 @@ static PyObject * pyswe_fixstar FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffffs)",val[0],val[1],val[2],val[3],val[4],val[5],st);
+    return Py_BuildValue("(ffffff)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
 }
 
 /* swisseph.fixstar2 */
 static char pyswe_fixstar2__doc__[] =
 "Calculate fixed star positions (fast) (ET).\n\n"
 "Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float and returned star name";
+"Return: tuple of 6 float, returned star name, and returned flags";
 
 static PyObject * pyswe_fixstar2 FUNCARGS_KEYWDS
 {
@@ -320,14 +320,14 @@ static PyObject * pyswe_fixstar2 FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffffs)",val[0],val[1],val[2],val[3],val[4],val[5],st);
+    return Py_BuildValue("(ffffff)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
 }
 
 /* swisseph.fixstar_ut */
 static char pyswe_fixstar_ut__doc__[] =
 "Calculate fixed star positions (UT).\n\n"
 "Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float and returned star name";
+"Return: tuple of 6 float, returned star name, and returned flags";
 
 static PyObject * pyswe_fixstar_ut FUNCARGS_KEYWDS
 {
@@ -346,14 +346,14 @@ static PyObject * pyswe_fixstar_ut FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffffs)",val[0],val[1],val[2],val[3],val[4],val[5],st);
+    return Py_BuildValue("(ffffff)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
 }
 
 /* swisseph.fixstar2_ut */
 static char pyswe_fixstar2_ut__doc__[] =
 "Calculate fixed star positions (fast) (UT).\n\n"
 "Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float and returned star name";
+"Return: tuple of 6 float, returned star name, and returned flags";
 
 static PyObject * pyswe_fixstar2_ut FUNCARGS_KEYWDS
 {
@@ -372,7 +372,7 @@ static PyObject * pyswe_fixstar2_ut FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffffs)",val[0],val[1],val[2],val[3],val[4],val[5],st);
+    return Py_BuildValue("(ffffff)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
 }
 
 /* swisseph.nod_aps */
