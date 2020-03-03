@@ -3,7 +3,7 @@
 
 #   This file is part of Pyswisseph.
 #
-#   Copyright (c) 2007-2017 Stanislas Marquis <stan@astrorigin.com>
+#   Copyright (c) 2007-2020 Stanislas Marquis <stan@astrorigin.com>
 #
 #   Pyswisseph is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -47,10 +47,10 @@ Standard installation (unixes): ``# python setup.py install``
 # Pyswisseph version string
 # Our version string gets the version of the swisseph library (x.xx.xx)
 # and our increment as suffix (-x).
-VERSION = '2.05.01-0'
+VERSION = '2.08.00-0'
 
 # Corresponding swisseph version string
-swe_version = '2.05.01'
+swe_version = '2.08.00'
 
 # libswe-dev detection
 # Set to True to find libswe in system.
