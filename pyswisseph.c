@@ -227,7 +227,9 @@ static PyObject * pyswe_get_planet_name FUNCARGS_KEYWDS
 static char pyswe_calc__doc__[] =
 "Calculate body positions (ET).\n\n"
 "Args: float julday, int planet, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: tuple of 6 float, and returned flags";
+"Return: tuple of 6 float, and returned flags\n\n"
+"Usage example:\n\n"
+"\tres, flg = swisseph.calc(jd, pl)";
 
 static PyObject * pyswe_calc FUNCARGS_KEYWDS
 {
@@ -251,7 +253,9 @@ static PyObject * pyswe_calc FUNCARGS_KEYWDS
 static char pyswe_calc_ut__doc__[] =
 "Calculate body positions (UT).\n\n"
 "Args: float julday, int planet, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: tuple of 6 float, and returned flags";
+"Return: tuple of 6 float, and returned flags\n\n"
+"Usage example:\n\n"
+"\tres, flg = swisseph.calc_ut(jd, pl)";
 
 static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
 {
@@ -275,7 +279,9 @@ static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
 static char pyswe_fixstar__doc__[] =
 "Calculate fixed star positions (ET).\n\n"
 "Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float, returned star name, and returned flags";
+"Return: tuple of 6 float, returned star name, and returned flags\n\n"
+"Usage example:\n\n"
+"\tres, stnam, flg = swisseph.fixstar(st, jd)";
 
 static PyObject * pyswe_fixstar FUNCARGS_KEYWDS
 {
@@ -301,7 +307,9 @@ static PyObject * pyswe_fixstar FUNCARGS_KEYWDS
 static char pyswe_fixstar2__doc__[] =
 "Calculate fixed star positions (fast) (ET).\n\n"
 "Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float, returned star name, and returned flags";
+"Return: tuple of 6 float, returned star name, and returned flags\n\n"
+"Usage example:\n\n"
+"\tres, stnam, flg = swisseph.fixstar2(st, jd)";
 
 static PyObject * pyswe_fixstar2 FUNCARGS_KEYWDS
 {
@@ -327,7 +335,9 @@ static PyObject * pyswe_fixstar2 FUNCARGS_KEYWDS
 static char pyswe_fixstar_ut__doc__[] =
 "Calculate fixed star positions (UT).\n\n"
 "Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float, returned star name, and returned flags";
+"Return: tuple of 6 float, returned star name, and returned flags\n\n"
+"Usage example:\n\n"
+"\tres, stnam, flg = swisseph.fixstar_ut(st, jd)";
 
 static PyObject * pyswe_fixstar_ut FUNCARGS_KEYWDS
 {
@@ -353,7 +363,9 @@ static PyObject * pyswe_fixstar_ut FUNCARGS_KEYWDS
 static char pyswe_fixstar2_ut__doc__[] =
 "Calculate fixed star positions (fast) (UT).\n\n"
 "Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float, returned star name, and returned flags";
+"Return: tuple of 6 float, returned star name, and returned flags\n\n"
+"Usage example:\n\n"
+"\tres, stnam, flg = swisseph.fixstar2_ut(st, jd)";
 
 static PyObject * pyswe_fixstar2_ut FUNCARGS_KEYWDS
 {
