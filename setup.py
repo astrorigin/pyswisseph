@@ -44,6 +44,9 @@ Standard installation (unixes): ``# python setup.py install``
 
 """
 
+import os.path, sys
+from distutils.core import setup, Extension
+
 # Pyswisseph version string
 # Our version string gets the version of the swisseph library (x.xx.xx)
 # and our increment as suffix (-x).
@@ -64,7 +67,6 @@ use_swephelp = True
 cflags = ['-std=gnu99']
 
 # Fix Clang error on OSX
-import sys
 if sys.platform == 'darwin':
     cflags.append('-Wno-error=unused-command-line-argument-hard-error-in-future')
 
@@ -73,8 +75,6 @@ ldflags = []
 
 # Don't modify below
 
-import os.path, sys
-from distutils.core import setup, Extension
 
 # Test for pkg-config
 has_pkgconfig = False
