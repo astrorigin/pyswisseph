@@ -1863,7 +1863,7 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
     static char *kwlist[] = {"jd_start", "geopos", "atmo", "observer", "object",
         "eventtype", "helflag", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOOOsii", kwlist,
-        &jdstart, o1, o2, o3, obj, &evnt, &flg))
+        &jdstart, &o1, &o2, &o3, &obj, &evnt, &flg))
         return NULL;
 
     if (!PySequence_Check(o1) || PySequence_Length(o1) != 3)
@@ -2239,23 +2239,23 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
     }
 }
 
-/* swisseph.heliacal_pheno_ut */ /* TODO? this is 99% copy of above function */
+/* swisseph.heliacal_pheno_ut */
 static char pyswe_heliacal_pheno_ut__doc__ [] =
-"Find the Julian day of the next heliacal phenomenon after a given start date.\n"
-"It works between geographic latitudes 60s - 60n.\n\n"
+"Provides data that are relevant for the calculation of heliacal risings and settings.\n\n"
 "Args: float jd_start, seq geopos, seq atmo, seq observer, str object, int enventtype, int helflag\n"
-"Return: tuple with 3 julian days";
+"Return: tuple of 50 float";
 
 static PyObject * pyswe_heliacal_pheno_ut FUNCARGS_KEYWDS
 {
-    double jdstart, geopos[3], atmo[4], observ[6], dret[3];
+    double jdstart, geopos[3], atmo[4], observ[6], dret[50];
     char serr[255], *obj = 0; /* dummy assign */
     int i, evnt, flg;
     PyObject *o1=0, *o2=0, *o3=0, *o4, *o5, *o6, *o7, *o8, *o9;
+    memset(dret, 0, sizeof(double) * 50);
     static char *kwlist[] = {"jd_start", "geopos", "atmo", "observer", "object",
         "eventtype", "helflag", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOOOsii", kwlist,
-        &jdstart, o1, o2, o3, obj, &evnt, &flg))
+        &jdstart, &o1, &o2, &o3, &obj, &evnt, &flg))
         return NULL;
 
     if (!PySequence_Check(o1) || PySequence_Length(o1) != 3)
@@ -2622,7 +2622,13 @@ static PyObject * pyswe_heliacal_pheno_ut FUNCARGS_KEYWDS
 
     if (i == 0)
     {
-        return Py_BuildValue("ddd", dret[0], dret[1], dret[2]);
+        return Py_BuildValue("dddddddddddddddddddddddddddddddddddddddddddddddddd",
+            dret[0],dret[1],dret[2],dret[3],dret[4],dret[5],dret[6],dret[7],dret[8],dret[9],
+            dret[10],dret[11],dret[12],dret[13],dret[14],dret[15],dret[16],dret[17],dret[18],dret[19],
+            dret[20],dret[21],dret[22],dret[23],dret[24],dret[25],dret[26],dret[27],dret[28],dret[29],
+            dret[30],dret[31],dret[32],dret[33],dret[34],dret[35],dret[36],dret[37],dret[38],dret[39],
+            dret[40],dret[41],dret[42],dret[43],dret[44],dret[45],dret[46],dret[47],dret[48],dret[49]);
+
     }
     else
     {
