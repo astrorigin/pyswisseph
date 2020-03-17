@@ -1,3 +1,6 @@
 [submodule "swephelp"]
-	path = swephelp
-	url = https://github.com/astrorigin/swephelp.git
+    path = swephelp
+    url = https://github.com/astrorigin/swephelp.git
+[submodule "libswe"]
+    path = libswe
+    url = https://github.com/astrorigin/swisseph.git
