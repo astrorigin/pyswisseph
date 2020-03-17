@@ -1,0 +1,3 @@
+[submodule "swephelp"]
+	path = swephelp
+	url = https://github.com/astrorigin/swephelp.git
