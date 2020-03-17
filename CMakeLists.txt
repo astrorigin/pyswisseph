@@ -15,7 +15,7 @@ endif()
 
 # Python version
 set( PYSWE_DESIRED_PYTHON_VERSION
-    2.7
+    3.6
     CACHE STRING "Desired Python version" )
 
 # Options
