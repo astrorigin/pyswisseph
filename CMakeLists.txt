@@ -1,6 +1,6 @@
 # Pyswisseph CMakeLists.txt
 
-cmake_minimum_required( VERSION 2.8 )
+cmake_minimum_required( VERSION 3.10 )
 
 project( pyswisseph )
 
@@ -14,9 +14,9 @@ else()
 endif()
 
 # Python version
-set( PYSWE_DESIRED_PYTHON_VERSION
+set( PYSWE_MINIMUM_PYTHON_VERSION
     3.6
-    CACHE STRING "Desired Python version" )
+    CACHE STRING "Minimum Python version" )
 
 # Options
 option( PYSWE_AUTO_SET_EPHE_PATH
@@ -57,9 +57,11 @@ else()
 endif()
 
 # Find Python libs
-find_package( PythonLibs ${PYSWE_DESIRED_PYTHON_VERSION} )
+find_package( PythonLibs ${PYSWE_MINIMUM_VERSION} )
 if ( NOT PYTHONLIBS_FOUND )
-    message( FATAL_ERROR "Cannot find Python libraries (version ${PYSWE_DESIRED_PYTHON_VERSION})" )
+    message( FATAL_ERROR "Cannot find Python libraries (version ${PYSWE_MINIMUM_PYTHON_VERSION})" )
+else()
+    message( STATUS "... Using Python version ${PYTHONLIBS_VERSION_STRING}" )
 endif()
 
 # Configure cswisseph
