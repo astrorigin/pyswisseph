@@ -4726,7 +4726,7 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "HELFLAG_AVKIND_MIN7", SE_HELFLAG_AVKIND_MIN7);
     PyModule_AddIntConstant(m, "HELFLAG_AVKIND_MIN9", SE_HELFLAG_AVKIND_MIN9);
     PyModule_AddIntConstant(m, "HELFLAG_AVKIND", SE_HELFLAG_AVKIND);
-    PyModule_AddObject(m, "TJD_INVALID", Py_BuildValue("f", TJD_INVALID));
+    PyModule_AddFloatConstant(m, "TJD_INVALID", TJD_INVALID);
     PyModule_AddIntConstant(m, "SIMULATE_VICTORVB", SIMULATE_VICTORVB);
 #if 0 /* Unused */
     PyModule_AddIntConstant(m, "HELIACAL_LONG_SEARCH", SE_HELIACAL_LONG_SEARCH);
@@ -4826,28 +4826,28 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "CONJUNCTION", SWH_CONJUNCTION);
     PyModule_AddIntConstant(m, "SQUISEXTILE", SWH_SQUISEXTILE);
     PyModule_AddIntConstant(m, "SEMINOVILE", SWH_SEMINOVILE);
-    PyModule_AddObject(m, "SQUISQUARE", Py_BuildValue("f", SWH_SQUISQUARE));
-    PyModule_AddObject(m, "UNDECILE", Py_BuildValue("f", SWH_UNDECILE));
+    PyModule_AddFloatConstant(m, "SQUISQUARE", SWH_SQUISQUARE);
+    PyModule_AddFloatConstant(m, "UNDECILE", SWH_UNDECILE);
     PyModule_AddIntConstant(m, "SEMISEXTILE", SWH_SEMISEXTILE);
     PyModule_AddIntConstant(m, "SEMIQUINTILE", SWH_SEMIQUINTILE);
     PyModule_AddIntConstant(m, "NOVILE", SWH_NOVILE);
     PyModule_AddIntConstant(m, "SEMISQUARE", SWH_SEMISQUARE);
-    PyModule_AddObject(m, "SEPTILE", Py_BuildValue("f", SWH_SEPTILE));
+    PyModule_AddFloatConstant(m, "SEPTILE", SWH_SEPTILE);
     PyModule_AddIntConstant(m, "SEXTILE", SWH_SEXTILE);
-    PyModule_AddObject(m, "BIUNDECILE", Py_BuildValue("f", SWH_BIUNDECILE));
+    PyModule_AddFloatConstant(m, "BIUNDECILE", SWH_BIUNDECILE);
     PyModule_AddIntConstant(m, "QUINTILE", SWH_QUINTILE);
     PyModule_AddIntConstant(m, "BINOVILE", SWH_BINOVILE);
     PyModule_AddIntConstant(m, "SQUARE", SWH_SQUARE);
-    PyModule_AddObject(m, "TRIUNDECILE", Py_BuildValue("f", SWH_TRIUNDECILE));
-    PyModule_AddObject(m, "BISEPTILE", Py_BuildValue("f", SWH_BISEPTILE));
+    PyModule_AddFloatConstant(m, "TRIUNDECILE", SWH_TRIUNDECILE);
+    PyModule_AddFloatConstant(m, "BISEPTILE", SWH_BISEPTILE);
     PyModule_AddIntConstant(m, "TRINE", SWH_TRINE);
-    PyModule_AddObject(m, "QUADUNDECILE", Py_BuildValue("f", SWH_QUADUNDECILE));
+    PyModule_AddFloatConstant(m, "QUADUNDECILE", SWH_QUADUNDECILE);
     PyModule_AddIntConstant(m, "SESQUISQUARE", SWH_SESQUISQUARE);
     PyModule_AddIntConstant(m, "BIQUINTILE", SWH_BIQUINTILE);
     PyModule_AddIntConstant(m, "QUINCUNX", SWH_QUINCUNX);
-    PyModule_AddObject(m, "TRISEPTILE", Py_BuildValue("f", SWH_TRISEPTILE));
+    PyModule_AddFloatConstant(m, "TRISEPTILE", SWH_TRISEPTILE);
     PyModule_AddIntConstant(m, "QUATRONOVILE", SWH_QUATRONOVILE);
-    PyModule_AddObject(m, "QUINUNDECILE", Py_BuildValue("f", SWH_QUINUNDECILE));
+    PyModule_AddFloatConstant(m, "QUINUNDECILE", SWH_QUINUNDECILE);
     PyModule_AddIntConstant(m, "OPPOSITION", SWH_OPPOSITION);
 
     /* Signs */
