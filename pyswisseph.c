@@ -29,10 +29,10 @@
  *  Swisseph homepage: http://www.astro.com/swisseph
  *
  *  Swisseph version: 2.08.00
- *  Last revision: 03.03.2020
+ *  Last revision: 27.03.2020
  */
 
-#define PYSWISSEPH_VERSION      20200303
+#define PYSWISSEPH_VERSION      20200327
 
 /* Set the default argument for set_ephe_path function */
 #ifndef PYSWE_DEFAULT_EPHE_PATH
@@ -78,149 +78,48 @@
 /* swisseph.Error (module exception type) */
 static PyObject * pyswe_Error;
 
-/* swisseph.set_ephe_path */
-static char pyswe_set_ephe_path__doc__[] =
-"Set ephemeris files path.\n\n"
-"Args: str path=\"" PYSWE_DEFAULT_EPHE_PATH "\"\n"
-"Return: None";
+/* swisseph.azalt */
+static char pyswe_azalt__doc__[] =
+"Calculate horizontal coordinates (azimuth and altitude) of a planet or a star"
+" from either ecliptical or equatorial coordinates (UTC).\n\n"
+"Args: float julday, float lon, float lat, float hei, float x, float y,"
+" float z=0.0, float press=0.0, float temp=0.0, int flag=ECL2HOR\n"
+"Return: tuple of 3 float (azimuth, true altitude, apparent altitude)";
 
-static PyObject * pyswe_set_ephe_path FUNCARGS_KEYWDS
+static PyObject * pyswe_azalt FUNCARGS_KEYWDS
 {
-    char *path = PYSWE_DEFAULT_EPHE_PATH;
-    static char *kwlist[] = {"path", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "|s", kwlist, &path))
+    double jd, geo[3], xin[3], press = 0.0, temp = 0.0, xaz[3];
+    int flag = SE_ECL2HOR;
+    static char *kwlist[] = {"julday", "lon", "lat", "hei",
+        "x", "y", "z", "press", "temp", "flag", NULL};
+    xin[2] = 0.0;
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddd|dddi", kwlist,
+        &jd, &geo[0], &geo[1], &geo[2], &xin[0], &xin[1], &xin[2], &press,
+        &temp, &flag))
         return NULL;
-    swe_set_ephe_path(path);
-    Py_RETURN_NONE;
+    swe_azalt(jd, flag, geo, press, temp, xin, xaz);
+    return Py_BuildValue("(fff)", xaz[0], xaz[1], xaz[2]);
 }
 
-/* swisseph.set_jpl_file */
-static char pyswe_set_jpl_file__doc__[] =
-"Set JPL file path.\n\n"
-"Args: str path\n"
-"Return: None";
+/* swisseph.azalt_rev */
+static char pyswe_azalt_rev__doc__[] =
+"Calculate either ecliptical or equatorial coordinates from azimuth and true"
+" altitude.\n\n"
+"Args: float julday, float lon, float lat, float hei, double azim, double alt,"
+" int flag=HOR2ECL\n"
+"Return: tuple of 2 float";
 
-static PyObject * pyswe_set_jpl_file FUNCARGS_KEYWDS
+static PyObject * pyswe_azalt_rev FUNCARGS_KEYWDS
 {
-    char *path;
-    static char *kwlist[] = {"path", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &path))
+    double jd, geo[3], xin[2], xout[2];
+    int flag = SE_HOR2ECL;
+    static char *kwlist[] = {"julday", "lon", "lat", "hei",
+        "azim", "alt", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddd|i", kwlist,
+        &jd, &geo[0], &geo[1], &geo[2], &xin[0], &xin[1], &flag))
         return NULL;
-    swe_set_jpl_file(path);
-    Py_RETURN_NONE;
-}
-
-/* swisseph.set_topo */
-static char pyswe_set_topo__doc__[] =
-"Set topocentric parameters.\n\n"
-"Args: float lon, float lat, float alt=0.0\n"
-"Return: None";
-
-static PyObject * pyswe_set_topo FUNCARGS_KEYWDS
-{
-    double lon, lat, alt = 0.0;
-    static char *kwlist[] = {"lon", "lat", "alt", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|d", kwlist,
-        &lon, &lat, &alt))
-        return NULL;
-    swe_set_topo(lon, lat, alt);
-    Py_RETURN_NONE;
-}
-
-/* swisseph.set_sid_mode */
-static char pyswe_set_sid_mode__doc__[] =
-"Set sidereal mode.\n\n"
-"Args: int mode, float t0=0.0, float ayan_t0=0.0\n"
-"Return: None";
-
-static PyObject * pyswe_set_sid_mode FUNCARGS_KEYWDS
-{
-    int mode;
-    double t0 = 0.0, ayan_t0 = 0.0;
-    static char *kwlist[] = {"mode", "t0", "ayan_t0", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i|dd", kwlist,
-        &mode, &t0, &ayan_t0))
-        return NULL;
-    swe_set_sid_mode(mode, t0, ayan_t0);
-    Py_RETURN_NONE;
-}
-
-/* swisseph.get_ayanamsa */
-static char pyswe_get_ayanamsa__doc__[] =
-"Calculate ayanamsa (ET).\n\n"
-"Args: float julday\n"
-"Return: float";
-
-static PyObject * pyswe_get_ayanamsa FUNCARGS_KEYWDS
-{
-    double jd, ret;
-    static char *kwlist[] = {"julday", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
-        return NULL;
-    ret = swe_get_ayanamsa(jd);
-    return Py_BuildValue("f", ret);
-}
-
-/* swisseph.get_ayanamsa_ut */
-static char pyswe_get_ayanamsa_ut__doc__[] =
-"Calculate ayanamsa (UT).\n\n"
-"Args: float julday\n"
-"Return: float";
-
-static PyObject * pyswe_get_ayanamsa_ut FUNCARGS_KEYWDS
-{
-    double jd, ret;
-    static char *kwlist[] = {"julday", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
-        return NULL;
-    ret = swe_get_ayanamsa_ut(jd);
-    return Py_BuildValue("f", ret);
-}
-
-/* swisseph.get_ayanamsa_name */
-static char pyswe_get_ayanamsa_name__doc__[] =
-"Get ayanamsa name from sidereal mode constant.\n\n"
-"Args: int sidmode\n"
-"Return: str";
-
-static PyObject * pyswe_get_ayanamsa_name FUNCARGS_KEYWDS
-{
-    int mode;
-    char *name;
-    static char *kwlist[] = {"sidmode", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &mode))
-        return NULL;
-    name = (char*) swe_get_ayanamsa_name(mode);
-    return Py_BuildValue("s", name);
-}
-
-/* swisseph.close */
-static char pyswe_close__doc__[] =
-"Close swiss ephemeris.\n\n"
-"Args: -\n"
-"Return: None";
-
-static PyObject * pyswe_close FUNCARGS_SELF
-{
-    swe_close();
-    Py_RETURN_NONE;
-}
-
-/* swisseph.get_planet_name */
-static char pyswe_get_planet_name__doc__[] =
-"Get planet name.\n\n"
-"Args: int planet\n"
-"Return: str";
-
-static PyObject * pyswe_get_planet_name FUNCARGS_KEYWDS
-{
-    int ipl;
-    char name[256];
-    static char *kwlist[] = {"planet", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &ipl))
-        return NULL;
-    swe_get_planet_name(ipl, name);
-    return Py_BuildValue("s", name);
+    swe_azalt_rev(jd, flag, geo, xin, xout);
+    return Py_BuildValue("(ff)", xout[0], xout[1]);
 }
 
 /* swisseph.calc */
@@ -273,6 +172,314 @@ static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
         return NULL;
     }
     return Py_BuildValue("(ffffff)i",val[0],val[1],val[2],val[3],val[4],val[5],ret);
+}
+
+/* swisseph.close */
+static char pyswe_close__doc__[] =
+"Close swiss ephemeris.\n\n"
+"Args: -\n"
+"Return: None";
+
+static PyObject * pyswe_close FUNCARGS_SELF
+{
+    swe_close();
+    Py_RETURN_NONE;
+}
+
+/* swisseph.cotrans */
+static char pyswe_cotrans__doc__[] =
+"Coordinate transformation from ecliptic to equator or vice-versa.\n\n"
+"Args: float lon, float lat, float dist, float obliquity\n"
+"Return: tuple of 3 float (longitude, latitude, distance)";
+
+static PyObject * pyswe_cotrans FUNCARGS_KEYWDS
+{
+    double xpo[3], xpn[3], eps;
+    static char *kwlist[] = {"lon", "lat", "dist", "obliquity", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddd", kwlist,
+        &xpo[0], &xpo[1], &xpo[2], &eps))
+        return NULL;
+    swe_cotrans(xpo, xpn, eps);
+    return Py_BuildValue("(fff)", xpn[0], xpn[1], xpn[2]);
+}
+
+/* swisseph.cotrans_sp */
+static char pyswe_cotrans_sp__doc__[] =
+"Coordinate transformation of position and speed, from ecliptic to equator"
+" or vice-versa.\n\n"
+"Args: float lon, float lat, float dist, float lonspeed, float latspeed,"
+" float distspeed, float obliquity\n"
+"Return: tuple of 6 float";
+
+static PyObject * pyswe_cotrans_sp FUNCARGS_KEYWDS
+{
+    double xpo[6], xpn[6], eps;
+    static char *kwlist[] = {"lon", "lat", "dist", "lonspeed",
+        "latspeed", "distspeed", "obliquity", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddddddd", kwlist,
+        &xpo[0], &xpo[1], &xpo[2], &xpo[3], &xpo[4], &xpo[5], &eps))
+        return NULL;
+    swe_cotrans(xpo, xpn, eps);
+    return Py_BuildValue("(ffffff)", xpn[0], xpn[1], xpn[2], xpn[3],
+        xpn[4], xpn[5]);
+}
+
+/* swisseph.cs2degstr */
+static char pyswe_cs2degstr__doc__[] =
+"Get degrees string from centiseconds.\n\n"
+"Args: int cs\n"
+"Return: str";
+
+static PyObject * pyswe_cs2degstr FUNCARGS_KEYWDS
+{
+    int cs;
+    char ret[9];
+    static char *kwlist[] = {"cs", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &cs))
+        return NULL;
+    swe_cs2degstr(cs, ret);
+    return Py_BuildValue("s", ret);
+}
+
+/* swisseph.cs2lonlatstr */
+static char pyswe_cs2lonlatstr__doc__[] =
+"Get longitude or latitude string from centiseconds.\n\n"
+"Args: int cs, char plus, char minus\n"
+"Return: str";
+
+static PyObject * pyswe_cs2lonlatstr FUNCARGS_KEYWDS
+{
+    int cs;
+    char ret[10], p, m;
+    static char *kwlist[] = {"cs", "plus", "minus", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "icc", kwlist,
+        &cs, &p, &m))
+        return NULL;
+    swe_cs2lonlatstr(cs, p, m, ret);
+    return Py_BuildValue("s", ret);
+}
+
+/* swisseph.cs2timestr */
+static char pyswe_cs2timestr__doc__[] =
+"Get time string from centiseconds.\n\n"
+"Args: int cs, char sep, bool suppresszero=True\n"
+"Return: str";
+
+static PyObject * pyswe_cs2timestr FUNCARGS_KEYWDS
+{
+    int cs, sep, suppresszero = 1;
+    char ret[9];
+    static char *kwlist[] = {"cs", "sep", "suppresszero", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ic|i", kwlist,
+        &cs, &sep, &suppresszero))
+        return NULL;
+    swe_cs2timestr(cs, sep, suppresszero, ret);
+    return Py_BuildValue("s", ret);
+}
+
+/* swisseph.csnorm */
+static char pyswe_csnorm__doc__[] =
+"Normalization of any centisecond number to the range [0;360].\n\n"
+"Args: int x\n"
+"Return: int";
+
+static PyObject * pyswe_csnorm FUNCARGS_KEYWDS
+{
+    int x;
+    static char *kwlist[] = {"x", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &x))
+        return NULL;
+    return Py_BuildValue("i", swe_csnorm(x));
+}
+
+/* swisseph.csroundsec */
+static char pyswe_csroundsec__doc__[] =
+"Round centiseconds, but at 29.5959 always down.\n\n"
+"Args: int x\n"
+"Return: int";
+
+static PyObject * pyswe_csroundsec FUNCARGS_KEYWDS
+{
+    int x;
+    static char *kwlist[] = {"x", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &x))
+        return NULL;
+    return Py_BuildValue("i", swe_csroundsec(x));
+}
+
+/* swisseph.d2l */
+static char pyswe_d2l__doc__[] =
+"Double to integer with rounding, no overflow check.\n\n"
+"Args: float x\n"
+"Return: int";
+
+static PyObject * pyswe_d2l FUNCARGS_KEYWDS
+{
+    double x;
+    static char *kwlist[] = {"x", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &x))
+        return NULL;
+    return Py_BuildValue("i", swe_d2l(x));
+}
+
+/* swisseph.date_conversion */
+static char pyswe_date_conversion__doc__[] =
+"Calculate Julian day number with check wether date is correct.\n\n"
+"Args: int year, int month, int day, float hour=12.0, char cal='g'\n"
+"Return: tuple (int result, float jd)";
+
+static PyObject * pyswe_date_conversion FUNCARGS_KEYWDS
+{
+    int year, month, day, ret;
+    double jd, hour = 12.0;
+    char cal = 'g';
+    static char *kwlist[] = {"year", "month", "day", "hour", "cal", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iii|dc", kwlist,
+        &year, &month, &day, &hour, &cal))
+        return NULL;
+    if (cal != 'g' && cal != 'j')
+    {
+        PyErr_SetString(pyswe_Error,
+            "swisseph.date_conversion: Invalid calendar (g/j)");
+        return NULL;
+    }
+    ret = swe_date_conversion(year, month, day, hour, cal, &jd);
+    return Py_BuildValue("if", ret, jd);
+}
+
+/* swisseph.day_of_week */
+static char pyswe_day_of_week__doc__[] =
+"Calculate day of week number [0;6] from julian day number.\n\n"
+"Args: float julday\n"
+"Return: int";
+
+static PyObject * pyswe_day_of_week FUNCARGS_KEYWDS
+{
+    double jd;
+    static char *kwlist[] = {"julday", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
+        return NULL;
+    return Py_BuildValue("i", swe_day_of_week(jd));
+}
+
+/* swisseph.deg_midp */
+static char pyswe_deg_midp__doc__[] =
+"Calculate midpoint (in degrees).\n\n"
+"Args: float x, float y\n"
+"Return: float";
+
+static PyObject * pyswe_deg_midp FUNCARGS_KEYWDS
+{
+    double x, y;
+    static char *kwlist[] = {"x", "y", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &x, &y))
+        return NULL;
+    return Py_BuildValue("f", swe_deg_midp(x, y));
+}
+
+/* swisseph.degnorm */
+static char pyswe_degnorm__doc__[] =
+"Normalization of any degree number to the range [0;360].\n\n"
+"Args: float x\n"
+"Return: float";
+
+static PyObject * pyswe_degnorm FUNCARGS_KEYWDS
+{
+    double x;
+    static char *kwlist[] = {"x", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &x))
+        return NULL;
+    return Py_BuildValue("f", swe_degnorm(x));
+}
+
+/* swisseph.deltat */
+static char pyswe_deltat__doc__[] =
+"Calculate value of delta T.\n\n"
+"Args: float julday\n"
+"Return: float";
+
+static PyObject * pyswe_deltat FUNCARGS_KEYWDS
+{
+    double jd;
+    static char *kwlist[] = {"julday", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
+        return NULL;
+    return Py_BuildValue("f", swe_deltat(jd));
+}
+
+/* swisseph.difcs2n */
+static char pyswe_difcs2n__doc__[] =
+"Calculate distance in centisecs p1 - p2 normalized to [-180;180].\n\n"
+"Args: int p1, int p2\n"
+"Return: int";
+
+static PyObject * pyswe_difcs2n FUNCARGS_KEYWDS
+{
+    int p1, p2;
+    static char *kwlist[] = {"p1", "p2", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ii", kwlist, &p1, &p2))
+        return NULL;
+    return Py_BuildValue("i", swe_difcs2n(p1, p2));
+}
+
+/* swisseph.difcsn */
+static char pyswe_difcsn__doc__[] =
+"Calculate distance in centisecs p1 - p2.\n\n"
+"Args: int p1, int p2\n"
+"Return: int";
+
+static PyObject * pyswe_difcsn FUNCARGS_KEYWDS
+{
+    int p1, p2;
+    static char *kwlist[] = {"p1", "p2", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ii", kwlist, &p1, &p2))
+        return NULL;
+    return Py_BuildValue("i", swe_difcsn(p1, p2));
+}
+
+/* swisseph.difdeg2n */
+static char pyswe_difdeg2n__doc__[] =
+"Calculate distance in degrees p1 - p2 normalized to [-180;180].\n\n"
+"Args: float p1, float p2\n"
+"Return: float";
+
+static PyObject * pyswe_difdeg2n FUNCARGS_KEYWDS
+{
+    double p1, p2;
+    static char *kwlist[] = {"p1", "p2", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &p1, &p2))
+        return NULL;
+    return Py_BuildValue("f", swe_difdeg2n(p1, p2));
+}
+
+/* swisseph.difdegn */
+static char pyswe_difdegn__doc__[] =
+"Calculate distance in degrees p1 - p2.\n\n"
+"Args: float p1, float p2\n"
+"Return: float";
+
+static PyObject * pyswe_difdegn FUNCARGS_KEYWDS
+{
+    double p1, p2;
+    static char *kwlist[] = {"p1", "p2", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &p1, &p2))
+        return NULL;
+    return Py_BuildValue("f", swe_difdegn(p1, p2));
+}
+
+/* swisseph.difrad2n */
+static char pyswe_difrad2n__doc__[] =
+"Calculate distance in radians p1 - p2 normalized to [-180;180].\n\n"
+"Args: float p1, float p2\n"
+"Return: float";
+
+static PyObject * pyswe_difrad2n FUNCARGS_KEYWDS
+{
+    double p1, p2;
+    static char *kwlist[] = {"p1", "p2", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &p1, &p2))
+        return NULL;
+    return Py_BuildValue("f", swe_difrad2n(p1, p2));
 }
 
 /* swisseph.fixstar */
@@ -331,32 +538,29 @@ static PyObject * pyswe_fixstar2 FUNCARGS_KEYWDS
     return Py_BuildValue("(ffffff)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
 }
 
-/* swisseph.fixstar_ut */
-static char pyswe_fixstar_ut__doc__[] =
-"Calculate fixed star positions (UT).\n\n"
-"Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float, returned star name, and returned flags\n\n"
-"Usage example:\n\n"
-"\tres, stnam, flg = swisseph.fixstar_ut(st, jd)";
+/* swisseph.fixstar2_mag */
+static char pyswe_fixstar2_mag__doc__ [] =
+"Get fixed star magnitude (fast).\n\n"
+"Args: str star\n"
+"Return: float";
 
-static PyObject * pyswe_fixstar_ut FUNCARGS_KEYWDS
+static PyObject * pyswe_fixstar2_mag FUNCARGS_KEYWDS
 {
-    char *star, st[(SE_MAX_STNAME*2)+1], err[256];
-    double jd, val[6];
-    int ret, flag = SEFLG_SWIEPH;
-    static char *kwlist[] = {"star", "julday", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
-        &star, &jd, &flag))
+    char *star, st[41], err[256];
+    int ret;
+    double mag;
+    static char *kwlist[] = {"star", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &star))
         return NULL;
-    memset(st, 0, (SE_MAX_STNAME*2)+1);
-    strncpy(st, star, SE_MAX_STNAME*2);
-    ret = swe_fixstar_ut(st, jd, flag, val, err);
+    memset(st, 0, 41);
+    strncpy(st, star, 40);
+    ret = swe_fixstar2_mag(st, &mag, err);
     if (ret < 0)
     {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
+    return Py_BuildValue("f", mag);
 }
 
 /* swisseph.fixstar2_ut */
@@ -387,235 +591,57 @@ static PyObject * pyswe_fixstar2_ut FUNCARGS_KEYWDS
     return Py_BuildValue("(ffffff)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
 }
 
-/* swisseph.nod_aps */
-static char pyswe_nod_aps__doc__[] =
-"Calculate planetary nodes and apsides (ET).\n\n"
-"Args: float julday, int planet, int method=NODBIT_MEAN, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: 4 tuples of 6 float (asc, des, per, aph)";
+/* swisseph.fixstar_mag */
+static char pyswe_fixstar_mag__doc__[] =
+"Get fixed star magnitude.\n\n"
+"Args: str star\n"
+"Return: float";
 
-static PyObject * pyswe_nod_aps FUNCARGS_KEYWDS
+static PyObject * pyswe_fixstar_mag FUNCARGS_KEYWDS
 {
-    char err[256];
-    double jd, xasc[6], xdsc[6], xper[6], xaph[6];
-    int ret, planet, method = SE_NODBIT_MEAN, flag = SEFLG_SWIEPH + SEFLG_SPEED;
-    static char *kwlist[] = {"julday", "planet", "method", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|ii", kwlist,
-        &jd, &planet, &method, &flag))
+    char *star, st[41], err[256];
+    int ret;
+    double mag;
+    static char *kwlist[] = {"star", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &star))
         return NULL;
-    ret = swe_nod_aps(jd, planet, flag, method, xasc, xdsc, xper, xaph, err);
+    memset(st, 0, 41);
+    strncpy(st, star, 40);
+    ret = swe_fixstar_mag(st, &mag, err);
     if (ret < 0)
     {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)(ffffff)(ffffff)(ffffff)", xasc[0],xasc[1],
-        xasc[2],xasc[3],xasc[4],xasc[5],xdsc[0],xdsc[1],xdsc[2],xdsc[3],xdsc[4],
-        xdsc[5],xper[0],xper[1],xper[2],xper[3],xper[4],xper[5],xaph[0],xaph[1],
-        xaph[2],xaph[3],xaph[4],xaph[5]);
+    return Py_BuildValue("f", mag);
 }
 
-/* swisseph.nod_aps_ut */
-static char pyswe_nod_aps_ut__doc__[] =
-"Calculate planetary nodes and apsides (UT).\n\n"
-"Args: float julday, int planet, int method=NODBIT_MEAN, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: 4 tuples of 6 float (asc, des, per, aph)";
+/* swisseph.fixstar_ut */
+static char pyswe_fixstar_ut__doc__[] =
+"Calculate fixed star positions (UT).\n\n"
+"Args: str star, float julday, int flag=FLG_SWIEPH\n"
+"Return: tuple of 6 float, returned star name, and returned flags\n\n"
+"Usage example:\n\n"
+"\tres, stnam, flg = swisseph.fixstar_ut(st, jd)";
 
-static PyObject * pyswe_nod_aps_ut FUNCARGS_KEYWDS
+static PyObject * pyswe_fixstar_ut FUNCARGS_KEYWDS
 {
-    char err[256];
-    double jd, xasc[6], xdsc[6], xper[6], xaph[6];
-    int ret, planet, method = SE_NODBIT_MEAN, flag = SEFLG_SWIEPH + SEFLG_SPEED;
-    static char *kwlist[] = {"julday", "planet", "method", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|ii", kwlist,
-        &jd, &planet, &method, &flag))
+    char *star, st[(SE_MAX_STNAME*2)+1], err[256];
+    double jd, val[6];
+    int ret, flag = SEFLG_SWIEPH;
+    static char *kwlist[] = {"star", "julday", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
+        &star, &jd, &flag))
         return NULL;
-    ret = swe_nod_aps_ut(jd, planet, flag, method, xasc, xdsc, xper, xaph, err);
+    memset(st, 0, (SE_MAX_STNAME*2)+1);
+    strncpy(st, star, SE_MAX_STNAME*2);
+    ret = swe_fixstar_ut(st, jd, flag, val, err);
     if (ret < 0)
     {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)(ffffff)(ffffff)(ffffff)", xasc[0],xasc[1],
-        xasc[2],xasc[3],xasc[4],xasc[5],xdsc[0],xdsc[1],xdsc[2],xdsc[3],xdsc[4],
-        xdsc[5],xper[0],xper[1],xper[2],xper[3],xper[4],xper[5],xaph[0],xaph[1],
-        xaph[2],xaph[3],xaph[4],xaph[5]);
-}
-
-/* swisseph.sidtime */
-static char pyswe_sidtime__doc__[] =
-"Calculate sidereal time (UT).\n\n"
-"Args: float julday\n"
-"Return: float";
-
-static PyObject * pyswe_sidtime FUNCARGS_KEYWDS
-{
-    double jd, ret;
-    static char *kwlist[] = {"julday", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
-        return NULL;
-    ret = swe_sidtime(jd);
-    return Py_BuildValue("f", ret);
-}
-
-/* swisseph.sidtime0 */
-static char pyswe_sidtime0__doc__[] =
-"Calculate sidereal time, given obliquity and nutation (UT).\n\n"
-"Args: float julday, float obliquity, float nutation\n"
-"Return: float";
-
-static PyObject * pyswe_sidtime0 FUNCARGS_KEYWDS
-{
-    double jd, ret, obliquity, nutation;
-    static char *kwlist[] = {"julday", "obliquity", "nutation", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd", kwlist,
-        &jd, &obliquity, &nutation))
-        return NULL;
-    ret = swe_sidtime0(jd, obliquity, nutation);
-    return Py_BuildValue("f", ret);
-}
-
-/* swisseph.houses */
-static char pyswe_houses__doc__[] =
-"Calculate houses cusps (UT).\n\n"
-"Args: float julday, float lat, float lon, char hsys='P'\n"
-"Return: 2 tuples of 12 and 8 float (cusps, ascmc) (except Gauquelin)";
-
-static PyObject * pyswe_houses FUNCARGS_KEYWDS
-{
-    double jd, lat, lon, cusps[37], ascmc[10];
-    int ret, hsys = 'P';
-    static char *kwlist[] = {"julday", "lat", "lon", "hsys", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|c", kwlist,
-        &jd, &lat, &lon, &hsys))
-        return NULL;
-    ret = swe_houses(jd, lat, lon, hsys, cusps, ascmc);
-    if (ret < 0)
-    {
-        PyErr_SetString(pyswe_Error, "swisseph.houses: error while computing");
-        return NULL;
-    }
-    if (hsys == 71) /* Gauquelin houses */
-    {
-        return Py_BuildValue("(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
-        cusps[1],cusps[2],cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],
-        cusps[9],cusps[10],cusps[11],cusps[12],cusps[13],cusps[14],cusps[15],
-        cusps[16],cusps[17],cusps[18],cusps[19],cusps[20],cusps[21],cusps[22],
-        cusps[23],cusps[24],cusps[25],cusps[26],cusps[27],cusps[28],cusps[29],
-        cusps[30],cusps[31],cusps[32],cusps[33],cusps[34],cusps[35],cusps[36],
-        ascmc[0],ascmc[1],ascmc[2],ascmc[3],ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
-    }
-    else
-    {
-        return Py_BuildValue("(ffffffffffff)(ffffffff)", cusps[1],cusps[2],
-        cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],cusps[9],cusps[10],
-        cusps[11],cusps[12],ascmc[0],ascmc[1],ascmc[2],ascmc[3],ascmc[4],ascmc[5],
-        ascmc[6],ascmc[7]);
-    }
-}
-
-/* swisseph.houses_armc */
-static char pyswe_houses_armc__doc__[] =
-"Calculate houses cusps with ARMC.\n\n"
-"Args: float armc, float lat, float obliquity, char hsys='P'\n"
-"Return: 2 tuples of 12 and 8 float (cusps, ascmc) (except Gauquelin)";
-
-static PyObject * pyswe_houses_armc FUNCARGS_KEYWDS
-{
-    double armc, lat, obl, cusps[37], ascmc[10];
-    int ret, hsys = 'P';
-    static char *kwlist[] = {"armc", "lat", "obliquity", "hsys", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|c", kwlist,
-        &armc, &lat, &obl, &hsys))
-        return NULL;
-    ret = swe_houses_armc(armc, lat, obl, hsys, cusps, ascmc);
-    if (ret < 0)
-    {
-        PyErr_SetString(pyswe_Error, "swisseph.houses_armc: error while computing");
-        return NULL;
-    }
-    if (hsys == 71) /* Gauquelin houses */
-    {
-        return Py_BuildValue("(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
-        cusps[1],cusps[2],cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],
-        cusps[9],cusps[10],cusps[11],cusps[12],cusps[13],cusps[14],cusps[15],
-        cusps[16],cusps[17],cusps[18],cusps[19],cusps[20],cusps[21],cusps[22],
-        cusps[23],cusps[24],cusps[25],cusps[26],cusps[27],cusps[28],cusps[29],
-        cusps[30],cusps[31],cusps[32],cusps[33],cusps[34],cusps[35],cusps[36],
-        ascmc[0],ascmc[1],ascmc[2],ascmc[3],ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
-    }
-    else
-    {
-        return Py_BuildValue("(ffffffffffff)(ffffffff)", cusps[1],cusps[2],
-        cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],cusps[9],
-        cusps[10],cusps[11],cusps[12],ascmc[0],ascmc[1],ascmc[2],ascmc[3],
-        ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
-    }
-}
-
-/* swisseph.houses_ex */
-static char pyswe_houses_ex__doc__[] =
-"Calculate houses cusps (extended) (UT).\n\n"
-"Args: float julday, float lat, float lon, char hsys='P', int flag=0\n"
-"Return: 2 tuples of 12 and 8 float (cusps, ascmc) (except Gauquelin)";
-
-static PyObject * pyswe_houses_ex FUNCARGS_KEYWDS
-{
-    double jd, lat, lon, cusps[37], ascmc[10];
-    int ret, hsys = 'P', flag = 0;
-    static char *kwlist[] = {"julday", "lat", "lon", "hsys", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|ci", kwlist,
-        &jd, &lat, &lon, &hsys, &flag))
-        return NULL;
-    ret = swe_houses_ex(jd, flag, lat, lon, hsys, cusps, ascmc);
-    if (ret < 0)
-    {
-        PyErr_SetString(pyswe_Error, "swisseph.houses_ex: error while computing");
-        return NULL;
-    }
-    if (hsys == 71) /* Gauquelin houses */
-    {
-        return Py_BuildValue("(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
-        cusps[1],cusps[2],cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],
-        cusps[9],cusps[10],cusps[11],cusps[12],cusps[13],cusps[14],cusps[15],
-        cusps[16],cusps[17],cusps[18],cusps[19],cusps[20],cusps[21],cusps[22],
-        cusps[23],cusps[24],cusps[25],cusps[26],cusps[27],cusps[28],cusps[29],
-        cusps[30],cusps[31],cusps[32],cusps[33],cusps[34],cusps[35],cusps[36],
-        ascmc[0],ascmc[1],ascmc[2],ascmc[3],ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
-    }
-    else
-    {
-        return Py_BuildValue("(ffffffffffff)(ffffffff)", cusps[1],cusps[2],
-        cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],cusps[9],
-        cusps[10],cusps[11],cusps[12],ascmc[0],ascmc[1],ascmc[2],ascmc[3],
-        ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
-    }
-}
-
-/* swisseph.house_pos */
-static char pyswe_house_pos__doc__[] =
-"Calculate house position of a body.\n\n"
-"Args: float armc, float geolat, float obliquity, float objlon,"
-" float objlat=0.0, char hsys='P'\n"
-"Return: float";
-
-static PyObject * pyswe_house_pos FUNCARGS_KEYWDS
-{
-    double armc, lat, obl, res;
-    double obj[] = {0.0, 0.0};
-    int hsys = 'P';
-    char err[256];
-    static char *kwlist[] = {"armc", "geolat", "obliquity", "objlon", "objlat",
-        "hsys", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddd|dc", kwlist,
-        &armc, &lat, &obl, &obj[0], &obj[1], &hsys))
-        return NULL;
-    res = swe_house_pos(armc, lat, obl, hsys, obj, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("f", res);
+    return Py_BuildValue("(ffffff)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
 }
 
 /* swisseph.gauquelin_sector */
@@ -674,243 +700,70 @@ static PyObject * pyswe_gauquelin_sector FUNCARGS_KEYWDS
     return Py_BuildValue("f", ret);
 }
 
-/* swisseph.house_name */
-static char pyswe_house_name__doc__[] =
-"Get the name of the house method.\n\n"
-"Args: char hsys\n"
-"Return: house system name";
-
-static PyObject * pyswe_house_name FUNCARGS_KEYWDS
-{
-    char hsys;
-    static char *kwlist[] = {"hsys", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "c", kwlist, &hsys))
-        return NULL;
-    return Py_BuildValue("s", swe_house_name(hsys));
-}
-
-/* swisseph.julday */
-static char pyswe_julday__doc__[] =
-"Calculate Julian day number.\n\n"
-"Args: int year, int month, int day, float hour=12.0, int cal=GREG_CAL\n"
-"Return: float";
-
-static PyObject * pyswe_julday FUNCARGS_KEYWDS
-{
-    int year, month, day;
-    double ret, hour = 12.0;
-    int cal = SE_GREG_CAL;
-    static char *kwlist[] = {"year", "month", "day", "hour", "cal", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iii|di", kwlist,
-        &year, &month, &day, &hour, &cal))
-        return NULL;
-    ret = swe_julday(year, month, day, hour, cal);
-    return Py_BuildValue("f", ret);
-}
-
-/* swisseph.date_conversion */
-static char pyswe_date_conversion__doc__[] =
-"Calculate Julian day number with check wether date is correct.\n\n"
-"Args: int year, int month, int day, float hour=12.0, char cal='g'\n"
-"Return: tuple (int result, float jd)";
-
-static PyObject * pyswe_date_conversion FUNCARGS_KEYWDS
-{
-    int year, month, day, ret;
-    double jd, hour = 12.0;
-    char cal = 'g';
-    static char *kwlist[] = {"year", "month", "day", "hour", "cal", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iii|dc", kwlist,
-        &year, &month, &day, &hour, &cal))
-        return NULL;
-    if (cal != 'g' && cal != 'j')
-    {
-        PyErr_SetString(pyswe_Error,
-            "swisseph.date_conversion: Invalid calendar (g/j)");
-        return NULL;
-    }
-    ret = swe_date_conversion(year, month, day, hour, cal, &jd);
-    return Py_BuildValue("if", ret, jd);
-}
-
-/* swisseph.revjul */
-static char pyswe_revjul__doc__[] =
-"Calculate year, month, day, hour from Julian day number.\n\n"
-"Args: float julday, int cal=GREG_CAL\n"
-"Return: tuple of 3 int and 1 float";
-
-static PyObject * pyswe_revjul FUNCARGS_KEYWDS
-{
-    int year, month, day, cal = SE_GREG_CAL;
-    double hour, jd;
-    static char *kwlist[] = {"julday", "cal", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist,
-        &jd, &cal))
-        return NULL;
-    swe_revjul(jd, cal, &year, &month, &day, &hour);
-    return Py_BuildValue("(iiif)", year, month, day, hour);
-}
-
-/* swisseph.utc_to_jd */
-static char pyswe_utc_to_jd__doc__ [] =
-"Convert UTC to julian day.\n\n"
-"Args: int year, int month, int day, int hour, int minutes, float seconds, int flag\n"
-"Return: tuple (float et, float ut)";
-
-static PyObject * pyswe_utc_to_jd FUNCARGS_KEYWDS
-{
-    int i, y, m, d, h, mi, flg;
-    double s, dret[2];
-    char serr[255];
-    static char *kwlist[] = {"year", "month", "day", "hour", "minutes",
-        "seconds", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iiiiidi", kwlist,
-        &y, &m, &d, &h, &mi, &s, &flg))
-        return NULL;
-    i = swe_utc_to_jd(y, m, d, h, mi, s, flg, dret, serr);
-    if (i < 0)
-    {
-        PyErr_SetString(pyswe_Error, serr);
-        return NULL;
-    }
-    return Py_BuildValue("dd", dret[0], dret[1]);
-}
-
-/* swisseph.jdet_to_utc */
-static char pyswe_jdet_to_utc__doc__ [] =
-"Convert ET julian day number to UTC.\n\n"
-"Args: float et, int flag\n"
-"Return: tuple (int year, int month, int day, int hour, int minutes, float seconds)";
-
-static PyObject * pyswe_jdet_to_utc FUNCARGS_KEYWDS
-{
-    int y, m, d, h, mi, flg;
-    double s, et;
-    static char *kwlist[] = {"et", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di", kwlist, &et, &flg))
-        return NULL;
-    swe_jdet_to_utc(et, flg, &y, &m, &d, &h, &mi, &s);
-    return Py_BuildValue("iiiiid", y, m, d, h, mi, s);
-}
-
-/* swisseph.jdut1_to_utc */
-static char pyswe_jdut1_to_utc__doc__ [] =
-"Convert UT julian day number to UTC.\n\n"
-"Args: float ut, int flag\n"
-"Return: tuple (int year, int month, int day, int hour, int minutes, float seconds)";
-
-static PyObject * pyswe_jdut1_to_utc FUNCARGS_KEYWDS
-{
-    int y, m, d, h, mi, flg;
-    double s, ut;
-    static char *kwlist[] = {"ut", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di", kwlist, &ut, &flg))
-        return NULL;
-    swe_jdut1_to_utc(ut, flg, &y, &m, &d, &h, &mi, &s);
-    return Py_BuildValue("iiiiid", y, m, d, h, mi, s);
-}
-
-/* swisseph.utc_time_zone */
-static char pyswe_utc_time_zone__doc__[] =
-"Transform local time to UTC or UTC to local time.\n\n"
-"Args: int year, int month, int day, int hour, int minutes, int seconds, float offset\n"
-"Return: tuple (year, month, day, hour, minutes, seconds)";
-
-static PyObject * pyswe_utc_time_zone FUNCARGS_KEYWDS
-{
-    int y, m, d, h, mi, y2, m2, d2, h2, mi2;
-    double s, tz, s2;
-    static char *kwlist[] = {"year", "month", "day", "hour", "minutes",
-        "seconds", "offset", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iiiiiid", kwlist,
-        &y, &m, &d, &h, &mi, &s, &tz))
-        return NULL;
-    swe_utc_time_zone(y, m, d, h, mi, s, tz, &y2, &m2, &d2, &h2, &mi2, &s2);
-    return Py_BuildValue("(iiiiid)", y2, m2, d2, h2, mi2, s2);
-}
-
-/* swisseph.deltat */
-static char pyswe_deltat__doc__[] =
-"Calculate value of delta T.\n\n"
+/* swisseph.get_ayanamsa */
+static char pyswe_get_ayanamsa__doc__[] =
+"Calculate ayanamsa (ET).\n\n"
 "Args: float julday\n"
 "Return: float";
 
-static PyObject * pyswe_deltat FUNCARGS_KEYWDS
+static PyObject * pyswe_get_ayanamsa FUNCARGS_KEYWDS
 {
-    double jd;
-    static char *kwlist[] = {"julday", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
-        return NULL;
-    return Py_BuildValue("f", swe_deltat(jd));
-}
-
-/* swisseph.time_equ */
-static char pyswe_time_equ__doc__[] =
-"Calculate equation of time (UT).\n\n"
-"Args: float julday\n"
-"Return: float";
-
-static PyObject * pyswe_time_equ FUNCARGS_KEYWDS
-{
-    int res;
     double jd, ret;
-    char err[256];
     static char *kwlist[] = {"julday", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
         return NULL;
-    res = swe_time_equ(jd, &ret, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
+    ret = swe_get_ayanamsa(jd);
     return Py_BuildValue("f", ret);
 }
 
-/* swisseph.lmt_to_lat */
-static char pyswe_lmt_to_lat__doc__[] =
-"Translate local mean time (LMT) to local apparent time (LAT).\n\n"
-"Args: float julday, float geolon\n"
+/* swisseph.get_ayanamsa_name */
+static char pyswe_get_ayanamsa_name__doc__[] =
+"Get ayanamsa name from sidereal mode constant.\n\n"
+"Args: int sidmode\n"
+"Return: str";
+
+static PyObject * pyswe_get_ayanamsa_name FUNCARGS_KEYWDS
+{
+    int mode;
+    char *name;
+    static char *kwlist[] = {"sidmode", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &mode))
+        return NULL;
+    name = (char*) swe_get_ayanamsa_name(mode);
+    return Py_BuildValue("s", name);
+}
+
+/* swisseph.get_ayanamsa_ut */
+static char pyswe_get_ayanamsa_ut__doc__[] =
+"Calculate ayanamsa (UT).\n\n"
+"Args: float julday\n"
 "Return: float";
 
-static PyObject * pyswe_lmt_to_lat FUNCARGS_KEYWDS
+static PyObject * pyswe_get_ayanamsa_ut FUNCARGS_KEYWDS
 {
-    int res;
-    double jd, lon, ret;
-    char err[256];
-    static char *kwlist[] = {"julday", "geolon" , NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &jd, &lon))
+    double jd, ret;
+    static char *kwlist[] = {"julday", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
         return NULL;
-    res = swe_lmt_to_lat(jd, lon, &ret, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
+    ret = swe_get_ayanamsa_ut(jd);
     return Py_BuildValue("f", ret);
 }
 
-/* swisseph.lat_to_lmt */
-static char pyswe_lat_to_lmt__doc__[] =
-"Translate local apparent time (LAT) to local mean time (LMT).\n\n"
-"Args: float julday, float geolon\n"
-"Return: float";
+/* swisseph.get_planet_name */
+static char pyswe_get_planet_name__doc__[] =
+"Get planet name.\n\n"
+"Args: int planet\n"
+"Return: str";
 
-static PyObject * pyswe_lat_to_lmt FUNCARGS_KEYWDS
+static PyObject * pyswe_get_planet_name FUNCARGS_KEYWDS
 {
-    int res;
-    double jd, lon, ret;
-    char err[256];
-    static char *kwlist[] = {"julday", "geolon" , NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &jd, &lon))
+    int ipl;
+    char name[256];
+    static char *kwlist[] = {"planet", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &ipl))
         return NULL;
-    res = swe_lat_to_lmt(jd, lon, &ret, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("f", ret);
+    swe_get_planet_name(ipl, name);
+    return Py_BuildValue("s", name);
 }
 
 /* swisseph.get_tid_acc */
@@ -922,1321 +775,6 @@ static char pyswe_get_tid_acc__doc__[] =
 static PyObject * pyswe_get_tid_acc FUNCARGS_SELF
 {
     return Py_BuildValue("f", swe_get_tid_acc());
-}
-
-/* swisseph.set_tid_acc */
-static char pyswe_set_tid_acc__doc__[] =
-"Set tidal acceleration.\n\n"
-"Args: float acc\n"
-"Return: None";
-
-static PyObject * pyswe_set_tid_acc FUNCARGS_KEYWDS
-{
-    double acc;
-    static char *kwlist[] = {"acc", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &acc))
-        return NULL;
-    swe_set_tid_acc(acc);
-    Py_RETURN_NONE;
-}
-
-/* swisseph.sol_eclipse_when_loc */
-static char pyswe_sol_eclipse_when_loc__doc__[] =
-"Find the next solar eclipse for a given geographic position (UTC).\n\n"
-"Args: float julday, float lon, float lat, float alt=0.0, bool backward=False,"
-" int flag=FLG_SWIEPH\n"
-"Return: tuples (retflag)(tret)(attr)";
-
-static PyObject * pyswe_sol_eclipse_when_loc FUNCARGS_KEYWDS
-{
-    double jd, geopos[3] = {0, 0, 0};
-    double tret[10] = {0,0,0,0,0,0,0,0,0,0};
-    double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    int res, backward = 0, flag = SEFLG_SWIEPH;
-    char err[256];
-    static char *kwlist[] = {"julday", "lon", "lat", "alt", "backward", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|dii", kwlist,
-        &jd, &geopos[0], &geopos[1], &geopos[2], &backward, &flag))
-        return NULL;
-    res = swe_sol_eclipse_when_loc(jd, flag, geopos, tret, attr, backward, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("(i)(fffffff)(fffffffffff)", res,
-        tret[0],tret[1],tret[2],tret[3],tret[4],tret[5],tret[6],
-        attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],attr[7],attr[8],
-        attr[9],attr[10]);
-}
-
-/* swisseph.lun_occult_when_loc */
-static char pyswe_lun_occult_when_loc__doc__[] =
-"Find next occultation of a body by the moon for a given geographic position (UTC).\n\n"
-"Args: float julday, int or str body, float lon, float lat, float alt=0.0,"
-" bool backward=False, int flag=FLG_SWIEPH\n"
-"Return: tuple of results";
-
-static PyObject * pyswe_lun_occult_when_loc FUNCARGS_KEYWDS
-{
-    double jd, tret[10], attr[20], geopos[3] = {0.0, 0.0, 0.0};
-    int res, plt, backward = 0, flag = SEFLG_SWIEPH;
-    char *star = "", err[256];
-    PyObject *body;
-    static char *kwlist[] = {"julday", "body", "lon", "lat", "alt", "backward", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOdd|dii", kwlist,
-        &jd, &body, &geopos[0], &geopos[1], &geopos[2], &backward, &flag))
-        return NULL;
-    if (PyLong_CheckExact(body)) /* long -> planet */
-    {
-        plt = (int) PyLong_AsLong(body);
-    }
-#if PY_MAJOR_VERSION >= 3
-    else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
-    {
-        plt = 0;
-        star = (char*) PyUnicode_AS_DATA(body);
-    }
-#elif PY_MAJOR_VERSION < 3
-    else if (PyInt_CheckExact(body)) /* int -> planet */
-    {
-        plt = (int) PyInt_AsLong(body);
-    }
-    else if (PyString_CheckExact(body)) /* str -> fixed star */
-    {
-        plt = 0;
-        star = PyString_AsString(body);
-    }
-#endif
-    else
-    {
-        PyErr_SetString(pyswe_Error, "swisseph.lun_occult_when_loc: Invalid body type");
-        return NULL;
-    }
-    res = swe_lun_occult_when_loc(jd, plt, star, flag, geopos, tret, attr, backward, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("(i)(fffffff)(ffffffff)", res,tret[0],tret[1],
-        tret[2],tret[3],tret[4],tret[5],tret[6],attr[0],attr[1],attr[2],
-        attr[3],attr[4],attr[5],attr[6],attr[7]);
-}
-
-/* swisseph.sol_eclipse_when_glob */
-static char pyswe_sol_eclipse_when_glob__doc__[] =
-"Find the next solar eclipse globally (UTC).\n\n"
-"Args: float jd_start, ecl_type=0, bool backward=False, int flag=FLG_SWIEPH\n"
-"Return: tuples (retflag)(tret)";
-
-static PyObject * pyswe_sol_eclipse_when_glob FUNCARGS_KEYWDS
-{
-    double jd, tret[10] = {0,0,0,0,0,0,0,0,0,0};
-    int res, ecltype = 0, backward = 0, flag = SEFLG_SWIEPH;
-    char err[256];
-    static char *kwlist[] = {"jd_start", "ecl_type", "backward", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|iii", kwlist,
-        &jd, &ecltype, &backward, &flag))
-        return NULL;
-    res = swe_sol_eclipse_when_glob(jd, flag, ecltype, tret, backward, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("(i)(ffffffffff)", res,tret[0],tret[1],tret[2],tret[3],
-        tret[4],tret[5],tret[6],tret[7],tret[8],tret[9]);
-}
-
-/* swisseph.lun_occult_when_glob */
-static char pyswe_lun_occult_when_glob__doc__[] =
-"Find the next occultation of a planet or star by the moon globally (UTC).\n\n"
-"Args: float jd_start, int or str body, int ecl_type=0, bool backward=False,"
-" int flag=FLG_SWIEPH\n"
-"Return: tuple of results";
-
-static PyObject * pyswe_lun_occult_when_glob FUNCARGS_KEYWDS
-{
-    double jd, tret[10];
-    int res, plt, ecltype = 0, backward = 0, flag = SEFLG_SWIEPH;
-    char *star = "", err[256];
-    PyObject *body;
-    static char *kwlist[] = {"jd_start", "body", "ecl_type", "backward", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dO|iii", kwlist,
-        &jd, &body, &ecltype, &backward, &flag))
-        return NULL;
-    if (PyLong_CheckExact(body)) /* long -> planet */
-    {
-        plt = (int) PyLong_AsLong(body);
-    }
-#if PY_MAJOR_VERSION >= 3
-    else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
-    {
-        plt = 0;
-        star = (char*) PyUnicode_AS_DATA(body);
-    }
-#elif PY_MAJOR_VERSION < 3
-    else if (PyInt_CheckExact(body)) /* int -> planet */
-    {
-        plt = (int) PyInt_AsLong(body);
-    }
-    else if (PyString_CheckExact(body)) /* str -> fixed star */
-    {
-        plt = 0;
-        star = PyString_AsString(body);
-    }
-#endif
-    else
-    {
-        PyErr_SetString(pyswe_Error, "swisseph.lun_occult_when_glob: Invalid body type");
-        return NULL;
-    }
-    res = swe_lun_occult_when_glob(jd, plt, star, flag, ecltype, tret, backward, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("(i)(ffffffffff)", res,tret[0],tret[1],tret[2],
-        tret[3],tret[4],tret[5],tret[6],tret[7],tret[8],tret[9]);
-}
-
-/* swisseph.sol_eclipse_how */
-static char pyswe_sol_eclipse_how__doc__[] =
-"Calculate attributes of a solar eclipse.\n\n"
-"Args: float julday, float lon, float lat, float alt=0.0, int flag=FLG_SWIEPH\n"
-"Return: tuples (retflag)(attr)";
-
-static PyObject * pyswe_sol_eclipse_how FUNCARGS_KEYWDS
-{
-    double jd, geopos[3] = {0, 0, 0};
-    double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    int res, flag = SEFLG_SWIEPH;
-    char err[256];
-    static char *kwlist[] = {"julday", "lon", "lat", "alt", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|di", kwlist,
-        &jd, &geopos[0], &geopos[1], &geopos[2], &flag))
-        return NULL;
-    res = swe_sol_eclipse_how(jd, flag, geopos, attr, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("(i)(fffffffffff)", res,attr[0],attr[1],attr[2],attr[3],
-        attr[4],attr[5],attr[6],attr[7],attr[8],attr[9],attr[10]);
-}
-
-/* swisseph.sol_eclipse_where */
-static char pyswe_sol_eclipse_where__doc__[] =
-"Find where a solar eclipse is central or maximal (UTC).\n\n"
-"Args: float julday, int flag=FLG_SWIEPH\n"
-"Return: tuples (retval)(geopos)(attr)";
-
-static PyObject * pyswe_sol_eclipse_where FUNCARGS_KEYWDS
-{
-    double jd, geopos[10] = {0,0,0,0,0,0,0,0,0,0};
-    double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    int res, flag = SEFLG_SWIEPH;
-    char err[256];
-    static char *kwlist[] = {"julday", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist, &jd, &flag))
-        return NULL;
-    res = swe_sol_eclipse_where(jd, flag, geopos, attr, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("(i)(ffffffffff)(fffffffffff)", res,geopos[0],geopos[1],
-        geopos[2],geopos[3],geopos[4],geopos[5],geopos[6],geopos[7],geopos[8],
-        geopos[9],attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],
-        attr[7],attr[8],attr[9],attr[10]);
-}
-
-/* swisseph.lun_occult_where */
-static char pyswe_lun_occult_where__doc__[] =
-"Find where a lunar occultation is central or maximal (UTC).\n\n"
-"Args: float julday, int or str body, int flag=FLG_SWIEPH\n"
-"Return: tuples (retval)(geopos)(attr)";
-
-static PyObject * pyswe_lun_occult_where FUNCARGS_KEYWDS
-{
-    double jd, geopos[10] = {0,0,0,0,0,0,0,0,0,0};
-    double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    int res, plt, flag = SEFLG_SWIEPH;
-    char *star = "", err[256];
-    PyObject *body;
-    static char *kwlist[] = {"julday", "body", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dO|i", kwlist,
-        &jd, &body, &flag))
-        return NULL;
-    if (PyLong_CheckExact(body)) /* long -> planet */
-    {
-        plt = (int) PyLong_AsLong(body);
-    }
-#if PY_MAJOR_VERSION >= 3
-    else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
-    {
-        plt = 0;
-        star = (char*) PyUnicode_AS_DATA(body);
-    }
-#elif PY_MAJOR_VERSION < 3
-    else if (PyInt_CheckExact(body)) /* int -> planet */
-    {
-        plt = (int) PyInt_AsLong(body);
-    }
-    else if (PyString_CheckExact(body)) /* str -> fixed star */
-    {
-        plt = 0;
-        star = PyString_AsString(body);
-    }
-#endif
-    else
-    {
-        PyErr_SetString(pyswe_Error, "swisseph.lun_occult_where: Invalid body type");
-        return NULL;
-    }
-    res = swe_lun_occult_where(jd, plt, star, flag, geopos, attr, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("(i)(ffffffffff)(ffffffff)", res,geopos[0],geopos[1],
-        geopos[2],geopos[3],geopos[4],geopos[5],geopos[6],geopos[7],geopos[8],
-        geopos[9],attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],attr[7]);
-}
-
-/* swisseph.lun_eclipse_how */
-static char pyswe_lun_eclipse_how__doc__[] =
-"Calculate attributes of a lunar eclipse (UTC).\n\n"
-"Args: float julday, float lon, float lat, float alt=0.0, int flag=FLG_SWIEPH\n"
-"Return: tuples (retflag)(attr)";
-
-static PyObject * pyswe_lun_eclipse_how FUNCARGS_KEYWDS
-{
-    double jd, geopos[3] = {0, 0, 0};
-    double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    int res, flag = SEFLG_SWIEPH;
-    char err[256];
-    static char *kwlist[] = {"julday", "lon", "lat", "alt", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|di", kwlist,
-        &jd, &geopos[0], &geopos[1], &geopos[2], &flag))
-        return NULL;
-    res = swe_lun_eclipse_how(jd, flag, geopos, attr, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("(i)(fffffffffff)", res,attr[0],attr[1],attr[2],attr[3],
-        attr[4],attr[5],attr[6],attr[7],attr[8],attr[9],attr[10]);
-}
-
-/* swisseph.lun_eclipse_when */
-static char pyswe_lun_eclipse_when__doc__[] =
-"Find the next lunar eclipse (UTC).\n\n"
-"Args: float jd_start, int ecl_type=0, bool backward=False, int flag=FLG_SWIEPH\n"
-"Return: tuples (retflag)(tret)";
-
-static PyObject * pyswe_lun_eclipse_when FUNCARGS_KEYWDS
-{
-    double jd, tret[10] = {0,0,0,0,0,0,0,0,0,0};
-    int res, ecltype = 0, backward = 0, flag = SEFLG_SWIEPH;
-    char err[256];
-    static char *kwlist[] = {"jd_start", "ecl_type", "backward", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|iii", kwlist,
-        &jd, &ecltype, &backward, &flag))
-        return NULL;
-    res = swe_lun_eclipse_when(jd, flag, ecltype, tret, backward, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("(i)(ffffffff)", res,tret[0],tret[1],tret[2],tret[3],
-        tret[4],tret[5],tret[6],tret[7]);
-}
-
-/* swisseph.lun_eclipse_when_loc */
-static char pyswe_lun_eclipse_when_loc__doc__[] =
-"Find the next lunar eclipse observable from a given geographic position.\n\n"
-"Args: float jd_start, float lon, float lat, float alt=0.0, bool backward=False,"
-" int flag=FLG_SWIEPH\n"
-"Return: 3 tuples (retflag, tret, attr)";
-
-static PyObject * pyswe_lun_eclipse_when_loc FUNCARGS_KEYWDS
-{
-    double jd, geopos[3] = { 0, 0, 0 };
-    double tret[10] = {0,0,0,0,0,0,0,0,0,0};
-    double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    int res, backward = 0, flag = SEFLG_SWIEPH;
-    char err[256];
-    static char *kwlist[] = {"jd_start", "lon", "lat", "alt", "backward",
-        "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|dii", kwlist, &jd,
-        &geopos[0], &geopos[1], &geopos[2], &backward, &flag))
-        return NULL;
-    res = swe_lun_eclipse_when_loc(jd, flag, geopos, tret, attr, backward, err);
-    if ( res < 0 )
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("(i)(dddddddddd)(dddddddddd)", res,tret[0],tret[1],
-        tret[2],tret[3],tret[4],tret[5],tret[6],tret[7],tret[8],tret[9],
-        attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],attr[7],
-        attr[8],attr[9]);
-}
-
-/* swisseph.rise_trans */
-static char pyswe_rise_trans__doc__[] =
-"Calculate times of rising, setting and meridian transits.\n\n"
-"Args: float jd_start, int or str body, float lon, float lat, float alt=0.0,"
-" float press=0.0, float temp=0.0, int rsmi=0, int flag=FLG_SWIEPH\n"
-"Return: tuple of results";
-
-static PyObject * pyswe_rise_trans FUNCARGS_KEYWDS
-{
-    double jd, tret[10], press = 0.0, temp = 0.0, geopos[3] = {0.0, 0.0, 0.0};
-    int res, plt, rsmi = 0, flag = SEFLG_SWIEPH;
-    char *star = "", err[256];
-    PyObject *body;
-    static char *kwlist[] = {"jd_start", "body", "lon", "lat", "alt", "press",
-        "temp", "rsmi", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOdd|dddii", kwlist,
-        &jd, &body, &geopos[0], &geopos[1], &geopos[2], &press, &temp, &rsmi, &flag))
-        return NULL;
-    if (PyLong_CheckExact(body)) /* long -> planet */
-    {
-        plt = (int) PyLong_AsLong(body);
-    }
-#if PY_MAJOR_VERSION >= 3
-    else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
-    {
-        plt = 0;
-        star = (char*) PyUnicode_AS_DATA(body);
-    }
-#elif PY_MAJOR_VERSION < 3
-    else if (PyInt_CheckExact(body)) /* int -> planet */
-    {
-        plt = (int) PyInt_AsLong(body);
-    }
-    else if (PyString_CheckExact(body)) /* str -> fixed star */
-    {
-        plt = 0;
-        star = PyString_AsString(body);
-    }
-#endif
-    else
-    {
-        PyErr_SetString(pyswe_Error, "swisseph.rise_trans: Invalid body type");
-        return NULL;
-    }
-    res = swe_rise_trans(jd, plt, star, flag, rsmi, geopos, press, temp, tret, err);
-    if (res == -1)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("(i)(ffffffffff)", res,tret[0],tret[1],tret[2],
-        tret[3],tret[4],tret[5],tret[6],tret[7],tret[8],tret[9]);
-}
-
-/* swisseph.pheno */
-static char pyswe_pheno__doc__[] =
-"Calculate planetary phenomena (ET).\n\n"
-"Args: float julday, int planet, int flag=FLG_SWIEPH\n"
-"Return: tuple of results";
-
-static PyObject * pyswe_pheno FUNCARGS_KEYWDS
-{
-    double jd, attr[20];
-    int res, plt, flag = SEFLG_SWIEPH;
-    char err[256];
-    static char *kwlist[] = {"julday", "planet", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|i", kwlist,
-        &jd, &plt, &flag))
-        return NULL;
-    res = swe_pheno(jd, plt, flag, attr, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("(fffff)", attr[0],attr[1],attr[2],attr[3],attr[4]);
-}
-
-/* swisseph.pheno_ut */
-static char pyswe_pheno_ut__doc__[] =
-"Calculate planetary phenomena (UTC).\n\n"
-"Args: float julday, int planet, int flag=FLG_SWIEPH\n"
-"Return: tuple of results";
-
-static PyObject * pyswe_pheno_ut FUNCARGS_KEYWDS
-{
-    double jd, attr[20];
-    int res, plt, flag = SEFLG_SWIEPH;
-    char err[256];
-    static char *kwlist[] = {"julday", "planet", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|i", kwlist,
-        &jd, &plt, &flag))
-        return NULL;
-    res = swe_pheno(jd, plt, flag, attr, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("(fffff)", attr[0],attr[1],attr[2],attr[3],attr[4]);
-}
-
-/* swisseph.refrac */
-static char pyswe_refrac__doc__[] =
-"Calculate either true altitude from apparent altitude, or apparent altitude"
-" from true altitude.\n\n"
-"Args: float alt, float press=0.0, float temp=0.0, int flag=TRUE_TO_APP\n"
-"Return: float";
-
-static PyObject * pyswe_refrac FUNCARGS_KEYWDS
-{
-    double alt, press = 0.0, temp = 0.0;
-    int flag = SE_TRUE_TO_APP;
-    static char *kwlist[] = {"alt", "press", "temp", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|ddi", kwlist,
-        &alt, &press, &temp, &flag))
-        return NULL;
-    return Py_BuildValue("f", swe_refrac(alt, press, temp, flag));
-}
-
-/* swisseph.refrac_extended */
-static char pyswe_refrac_extended__doc__[] =
-"Calculate either true altitude from apparent altitude, or apparent altitude"
-" from true altitude, for geographical altitudes above sea level.\n\n"
-"Args: float alt, float geoalt, float lrate, float press=0.0, float temp=0.0,"
-" int flag=TRUE_TO_APP\n"
-"Return: 2 tuples of 1 and 4 float";
-
-static PyObject * pyswe_refrac_extended FUNCARGS_KEYWDS
-{
-    double alt, geoalt, lapserate, ret, dret[4], press = 0.0, temp = 0.0;
-    int flag = SE_TRUE_TO_APP;
-    static char *kwlist[] = {"alt", "geoalt", "lrate", "press",
-        "temp", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|ddi", kwlist,
-        &alt, &geoalt, &lapserate, &press, &temp, &flag))
-        return NULL;
-    ret = swe_refrac_extended(alt, geoalt, press, temp, lapserate, flag, dret);
-    return Py_BuildValue("(f)(ffff)", ret, dret[0], dret[1], dret[2], dret[3]);
-}
-
-/* swisseph.set_lapse_rate */
-static char pyswe_set_lapse_rate__doc__[] =
-"Set lapse rate.\n\nArgs: float lrate\nReturn: None";
-
-static PyObject * pyswe_set_lapse_rate FUNCARGS_KEYWDS
-{
-    double lapserate;
-    static char *kwlist[] = {"lrate", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist,
-        &lapserate))
-        return NULL;
-    swe_set_lapse_rate(lapserate);
-    Py_RETURN_NONE;
-}
-
-/* swisseph.azalt */
-static char pyswe_azalt__doc__[] =
-"Calculate horizontal coordinates (azimuth and altitude) of a planet or a star"
-" from either ecliptical or equatorial coordinates (UTC).\n\n"
-"Args: float julday, float lon, float lat, float hei, float x, float y,"
-" float z=0.0, float press=0.0, float temp=0.0, int flag=ECL2HOR\n"
-"Return: tuple of 3 float (azimuth, true altitude, apparent altitude)";
-
-static PyObject * pyswe_azalt FUNCARGS_KEYWDS
-{
-    double jd, geo[3], xin[3], press = 0.0, temp = 0.0, xaz[3];
-    int flag = SE_ECL2HOR;
-    static char *kwlist[] = {"julday", "lon", "lat", "hei",
-        "x", "y", "z", "press", "temp", "flag", NULL};
-    xin[2] = 0.0;
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddd|dddi", kwlist,
-        &jd, &geo[0], &geo[1], &geo[2], &xin[0], &xin[1], &xin[2], &press,
-        &temp, &flag))
-        return NULL;
-    swe_azalt(jd, flag, geo, press, temp, xin, xaz);
-    return Py_BuildValue("(fff)", xaz[0], xaz[1], xaz[2]);
-};
-
-/* swisseph.azalt_rev */
-static char pyswe_azalt_rev__doc__[] =
-"Calculate either ecliptical or equatorial coordinates from azimuth and true"
-" altitude.\n\n"
-"Args: float julday, float lon, float lat, float hei, double azim, double alt,"
-" int flag=HOR2ECL\n"
-"Return: tuple of 2 float";
-
-static PyObject * pyswe_azalt_rev FUNCARGS_KEYWDS
-{
-    double jd, geo[3], xin[2], xout[2];
-    int flag = SE_HOR2ECL;
-    static char *kwlist[] = {"julday", "lon", "lat", "hei",
-        "azim", "alt", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddd|i", kwlist,
-        &jd, &geo[0], &geo[1], &geo[2], &xin[0], &xin[1], &flag))
-        return NULL;
-    swe_azalt_rev(jd, flag, geo, xin, xout);
-    return Py_BuildValue("(ff)", xout[0], xout[1]);
-}
-
-/* *** Auxiliary functions *** */
-
-/* swisseph.cotrans */
-static char pyswe_cotrans__doc__[] =
-"Coordinate transformation from ecliptic to equator or vice-versa.\n\n"
-"Args: float lon, float lat, float dist, float obliquity\n"
-"Return: tuple of 3 float (longitude, latitude, distance)";
-
-static PyObject * pyswe_cotrans FUNCARGS_KEYWDS
-{
-    double xpo[3], xpn[3], eps;
-    static char *kwlist[] = {"lon", "lat", "dist", "obliquity", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddd", kwlist,
-        &xpo[0], &xpo[1], &xpo[2], &eps))
-        return NULL;
-    swe_cotrans(xpo, xpn, eps);
-    return Py_BuildValue("(fff)", xpn[0], xpn[1], xpn[2]);
-}
-
-/* swisseph.cotrans_sp */
-static char pyswe_cotrans_sp__doc__[] =
-"Coordinate transformation of position and speed, from ecliptic to equator"
-" or vice-versa.\n\n"
-"Args: float lon, float lat, float dist, float lonspeed, float latspeed,"
-" float distspeed, float obliquity\n"
-"Return: tuple of 6 float";
-
-static PyObject * pyswe_cotrans_sp FUNCARGS_KEYWDS
-{
-    double xpo[6], xpn[6], eps;
-    static char *kwlist[] = {"lon", "lat", "dist", "lonspeed",
-        "latspeed", "distspeed", "obliquity", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddddddd", kwlist,
-        &xpo[0], &xpo[1], &xpo[2], &xpo[3], &xpo[4], &xpo[5], &eps))
-        return NULL;
-    swe_cotrans(xpo, xpn, eps);
-    return Py_BuildValue("(ffffff)", xpn[0], xpn[1], xpn[2], xpn[3],
-        xpn[4], xpn[5]);
-}
-
-/* swisseph.degnorm */
-static char pyswe_degnorm__doc__[] =
-"Normalization of any degree number to the range [0;360].\n\n"
-"Args: float x\n"
-"Return: float";
-
-static PyObject * pyswe_degnorm FUNCARGS_KEYWDS
-{
-    double x;
-    static char *kwlist[] = {"x", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &x))
-        return NULL;
-    return Py_BuildValue("f", swe_degnorm(x));
-}
-
-/* swisseph.csnorm */
-static char pyswe_csnorm__doc__[] =
-"Normalization of any centisecond number to the range [0;360].\n\n"
-"Args: int x\n"
-"Return: int";
-
-static PyObject * pyswe_csnorm FUNCARGS_KEYWDS
-{
-    int x;
-    static char *kwlist[] = {"x", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &x))
-        return NULL;
-    return Py_BuildValue("i", swe_csnorm(x));
-}
-
-/* swisseph.radnorm */
-static char pyswe_radnorm__doc__[] =
-"Normalization of any radian number to the range [0;2*pi].\n\n"
-"Args: float x\n"
-"Return: float";
-
-static PyObject * pyswe_radnorm FUNCARGS_KEYWDS
-{
-    double x;
-    static char *kwlist[] = {"x", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &x))
-        return NULL;
-    return Py_BuildValue("f", swe_radnorm(x));
-}
-
-/* swisseph.rad_midp */
-static char pyswe_rad_midp__doc__[] =
-"Calculate midpoint (in radians).\n\n"
-"Args: float x, float y\n"
-"Return: float";
-
-static PyObject * pyswe_rad_midp FUNCARGS_KEYWDS
-{
-    double x, y;
-    static char *kwlist[] = {"x", "y", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &x, &y))
-        return NULL;
-    return Py_BuildValue("f", swe_rad_midp(x, y));
-}
-
-/* swisseph.deg_midp */
-static char pyswe_deg_midp__doc__[] =
-"Calculate midpoint (in degrees).\n\n"
-"Args: float x, float y\n"
-"Return: float";
-
-static PyObject * pyswe_deg_midp FUNCARGS_KEYWDS
-{
-    double x, y;
-    static char *kwlist[] = {"x", "y", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &x, &y))
-        return NULL;
-    return Py_BuildValue("f", swe_deg_midp(x, y));
-}
-
-/* swisseph.split_deg */
-static char pyswe_split_deg__doc__[] =
-"Split centiseconds in degrees, minutes, seconds, fraction of seconds, zodiac sign number.\n\n"
-"Args: float ddeg, int roundflag\n"
-"Return: tuple";
-
-static PyObject * pyswe_split_deg FUNCARGS_KEYWDS
-{
-    double ddeg, secfr;
-    int deg, min, sec, sign, flag;
-    static char *kwlist[] = {"ddeg", "roundflag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di", kwlist, &ddeg, &flag))
-        return NULL;
-    swe_split_deg(ddeg, flag, &deg, &min, &sec, &secfr, &sign);
-    return Py_BuildValue("(iiidi)", deg, min, sec, secfr, sign);
-}
-
-/* swisseph.difcsn */
-static char pyswe_difcsn__doc__[] =
-"Calculate distance in centisecs p1 - p2.\n\n"
-"Args: int p1, int p2\n"
-"Return: int";
-
-static PyObject * pyswe_difcsn FUNCARGS_KEYWDS
-{
-    int p1, p2;
-    static char *kwlist[] = {"p1", "p2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ii", kwlist, &p1, &p2))
-        return NULL;
-    return Py_BuildValue("i", swe_difcsn(p1, p2));
-}
-
-/* swisseph.difdegn */
-static char pyswe_difdegn__doc__[] =
-"Calculate distance in degrees p1 - p2.\n\n"
-"Args: float p1, float p2\n"
-"Return: float";
-
-static PyObject * pyswe_difdegn FUNCARGS_KEYWDS
-{
-    double p1, p2;
-    static char *kwlist[] = {"p1", "p2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &p1, &p2))
-        return NULL;
-    return Py_BuildValue("f", swe_difdegn(p1, p2));
-}
-
-/* swisseph.difcs2n */
-static char pyswe_difcs2n__doc__[] =
-"Calculate distance in centisecs p1 - p2 normalized to [-180;180].\n\n"
-"Args: int p1, int p2\n"
-"Return: int";
-
-static PyObject * pyswe_difcs2n FUNCARGS_KEYWDS
-{
-    int p1, p2;
-    static char *kwlist[] = {"p1", "p2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ii", kwlist, &p1, &p2))
-        return NULL;
-    return Py_BuildValue("i", swe_difcs2n(p1, p2));
-}
-
-/* swisseph.difdeg2n */
-static char pyswe_difdeg2n__doc__[] =
-"Calculate distance in degrees p1 - p2 normalized to [-180;180].\n\n"
-"Args: float p1, float p2\n"
-"Return: float";
-
-static PyObject * pyswe_difdeg2n FUNCARGS_KEYWDS
-{
-    double p1, p2;
-    static char *kwlist[] = {"p1", "p2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &p1, &p2))
-        return NULL;
-    return Py_BuildValue("f", swe_difdeg2n(p1, p2));
-}
-
-/* swisseph.difrad2n */
-static char pyswe_difrad2n__doc__[] =
-"Calculate distance in radians p1 - p2 normalized to [-180;180].\n\n"
-"Args: float p1, float p2\n"
-"Return: float";
-
-static PyObject * pyswe_difrad2n FUNCARGS_KEYWDS
-{
-    double p1, p2;
-    static char *kwlist[] = {"p1", "p2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &p1, &p2))
-        return NULL;
-    return Py_BuildValue("f", swe_difrad2n(p1, p2));
-}
-
-/* swisseph.csroundsec */
-static char pyswe_csroundsec__doc__[] =
-"Round centiseconds, but at 29.5959 always down.\n\n"
-"Args: int x\n"
-"Return: int";
-
-static PyObject * pyswe_csroundsec FUNCARGS_KEYWDS
-{
-    int x;
-    static char *kwlist[] = {"x", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &x))
-        return NULL;
-    return Py_BuildValue("i", swe_csroundsec(x));
-}
-
-/* swisseph.d2l */
-static char pyswe_d2l__doc__[] =
-"Double to integer with rounding, no overflow check.\n\n"
-"Args: float x\n"
-"Return: int";
-
-static PyObject * pyswe_d2l FUNCARGS_KEYWDS
-{
-    double x;
-    static char *kwlist[] = {"x", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &x))
-        return NULL;
-    return Py_BuildValue("i", swe_d2l(x));
-}
-
-/* swisseph.day_of_week */
-static char pyswe_day_of_week__doc__[] =
-"Calculate day of week number [0;6] from julian day number.\n\n"
-"Args: float julday\n"
-"Return: int";
-
-static PyObject * pyswe_day_of_week FUNCARGS_KEYWDS
-{
-    double jd;
-    static char *kwlist[] = {"julday", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
-        return NULL;
-    return Py_BuildValue("i", swe_day_of_week(jd));
-}
-
-/* swisseph.cs2timestr */
-static char pyswe_cs2timestr__doc__[] =
-"Get time string from centiseconds.\n\n"
-"Args: int cs, char sep, bool suppresszero=True\n"
-"Return: str";
-
-static PyObject * pyswe_cs2timestr FUNCARGS_KEYWDS
-{
-    int cs, sep, suppresszero = 1;
-    char ret[9];
-    static char *kwlist[] = {"cs", "sep", "suppresszero", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ic|i", kwlist,
-        &cs, &sep, &suppresszero))
-        return NULL;
-    swe_cs2timestr(cs, sep, suppresszero, ret);
-    return Py_BuildValue("s", ret);
-}
-
-/* swisseph.cs2lonlatstr */
-static char pyswe_cs2lonlatstr__doc__[] =
-"Get longitude or latitude string from centiseconds.\n\n"
-"Args: int cs, char plus, char minus\n"
-"Return: str";
-
-static PyObject * pyswe_cs2lonlatstr FUNCARGS_KEYWDS
-{
-    int cs;
-    char ret[10], p, m;
-    static char *kwlist[] = {"cs", "plus", "minus", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "icc", kwlist,
-        &cs, &p, &m))
-        return NULL;
-    swe_cs2lonlatstr(cs, p, m, ret);
-    return Py_BuildValue("s", ret);
-}
-
-/* swisseph.cs2degstr */
-static char pyswe_cs2degstr__doc__[] =
-"Get degrees string from centiseconds.\n\n"
-"Args: int cs\n"
-"Return: str";
-
-static PyObject * pyswe_cs2degstr FUNCARGS_KEYWDS
-{
-    int cs;
-    char ret[9];
-    static char *kwlist[] = {"cs", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &cs))
-        return NULL;
-    swe_cs2degstr(cs, ret);
-    return Py_BuildValue("s", ret);
-}
-
-/* swisseph.fixstar_mag */
-static char pyswe_fixstar_mag__doc__ [] =
-"Get fixed star magnitude.\n\n"
-"Args: str star\n"
-"Return: float";
-
-static PyObject * pyswe_fixstar_mag FUNCARGS_KEYWDS
-{
-    char *star, st[41], err[256];
-    int ret;
-    double mag;
-    static char *kwlist[] = {"star", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &star))
-        return NULL;
-    memset(st, 0, 41);
-    strncpy(st, star, 40);
-    ret = swe_fixstar_mag(st, &mag, err);
-    if (ret < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("f", mag);
-}
-
-/* swisseph.fixstar2_mag */
-static char pyswe_fixstar2_mag__doc__ [] =
-"Get fixed star magnitude (fast).\n\n"
-"Args: str star\n"
-"Return: float";
-
-static PyObject * pyswe_fixstar2_mag FUNCARGS_KEYWDS
-{
-    char *star, st[41], err[256];
-    int ret;
-    double mag;
-    static char *kwlist[] = {"star", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &star))
-        return NULL;
-    memset(st, 0, 41);
-    strncpy(st, star, 40);
-    ret = swe_fixstar2_mag(st, &mag, err);
-    if (ret < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("f", mag);
-}
-
-/* swisseph.heliacal_ut */
-static char pyswe_heliacal_ut__doc__ [] =
-"Find the Julian day of the next heliacal phenomenon after a given start date.\n"
-"It works between geographic latitudes 60s - 60n.\n\n"
-"Args: float jd_start, seq geopos, seq atmo, seq observer, str object,"
-" int enventtype, int helflag\n"
-"Return: tuple with 3 julian days";
-
-static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
-{
-    double jdstart, geopos[3], atmo[4], observ[6], dret[3];
-    char serr[255], *obj = 0; /* dummy assign */
-    int i, evnt, flg;
-    PyObject *o1=0, *o2=0, *o3=0, *o4, *o5, *o6, *o7, *o8, *o9;
-    static char *kwlist[] = {"jd_start", "geopos", "atmo", "observer", "object",
-        "eventtype", "helflag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOOOsii", kwlist,
-        &jdstart, &o1, &o2, &o3, &obj, &evnt, &flg))
-        return NULL;
-
-    if (!PySequence_Check(o1) || PySequence_Length(o1) != 3)
-    {
-        PyErr_SetString(pyswe_Error, "Invalid geopos sequence");
-        return NULL;
-    }
-    else
-    {
-        o4 = PySequence_ITEM(o1, 0);
-        o5 = PySequence_ITEM(o1, 1);
-        o6 = PySequence_ITEM(o1, 2);
-        if (!PyNumber_Check(o4) || !PyNumber_Check(o5) || !PyNumber_Check(o6))
-        {
-            PyErr_SetString(pyswe_Error, "Invalid geopos value type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-            return NULL;
-        }
-
-        /* checking longitude */
-        if (PyFloat_Check(o4))
-        {
-            geopos[0] = PyFloat_AsDouble(o4);
-        }
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-        {
-            geopos[0] = (double) PyInt_AsLong(o4);
-        }
-#endif
-        else if (PyLong_Check(o4))
-        {
-            geopos[0] = (double) PyLong_AsLong(o4);
-        }
-        else
-        {
-            PyErr_SetString(pyswe_Error, "Invalid longitude type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-            return NULL;
-        }
-
-        /* checking latitude */
-        if (PyFloat_Check(o5))
-        {
-            geopos[1] = PyFloat_AsDouble(o5);
-        }
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-        {
-            geopos[1] = (double) PyInt_AsLong(o5);
-        }
-#endif
-        else if (PyLong_Check(o5))
-        {
-            geopos[1] = (double) PyLong_AsLong(o5);
-        }
-        else
-        {
-            PyErr_SetString(pyswe_Error, "Invalid latitude type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-            return NULL;
-        }
-
-        /* checking altitude */
-        if (PyFloat_Check(o6))
-        {
-            geopos[2] = PyFloat_AsDouble(o6);
-        }
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-        {
-            geopos[2] = (double) PyInt_AsLong(o6);
-        }
-#endif
-        else if (PyLong_Check(o6))
-        {
-            geopos[2] = (double) PyLong_AsLong(o6);
-        }
-        else
-        {
-            PyErr_SetString(pyswe_Error, "Invalid altitude type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-            return NULL;
-        }
-
-        Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-    }
-
-    if (!PySequence_Check(o2) || PySequence_Length(o2) != 4)
-    {
-        PyErr_SetString(pyswe_Error, "Invalid atmospheric sequence");
-        return NULL;
-    }
-    else
-    {
-        o4 = PySequence_ITEM(o2, 0);
-        o5 = PySequence_ITEM(o2, 1);
-        o6 = PySequence_ITEM(o2, 2);
-        o7 = PySequence_ITEM(o2, 3);
-        if (!PyNumber_Check(o4) || !PyNumber_Check(o5) || !PyNumber_Check(o6)
-            || !PyNumber_Check(o7))
-        {
-            PyErr_SetString(pyswe_Error, "Invalid atmospheric value type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-
-        /* atmospheric pressure */
-        if (PyFloat_Check(o4))
-        {
-            atmo[0] = PyFloat_AsDouble(o4);
-        }
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o4))
-        {
-            atmo[0] = (double) PyInt_AsLong(o4);
-        }
-#endif
-        else if (PyLong_Check(o4))
-        {
-            atmo[0] = (double) PyLong_AsLong(o4);
-        }
-        else
-        {
-            PyErr_SetString(pyswe_Error, "Invalid atmospheric pressure");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-
-        /* atmospheric temperature */
-        if (PyFloat_Check(o5))
-        {
-            atmo[1] = PyFloat_AsDouble(o5);
-        }
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-        {
-            atmo[1] = (double) PyInt_AsLong(o5);
-        }
-#endif
-        else if (PyLong_Check(o5))
-        {
-            atmo[1] = (double) PyLong_AsLong(o5);
-        }
-        else
-        {
-            PyErr_SetString(pyswe_Error, "Invalid atmospheric temperature");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-
-        /* humidity */
-        if (PyFloat_Check(o6))
-        {
-            atmo[2] = PyFloat_AsDouble(o6);
-        }
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o6))
-        {
-            atmo[2] = (double) PyInt_AsLong(o6);
-        }
-#endif
-        else if (PyLong_Check(o6))
-        {
-            atmo[2] = (double) PyLong_AsLong(o6);
-        }
-        else
-        {
-            PyErr_SetString(pyswe_Error, "Invalid humidity");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-
-        /* meteorological range */
-        if (PyFloat_Check(o7))
-        {
-            atmo[3] = PyFloat_AsDouble(o7);
-        }
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o7))
-        {
-            atmo[3] = (double) PyInt_AsLong(o7);
-        }
-#endif
-        else if (PyLong_Check(o7))
-        {
-            atmo[3] = (double) PyLong_AsLong(o7);
-        }
-        else
-        {
-            PyErr_SetString(pyswe_Error, "Invalid meteorological range");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-
-        Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-    }
-
-    if (!PySequence_Check(o3) || PySequence_Length(o3) != 6)
-    {
-        PyErr_SetString(pyswe_Error, "Invalid observer sequence");
-        return NULL;
-    }
-    else
-    {
-        o4 = PySequence_ITEM(o3, 0);
-        o5 = PySequence_ITEM(o3, 1);
-        o6 = PySequence_ITEM(o3, 2);
-        o7 = PySequence_ITEM(o3, 3);
-        o8 = PySequence_ITEM(o3, 4);
-        o9 = PySequence_ITEM(o3, 5);
-        if (!PyNumber_Check(o4) || !PyNumber_Check(o5) || !PyNumber_Check(o6)
-            || !PyNumber_Check(o7) || !PyNumber_Check(o8) || !PyNumber_Check(o9))
-        {
-            PyErr_SetString(pyswe_Error, "Invalid observer value type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-
-        /* observer age */
-        if (PyFloat_Check(o4))
-        {
-            observ[0] = PyFloat_AsDouble(o4);
-        }
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o4))
-        {
-            observ[0] = (double) PyInt_AsLong(o4);
-        }
-#endif
-        else if (PyLong_Check(o4))
-        {
-            observ[0] = (double) PyLong_AsLong(o4);
-        }
-        else
-        {
-            PyErr_SetString(pyswe_Error, "Invalid observer age");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-
-        /* snellen ratio */
-        if (PyFloat_Check(o5))
-        {
-            observ[1] = PyFloat_AsDouble(o5);
-        }
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-        {
-            observ[1] = (double) PyInt_AsLong(o5);
-        }
-#endif
-        else if (PyLong_Check(o5))
-        {
-            observ[1] = (double) PyLong_AsLong(o5);
-        }
-        else
-        {
-            PyErr_SetString(pyswe_Error, "Invalid snellen ratio");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-
-        /* mono/binocular */
-        if (PyFloat_Check(o6))
-        {
-            observ[2] = PyFloat_AsDouble(o6);
-        }
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o6))
-        {
-            observ[2] = (double) PyInt_AsLong(o6);
-        }
-#endif
-        else if (PyLong_Check(o6))
-        {
-            observ[2] = (double) PyLong_AsLong(o6);
-        }
-        else
-        {
-            PyErr_SetString(pyswe_Error, "Invalid telescope");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-
-        /* telescope magnification */
-        if (PyFloat_Check(o7))
-        {
-            observ[3] = PyFloat_AsDouble(o7);
-        }
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o7))
-        {
-            observ[3] = (double) PyInt_AsLong(o7);
-        }
-#endif
-        else if (PyLong_Check(o7))
-        {
-            observ[3] = (double) PyLong_AsLong(o7);
-        }
-        else
-        {
-            PyErr_SetString(pyswe_Error, "Invalid telescope magnification");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-
-        /* optical aperture */
-        if (PyFloat_Check(o8))
-        {
-            observ[4] = PyFloat_AsDouble(o8);
-        }
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o8))
-        {
-            observ[4] = (double) PyInt_AsLong(o8);
-        }
-#endif
-        else if (PyLong_Check(o8))
-        {
-            observ[4] = (double) PyLong_AsLong(o8);
-        }
-        else
-        {
-            PyErr_SetString(pyswe_Error, "Invalid telescope aperture");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-
-        /* optical transmission */
-        if (PyFloat_Check(o9))
-        {
-            observ[5] = PyFloat_AsDouble(o9);
-        }
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o9))
-        {
-            observ[5] = (double) PyInt_AsLong(o9);
-        }
-#endif
-        else if (PyLong_Check(o9))
-        {
-            observ[5] = (double) PyLong_AsLong(o9);
-        }
-        else
-        {
-            PyErr_SetString(pyswe_Error, "Invalid telescope aperture");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-
-        Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-        Py_DECREF(o8); Py_DECREF(o9);
-    }
-
-    i = swe_heliacal_ut(jdstart, geopos, atmo, observ, obj, evnt, flg, dret, serr);
-
-    if (i == 0)
-    {
-        return Py_BuildValue("ddd", dret[0], dret[1], dret[2]);
-    }
-    else
-    {
-        PyErr_SetString(pyswe_Error, serr);
-        return NULL;
-    }
 }
 
 /* swisseph.heliacal_pheno_ut */
@@ -2635,6 +1173,1466 @@ static PyObject * pyswe_heliacal_pheno_ut FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, serr);
         return NULL;
     }
+}
+
+/* swisseph.heliacal_ut */
+static char pyswe_heliacal_ut__doc__ [] =
+"Find the Julian day of the next heliacal phenomenon after a given start date.\n"
+"It works between geographic latitudes 60s - 60n.\n\n"
+"Args: float jd_start, seq geopos, seq atmo, seq observer, str object,"
+" int enventtype, int helflag\n"
+"Return: tuple with 3 julian days";
+
+static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
+{
+    double jdstart, geopos[3], atmo[4], observ[6], dret[3];
+    char serr[255], *obj = 0; /* dummy assign */
+    int i, evnt, flg;
+    PyObject *o1=0, *o2=0, *o3=0, *o4, *o5, *o6, *o7, *o8, *o9;
+    static char *kwlist[] = {"jd_start", "geopos", "atmo", "observer", "object",
+        "eventtype", "helflag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOOOsii", kwlist,
+        &jdstart, &o1, &o2, &o3, &obj, &evnt, &flg))
+        return NULL;
+
+    if (!PySequence_Check(o1) || PySequence_Length(o1) != 3)
+    {
+        PyErr_SetString(pyswe_Error, "Invalid geopos sequence");
+        return NULL;
+    }
+    else
+    {
+        o4 = PySequence_ITEM(o1, 0);
+        o5 = PySequence_ITEM(o1, 1);
+        o6 = PySequence_ITEM(o1, 2);
+        if (!PyNumber_Check(o4) || !PyNumber_Check(o5) || !PyNumber_Check(o6))
+        {
+            PyErr_SetString(pyswe_Error, "Invalid geopos value type");
+            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
+            return NULL;
+        }
+
+        /* checking longitude */
+        if (PyFloat_Check(o4))
+        {
+            geopos[0] = PyFloat_AsDouble(o4);
+        }
+#if PY_MAJOR_VERSION < 3
+        else if (PyInt_Check(o5))
+        {
+            geopos[0] = (double) PyInt_AsLong(o4);
+        }
+#endif
+        else if (PyLong_Check(o4))
+        {
+            geopos[0] = (double) PyLong_AsLong(o4);
+        }
+        else
+        {
+            PyErr_SetString(pyswe_Error, "Invalid longitude type");
+            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
+            return NULL;
+        }
+
+        /* checking latitude */
+        if (PyFloat_Check(o5))
+        {
+            geopos[1] = PyFloat_AsDouble(o5);
+        }
+#if PY_MAJOR_VERSION < 3
+        else if (PyInt_Check(o5))
+        {
+            geopos[1] = (double) PyInt_AsLong(o5);
+        }
+#endif
+        else if (PyLong_Check(o5))
+        {
+            geopos[1] = (double) PyLong_AsLong(o5);
+        }
+        else
+        {
+            PyErr_SetString(pyswe_Error, "Invalid latitude type");
+            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
+            return NULL;
+        }
+
+        /* checking altitude */
+        if (PyFloat_Check(o6))
+        {
+            geopos[2] = PyFloat_AsDouble(o6);
+        }
+#if PY_MAJOR_VERSION < 3
+        else if (PyInt_Check(o5))
+        {
+            geopos[2] = (double) PyInt_AsLong(o6);
+        }
+#endif
+        else if (PyLong_Check(o6))
+        {
+            geopos[2] = (double) PyLong_AsLong(o6);
+        }
+        else
+        {
+            PyErr_SetString(pyswe_Error, "Invalid altitude type");
+            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
+            return NULL;
+        }
+
+        Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
+    }
+
+    if (!PySequence_Check(o2) || PySequence_Length(o2) != 4)
+    {
+        PyErr_SetString(pyswe_Error, "Invalid atmospheric sequence");
+        return NULL;
+    }
+    else
+    {
+        o4 = PySequence_ITEM(o2, 0);
+        o5 = PySequence_ITEM(o2, 1);
+        o6 = PySequence_ITEM(o2, 2);
+        o7 = PySequence_ITEM(o2, 3);
+        if (!PyNumber_Check(o4) || !PyNumber_Check(o5) || !PyNumber_Check(o6)
+            || !PyNumber_Check(o7))
+        {
+            PyErr_SetString(pyswe_Error, "Invalid atmospheric value type");
+            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
+            return NULL;
+        }
+
+        /* atmospheric pressure */
+        if (PyFloat_Check(o4))
+        {
+            atmo[0] = PyFloat_AsDouble(o4);
+        }
+#if PY_MAJOR_VERSION < 3
+        else if (PyInt_Check(o4))
+        {
+            atmo[0] = (double) PyInt_AsLong(o4);
+        }
+#endif
+        else if (PyLong_Check(o4))
+        {
+            atmo[0] = (double) PyLong_AsLong(o4);
+        }
+        else
+        {
+            PyErr_SetString(pyswe_Error, "Invalid atmospheric pressure");
+            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
+            return NULL;
+        }
+
+        /* atmospheric temperature */
+        if (PyFloat_Check(o5))
+        {
+            atmo[1] = PyFloat_AsDouble(o5);
+        }
+#if PY_MAJOR_VERSION < 3
+        else if (PyInt_Check(o5))
+        {
+            atmo[1] = (double) PyInt_AsLong(o5);
+        }
+#endif
+        else if (PyLong_Check(o5))
+        {
+            atmo[1] = (double) PyLong_AsLong(o5);
+        }
+        else
+        {
+            PyErr_SetString(pyswe_Error, "Invalid atmospheric temperature");
+            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
+            return NULL;
+        }
+
+        /* humidity */
+        if (PyFloat_Check(o6))
+        {
+            atmo[2] = PyFloat_AsDouble(o6);
+        }
+#if PY_MAJOR_VERSION < 3
+        else if (PyInt_Check(o6))
+        {
+            atmo[2] = (double) PyInt_AsLong(o6);
+        }
+#endif
+        else if (PyLong_Check(o6))
+        {
+            atmo[2] = (double) PyLong_AsLong(o6);
+        }
+        else
+        {
+            PyErr_SetString(pyswe_Error, "Invalid humidity");
+            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
+            return NULL;
+        }
+
+        /* meteorological range */
+        if (PyFloat_Check(o7))
+        {
+            atmo[3] = PyFloat_AsDouble(o7);
+        }
+#if PY_MAJOR_VERSION < 3
+        else if (PyInt_Check(o7))
+        {
+            atmo[3] = (double) PyInt_AsLong(o7);
+        }
+#endif
+        else if (PyLong_Check(o7))
+        {
+            atmo[3] = (double) PyLong_AsLong(o7);
+        }
+        else
+        {
+            PyErr_SetString(pyswe_Error, "Invalid meteorological range");
+            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
+            return NULL;
+        }
+
+        Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
+    }
+
+    if (!PySequence_Check(o3) || PySequence_Length(o3) != 6)
+    {
+        PyErr_SetString(pyswe_Error, "Invalid observer sequence");
+        return NULL;
+    }
+    else
+    {
+        o4 = PySequence_ITEM(o3, 0);
+        o5 = PySequence_ITEM(o3, 1);
+        o6 = PySequence_ITEM(o3, 2);
+        o7 = PySequence_ITEM(o3, 3);
+        o8 = PySequence_ITEM(o3, 4);
+        o9 = PySequence_ITEM(o3, 5);
+        if (!PyNumber_Check(o4) || !PyNumber_Check(o5) || !PyNumber_Check(o6)
+            || !PyNumber_Check(o7) || !PyNumber_Check(o8) || !PyNumber_Check(o9))
+        {
+            PyErr_SetString(pyswe_Error, "Invalid observer value type");
+            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
+            Py_DECREF(o8); Py_DECREF(o9);
+            return NULL;
+        }
+
+        /* observer age */
+        if (PyFloat_Check(o4))
+        {
+            observ[0] = PyFloat_AsDouble(o4);
+        }
+#if PY_MAJOR_VERSION < 3
+        else if (PyInt_Check(o4))
+        {
+            observ[0] = (double) PyInt_AsLong(o4);
+        }
+#endif
+        else if (PyLong_Check(o4))
+        {
+            observ[0] = (double) PyLong_AsLong(o4);
+        }
+        else
+        {
+            PyErr_SetString(pyswe_Error, "Invalid observer age");
+            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
+            Py_DECREF(o8); Py_DECREF(o9);
+            return NULL;
+        }
+
+        /* snellen ratio */
+        if (PyFloat_Check(o5))
+        {
+            observ[1] = PyFloat_AsDouble(o5);
+        }
+#if PY_MAJOR_VERSION < 3
+        else if (PyInt_Check(o5))
+        {
+            observ[1] = (double) PyInt_AsLong(o5);
+        }
+#endif
+        else if (PyLong_Check(o5))
+        {
+            observ[1] = (double) PyLong_AsLong(o5);
+        }
+        else
+        {
+            PyErr_SetString(pyswe_Error, "Invalid snellen ratio");
+            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
+            Py_DECREF(o8); Py_DECREF(o9);
+            return NULL;
+        }
+
+        /* mono/binocular */
+        if (PyFloat_Check(o6))
+        {
+            observ[2] = PyFloat_AsDouble(o6);
+        }
+#if PY_MAJOR_VERSION < 3
+        else if (PyInt_Check(o6))
+        {
+            observ[2] = (double) PyInt_AsLong(o6);
+        }
+#endif
+        else if (PyLong_Check(o6))
+        {
+            observ[2] = (double) PyLong_AsLong(o6);
+        }
+        else
+        {
+            PyErr_SetString(pyswe_Error, "Invalid telescope");
+            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
+            Py_DECREF(o8); Py_DECREF(o9);
+            return NULL;
+        }
+
+        /* telescope magnification */
+        if (PyFloat_Check(o7))
+        {
+            observ[3] = PyFloat_AsDouble(o7);
+        }
+#if PY_MAJOR_VERSION < 3
+        else if (PyInt_Check(o7))
+        {
+            observ[3] = (double) PyInt_AsLong(o7);
+        }
+#endif
+        else if (PyLong_Check(o7))
+        {
+            observ[3] = (double) PyLong_AsLong(o7);
+        }
+        else
+        {
+            PyErr_SetString(pyswe_Error, "Invalid telescope magnification");
+            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
+            Py_DECREF(o8); Py_DECREF(o9);
+            return NULL;
+        }
+
+        /* optical aperture */
+        if (PyFloat_Check(o8))
+        {
+            observ[4] = PyFloat_AsDouble(o8);
+        }
+#if PY_MAJOR_VERSION < 3
+        else if (PyInt_Check(o8))
+        {
+            observ[4] = (double) PyInt_AsLong(o8);
+        }
+#endif
+        else if (PyLong_Check(o8))
+        {
+            observ[4] = (double) PyLong_AsLong(o8);
+        }
+        else
+        {
+            PyErr_SetString(pyswe_Error, "Invalid telescope aperture");
+            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
+            Py_DECREF(o8); Py_DECREF(o9);
+            return NULL;
+        }
+
+        /* optical transmission */
+        if (PyFloat_Check(o9))
+        {
+            observ[5] = PyFloat_AsDouble(o9);
+        }
+#if PY_MAJOR_VERSION < 3
+        else if (PyInt_Check(o9))
+        {
+            observ[5] = (double) PyInt_AsLong(o9);
+        }
+#endif
+        else if (PyLong_Check(o9))
+        {
+            observ[5] = (double) PyLong_AsLong(o9);
+        }
+        else
+        {
+            PyErr_SetString(pyswe_Error, "Invalid telescope aperture");
+            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
+            Py_DECREF(o8); Py_DECREF(o9);
+            return NULL;
+        }
+
+        Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
+        Py_DECREF(o8); Py_DECREF(o9);
+    }
+
+    i = swe_heliacal_ut(jdstart, geopos, atmo, observ, obj, evnt, flg, dret, serr);
+
+    if (i == 0)
+    {
+        return Py_BuildValue("ddd", dret[0], dret[1], dret[2]);
+    }
+    else
+    {
+        PyErr_SetString(pyswe_Error, serr);
+        return NULL;
+    }
+}
+
+/* swisseph.house_name */
+static char pyswe_house_name__doc__[] =
+"Get the name of the house method.\n\n"
+"Args: char hsys\n"
+"Return: house system name";
+
+static PyObject * pyswe_house_name FUNCARGS_KEYWDS
+{
+    char hsys;
+    static char *kwlist[] = {"hsys", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "c", kwlist, &hsys))
+        return NULL;
+    return Py_BuildValue("s", swe_house_name(hsys));
+}
+
+/* swisseph.house_pos */
+static char pyswe_house_pos__doc__[] =
+"Calculate house position of a body.\n\n"
+"Args: float armc, float geolat, float obliquity, float objlon,"
+" float objlat=0.0, char hsys='P'\n"
+"Return: float";
+
+static PyObject * pyswe_house_pos FUNCARGS_KEYWDS
+{
+    double armc, lat, obl, res;
+    double obj[] = {0.0, 0.0};
+    int hsys = 'P';
+    char err[256];
+    static char *kwlist[] = {"armc", "geolat", "obliquity", "objlon", "objlat",
+        "hsys", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddd|dc", kwlist,
+        &armc, &lat, &obl, &obj[0], &obj[1], &hsys))
+        return NULL;
+    res = swe_house_pos(armc, lat, obl, hsys, obj, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("f", res);
+}
+
+/* swisseph.houses */
+static char pyswe_houses__doc__[] =
+"Calculate houses cusps (UT).\n\n"
+"Args: float julday, float lat, float lon, char hsys='P'\n"
+"Return: 2 tuples of 12 and 8 float (cusps, ascmc) (except Gauquelin)";
+
+static PyObject * pyswe_houses FUNCARGS_KEYWDS
+{
+    double jd, lat, lon, cusps[37], ascmc[10];
+    int ret, hsys = 'P';
+    static char *kwlist[] = {"julday", "lat", "lon", "hsys", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|c", kwlist,
+        &jd, &lat, &lon, &hsys))
+        return NULL;
+    ret = swe_houses(jd, lat, lon, hsys, cusps, ascmc);
+    if (ret < 0)
+    {
+        PyErr_SetString(pyswe_Error, "swisseph.houses: error while computing");
+        return NULL;
+    }
+    if (hsys == 71) /* Gauquelin houses */
+    {
+        return Py_BuildValue("(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
+        cusps[1],cusps[2],cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],
+        cusps[9],cusps[10],cusps[11],cusps[12],cusps[13],cusps[14],cusps[15],
+        cusps[16],cusps[17],cusps[18],cusps[19],cusps[20],cusps[21],cusps[22],
+        cusps[23],cusps[24],cusps[25],cusps[26],cusps[27],cusps[28],cusps[29],
+        cusps[30],cusps[31],cusps[32],cusps[33],cusps[34],cusps[35],cusps[36],
+        ascmc[0],ascmc[1],ascmc[2],ascmc[3],ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
+    }
+    else
+    {
+        return Py_BuildValue("(ffffffffffff)(ffffffff)", cusps[1],cusps[2],
+        cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],cusps[9],cusps[10],
+        cusps[11],cusps[12],ascmc[0],ascmc[1],ascmc[2],ascmc[3],ascmc[4],ascmc[5],
+        ascmc[6],ascmc[7]);
+    }
+}
+
+/* swisseph.houses_armc */
+static char pyswe_houses_armc__doc__[] =
+"Calculate houses cusps with ARMC.\n\n"
+"Args: float armc, float lat, float obliquity, char hsys='P'\n"
+"Return: 2 tuples of 12 and 8 float (cusps, ascmc) (except Gauquelin)";
+
+static PyObject * pyswe_houses_armc FUNCARGS_KEYWDS
+{
+    double armc, lat, obl, cusps[37], ascmc[10];
+    int ret, hsys = 'P';
+    static char *kwlist[] = {"armc", "lat", "obliquity", "hsys", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|c", kwlist,
+        &armc, &lat, &obl, &hsys))
+        return NULL;
+    ret = swe_houses_armc(armc, lat, obl, hsys, cusps, ascmc);
+    if (ret < 0)
+    {
+        PyErr_SetString(pyswe_Error, "swisseph.houses_armc: error while computing");
+        return NULL;
+    }
+    if (hsys == 71) /* Gauquelin houses */
+    {
+        return Py_BuildValue("(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
+        cusps[1],cusps[2],cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],
+        cusps[9],cusps[10],cusps[11],cusps[12],cusps[13],cusps[14],cusps[15],
+        cusps[16],cusps[17],cusps[18],cusps[19],cusps[20],cusps[21],cusps[22],
+        cusps[23],cusps[24],cusps[25],cusps[26],cusps[27],cusps[28],cusps[29],
+        cusps[30],cusps[31],cusps[32],cusps[33],cusps[34],cusps[35],cusps[36],
+        ascmc[0],ascmc[1],ascmc[2],ascmc[3],ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
+    }
+    else
+    {
+        return Py_BuildValue("(ffffffffffff)(ffffffff)", cusps[1],cusps[2],
+        cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],cusps[9],
+        cusps[10],cusps[11],cusps[12],ascmc[0],ascmc[1],ascmc[2],ascmc[3],
+        ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
+    }
+}
+
+/* swisseph.houses_ex */
+static char pyswe_houses_ex__doc__[] =
+"Calculate houses cusps (extended) (UT).\n\n"
+"Args: float julday, float lat, float lon, char hsys='P', int flag=0\n"
+"Return: 2 tuples of 12 and 8 float (cusps, ascmc) (except Gauquelin)";
+
+static PyObject * pyswe_houses_ex FUNCARGS_KEYWDS
+{
+    double jd, lat, lon, cusps[37], ascmc[10];
+    int ret, hsys = 'P', flag = 0;
+    static char *kwlist[] = {"julday", "lat", "lon", "hsys", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|ci", kwlist,
+        &jd, &lat, &lon, &hsys, &flag))
+        return NULL;
+    ret = swe_houses_ex(jd, flag, lat, lon, hsys, cusps, ascmc);
+    if (ret < 0)
+    {
+        PyErr_SetString(pyswe_Error, "swisseph.houses_ex: error while computing");
+        return NULL;
+    }
+    if (hsys == 71) /* Gauquelin houses */
+    {
+        return Py_BuildValue("(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
+        cusps[1],cusps[2],cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],
+        cusps[9],cusps[10],cusps[11],cusps[12],cusps[13],cusps[14],cusps[15],
+        cusps[16],cusps[17],cusps[18],cusps[19],cusps[20],cusps[21],cusps[22],
+        cusps[23],cusps[24],cusps[25],cusps[26],cusps[27],cusps[28],cusps[29],
+        cusps[30],cusps[31],cusps[32],cusps[33],cusps[34],cusps[35],cusps[36],
+        ascmc[0],ascmc[1],ascmc[2],ascmc[3],ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
+    }
+    else
+    {
+        return Py_BuildValue("(ffffffffffff)(ffffffff)", cusps[1],cusps[2],
+        cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],cusps[9],
+        cusps[10],cusps[11],cusps[12],ascmc[0],ascmc[1],ascmc[2],ascmc[3],
+        ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
+    }
+}
+
+/* swisseph.jdet_to_utc */
+static char pyswe_jdet_to_utc__doc__ [] =
+"Convert ET julian day number to UTC.\n\n"
+"Args: float et, int flag\n"
+"Return: tuple (int year, int month, int day, int hour, int minutes, float seconds)";
+
+static PyObject * pyswe_jdet_to_utc FUNCARGS_KEYWDS
+{
+    int y, m, d, h, mi, flg;
+    double s, et;
+    static char *kwlist[] = {"et", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di", kwlist, &et, &flg))
+        return NULL;
+    swe_jdet_to_utc(et, flg, &y, &m, &d, &h, &mi, &s);
+    return Py_BuildValue("iiiiid", y, m, d, h, mi, s);
+}
+
+/* swisseph.jdut1_to_utc */
+static char pyswe_jdut1_to_utc__doc__ [] =
+"Convert UT julian day number to UTC.\n\n"
+"Args: float ut, int flag\n"
+"Return: tuple (int year, int month, int day, int hour, int minutes, float seconds)";
+
+static PyObject * pyswe_jdut1_to_utc FUNCARGS_KEYWDS
+{
+    int y, m, d, h, mi, flg;
+    double s, ut;
+    static char *kwlist[] = {"ut", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di", kwlist, &ut, &flg))
+        return NULL;
+    swe_jdut1_to_utc(ut, flg, &y, &m, &d, &h, &mi, &s);
+    return Py_BuildValue("iiiiid", y, m, d, h, mi, s);
+}
+
+/* swisseph.julday */
+static char pyswe_julday__doc__[] =
+"Calculate Julian day number.\n\n"
+"Args: int year, int month, int day, float hour=12.0, int cal=GREG_CAL\n"
+"Return: float";
+
+static PyObject * pyswe_julday FUNCARGS_KEYWDS
+{
+    int year, month, day;
+    double ret, hour = 12.0;
+    int cal = SE_GREG_CAL;
+    static char *kwlist[] = {"year", "month", "day", "hour", "cal", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iii|di", kwlist,
+        &year, &month, &day, &hour, &cal))
+        return NULL;
+    ret = swe_julday(year, month, day, hour, cal);
+    return Py_BuildValue("f", ret);
+}
+
+/* swisseph.lat_to_lmt */
+static char pyswe_lat_to_lmt__doc__[] =
+"Translate local apparent time (LAT) to local mean time (LMT).\n\n"
+"Args: float julday, float geolon\n"
+"Return: float";
+
+static PyObject * pyswe_lat_to_lmt FUNCARGS_KEYWDS
+{
+    int res;
+    double jd, lon, ret;
+    char err[256];
+    static char *kwlist[] = {"julday", "geolon" , NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &jd, &lon))
+        return NULL;
+    res = swe_lat_to_lmt(jd, lon, &ret, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("f", ret);
+}
+
+/* swisseph.lmt_to_lat */
+static char pyswe_lmt_to_lat__doc__[] =
+"Translate local mean time (LMT) to local apparent time (LAT).\n\n"
+"Args: float julday, float geolon\n"
+"Return: float";
+
+static PyObject * pyswe_lmt_to_lat FUNCARGS_KEYWDS
+{
+    int res;
+    double jd, lon, ret;
+    char err[256];
+    static char *kwlist[] = {"julday", "geolon" , NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &jd, &lon))
+        return NULL;
+    res = swe_lmt_to_lat(jd, lon, &ret, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("f", ret);
+}
+
+/* swisseph.lun_eclipse_how */
+static char pyswe_lun_eclipse_how__doc__[] =
+"Calculate attributes of a lunar eclipse (UTC).\n\n"
+"Args: float julday, float lon, float lat, float alt=0.0, int flag=FLG_SWIEPH\n"
+"Return: tuples (retflag)(attr)";
+
+static PyObject * pyswe_lun_eclipse_how FUNCARGS_KEYWDS
+{
+    double jd, geopos[3] = {0, 0, 0};
+    double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    int res, flag = SEFLG_SWIEPH;
+    char err[256];
+    static char *kwlist[] = {"julday", "lon", "lat", "alt", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|di", kwlist,
+        &jd, &geopos[0], &geopos[1], &geopos[2], &flag))
+        return NULL;
+    res = swe_lun_eclipse_how(jd, flag, geopos, attr, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(i)(fffffffffff)", res,attr[0],attr[1],attr[2],attr[3],
+        attr[4],attr[5],attr[6],attr[7],attr[8],attr[9],attr[10]);
+}
+
+/* swisseph.lun_eclipse_when */
+static char pyswe_lun_eclipse_when__doc__[] =
+"Find the next lunar eclipse (UTC).\n\n"
+"Args: float jd_start, int ecl_type=0, bool backward=False, int flag=FLG_SWIEPH\n"
+"Return: tuples (retflag)(tret)";
+
+static PyObject * pyswe_lun_eclipse_when FUNCARGS_KEYWDS
+{
+    double jd, tret[10] = {0,0,0,0,0,0,0,0,0,0};
+    int res, ecltype = 0, backward = 0, flag = SEFLG_SWIEPH;
+    char err[256];
+    static char *kwlist[] = {"jd_start", "ecl_type", "backward", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|iii", kwlist,
+        &jd, &ecltype, &backward, &flag))
+        return NULL;
+    res = swe_lun_eclipse_when(jd, flag, ecltype, tret, backward, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(i)(ffffffff)", res,tret[0],tret[1],tret[2],tret[3],
+        tret[4],tret[5],tret[6],tret[7]);
+}
+
+/* swisseph.lun_eclipse_when_loc */
+static char pyswe_lun_eclipse_when_loc__doc__[] =
+"Find the next lunar eclipse observable from a given geographic position.\n\n"
+"Args: float jd_start, float lon, float lat, float alt=0.0, bool backward=False,"
+" int flag=FLG_SWIEPH\n"
+"Return: 3 tuples (retflag, tret, attr)";
+
+static PyObject * pyswe_lun_eclipse_when_loc FUNCARGS_KEYWDS
+{
+    double jd, geopos[3] = { 0, 0, 0 };
+    double tret[10] = {0,0,0,0,0,0,0,0,0,0};
+    double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    int res, backward = 0, flag = SEFLG_SWIEPH;
+    char err[256];
+    static char *kwlist[] = {"jd_start", "lon", "lat", "alt", "backward",
+        "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|dii", kwlist, &jd,
+        &geopos[0], &geopos[1], &geopos[2], &backward, &flag))
+        return NULL;
+    res = swe_lun_eclipse_when_loc(jd, flag, geopos, tret, attr, backward, err);
+    if ( res < 0 )
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(i)(dddddddddd)(dddddddddd)", res,tret[0],tret[1],
+        tret[2],tret[3],tret[4],tret[5],tret[6],tret[7],tret[8],tret[9],
+        attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],attr[7],
+        attr[8],attr[9]);
+}
+
+/* swisseph.lun_occult_when_glob */
+static char pyswe_lun_occult_when_glob__doc__[] =
+"Find the next occultation of a planet or star by the moon globally (UTC).\n\n"
+"Args: float jd_start, int or str body, int ecl_type=0, bool backward=False,"
+" int flag=FLG_SWIEPH\n"
+"Return: tuple of results";
+
+static PyObject * pyswe_lun_occult_when_glob FUNCARGS_KEYWDS
+{
+    double jd, tret[10];
+    int res, plt, ecltype = 0, backward = 0, flag = SEFLG_SWIEPH;
+    char *star = "", err[256];
+    PyObject *body;
+    static char *kwlist[] = {"jd_start", "body", "ecl_type", "backward", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dO|iii", kwlist,
+        &jd, &body, &ecltype, &backward, &flag))
+        return NULL;
+    if (PyLong_CheckExact(body)) /* long -> planet */
+    {
+        plt = (int) PyLong_AsLong(body);
+    }
+#if PY_MAJOR_VERSION >= 3
+    else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
+    {
+        plt = 0;
+        star = (char*) PyUnicode_AS_DATA(body);
+    }
+#elif PY_MAJOR_VERSION < 3
+    else if (PyInt_CheckExact(body)) /* int -> planet */
+    {
+        plt = (int) PyInt_AsLong(body);
+    }
+    else if (PyString_CheckExact(body)) /* str -> fixed star */
+    {
+        plt = 0;
+        star = PyString_AsString(body);
+    }
+#endif
+    else
+    {
+        PyErr_SetString(pyswe_Error, "swisseph.lun_occult_when_glob: Invalid body type");
+        return NULL;
+    }
+    res = swe_lun_occult_when_glob(jd, plt, star, flag, ecltype, tret, backward, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(i)(ffffffffff)", res,tret[0],tret[1],tret[2],
+        tret[3],tret[4],tret[5],tret[6],tret[7],tret[8],tret[9]);
+}
+
+/* swisseph.lun_occult_when_loc */
+static char pyswe_lun_occult_when_loc__doc__[] =
+"Find next occultation of a body by the moon for a given geographic position (UTC).\n\n"
+"Args: float julday, int or str body, float lon, float lat, float alt=0.0,"
+" bool backward=False, int flag=FLG_SWIEPH\n"
+"Return: tuple of results";
+
+static PyObject * pyswe_lun_occult_when_loc FUNCARGS_KEYWDS
+{
+    double jd, tret[10], attr[20], geopos[3] = {0.0, 0.0, 0.0};
+    int res, plt, backward = 0, flag = SEFLG_SWIEPH;
+    char *star = "", err[256];
+    PyObject *body;
+    static char *kwlist[] = {"julday", "body", "lon", "lat", "alt", "backward", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOdd|dii", kwlist,
+        &jd, &body, &geopos[0], &geopos[1], &geopos[2], &backward, &flag))
+        return NULL;
+    if (PyLong_CheckExact(body)) /* long -> planet */
+    {
+        plt = (int) PyLong_AsLong(body);
+    }
+#if PY_MAJOR_VERSION >= 3
+    else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
+    {
+        plt = 0;
+        star = (char*) PyUnicode_AS_DATA(body);
+    }
+#elif PY_MAJOR_VERSION < 3
+    else if (PyInt_CheckExact(body)) /* int -> planet */
+    {
+        plt = (int) PyInt_AsLong(body);
+    }
+    else if (PyString_CheckExact(body)) /* str -> fixed star */
+    {
+        plt = 0;
+        star = PyString_AsString(body);
+    }
+#endif
+    else
+    {
+        PyErr_SetString(pyswe_Error, "swisseph.lun_occult_when_loc: Invalid body type");
+        return NULL;
+    }
+    res = swe_lun_occult_when_loc(jd, plt, star, flag, geopos, tret, attr, backward, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(i)(fffffff)(ffffffff)", res,tret[0],tret[1],
+        tret[2],tret[3],tret[4],tret[5],tret[6],attr[0],attr[1],attr[2],
+        attr[3],attr[4],attr[5],attr[6],attr[7]);
+}
+
+/* swisseph.lun_occult_where */
+static char pyswe_lun_occult_where__doc__[] =
+"Find where a lunar occultation is central or maximal (UTC).\n\n"
+"Args: float julday, int or str body, int flag=FLG_SWIEPH\n"
+"Return: tuples (retval)(geopos)(attr)";
+
+static PyObject * pyswe_lun_occult_where FUNCARGS_KEYWDS
+{
+    double jd, geopos[10] = {0,0,0,0,0,0,0,0,0,0};
+    double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    int res, plt, flag = SEFLG_SWIEPH;
+    char *star = "", err[256];
+    PyObject *body;
+    static char *kwlist[] = {"julday", "body", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dO|i", kwlist,
+        &jd, &body, &flag))
+        return NULL;
+    if (PyLong_CheckExact(body)) /* long -> planet */
+    {
+        plt = (int) PyLong_AsLong(body);
+    }
+#if PY_MAJOR_VERSION >= 3
+    else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
+    {
+        plt = 0;
+        star = (char*) PyUnicode_AS_DATA(body);
+    }
+#elif PY_MAJOR_VERSION < 3
+    else if (PyInt_CheckExact(body)) /* int -> planet */
+    {
+        plt = (int) PyInt_AsLong(body);
+    }
+    else if (PyString_CheckExact(body)) /* str -> fixed star */
+    {
+        plt = 0;
+        star = PyString_AsString(body);
+    }
+#endif
+    else
+    {
+        PyErr_SetString(pyswe_Error, "swisseph.lun_occult_where: Invalid body type");
+        return NULL;
+    }
+    res = swe_lun_occult_where(jd, plt, star, flag, geopos, attr, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(i)(ffffffffff)(ffffffff)", res,geopos[0],geopos[1],
+        geopos[2],geopos[3],geopos[4],geopos[5],geopos[6],geopos[7],geopos[8],
+        geopos[9],attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],attr[7]);
+}
+
+/* swisseph.nod_aps */
+static char pyswe_nod_aps__doc__[] =
+"Calculate planetary nodes and apsides (ET).\n\n"
+"Args: float julday, int planet, int method=NODBIT_MEAN, int flag=FLG_SWIEPH+FLG_SPEED\n"
+"Return: 4 tuples of 6 float (asc, des, per, aph)";
+
+static PyObject * pyswe_nod_aps FUNCARGS_KEYWDS
+{
+    char err[256];
+    double jd, xasc[6], xdsc[6], xper[6], xaph[6];
+    int ret, planet, method = SE_NODBIT_MEAN, flag = SEFLG_SWIEPH + SEFLG_SPEED;
+    static char *kwlist[] = {"julday", "planet", "method", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|ii", kwlist,
+        &jd, &planet, &method, &flag))
+        return NULL;
+    ret = swe_nod_aps(jd, planet, flag, method, xasc, xdsc, xper, xaph, err);
+    if (ret < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(ffffff)(ffffff)(ffffff)(ffffff)", xasc[0],xasc[1],
+        xasc[2],xasc[3],xasc[4],xasc[5],xdsc[0],xdsc[1],xdsc[2],xdsc[3],xdsc[4],
+        xdsc[5],xper[0],xper[1],xper[2],xper[3],xper[4],xper[5],xaph[0],xaph[1],
+        xaph[2],xaph[3],xaph[4],xaph[5]);
+}
+
+/* swisseph.nod_aps_ut */
+static char pyswe_nod_aps_ut__doc__[] =
+"Calculate planetary nodes and apsides (UT).\n\n"
+"Args: float julday, int planet, int method=NODBIT_MEAN, int flag=FLG_SWIEPH+FLG_SPEED\n"
+"Return: 4 tuples of 6 float (asc, des, per, aph)";
+
+static PyObject * pyswe_nod_aps_ut FUNCARGS_KEYWDS
+{
+    char err[256];
+    double jd, xasc[6], xdsc[6], xper[6], xaph[6];
+    int ret, planet, method = SE_NODBIT_MEAN, flag = SEFLG_SWIEPH + SEFLG_SPEED;
+    static char *kwlist[] = {"julday", "planet", "method", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|ii", kwlist,
+        &jd, &planet, &method, &flag))
+        return NULL;
+    ret = swe_nod_aps_ut(jd, planet, flag, method, xasc, xdsc, xper, xaph, err);
+    if (ret < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(ffffff)(ffffff)(ffffff)(ffffff)", xasc[0],xasc[1],
+        xasc[2],xasc[3],xasc[4],xasc[5],xdsc[0],xdsc[1],xdsc[2],xdsc[3],xdsc[4],
+        xdsc[5],xper[0],xper[1],xper[2],xper[3],xper[4],xper[5],xaph[0],xaph[1],
+        xaph[2],xaph[3],xaph[4],xaph[5]);
+}
+
+/* swisseph.pheno */
+static char pyswe_pheno__doc__[] =
+"Calculate planetary phenomena (ET).\n\n"
+"Args: float julday, int planet, int flag=FLG_SWIEPH\n"
+"Return: tuple of results";
+
+static PyObject * pyswe_pheno FUNCARGS_KEYWDS
+{
+    double jd, attr[20];
+    int res, plt, flag = SEFLG_SWIEPH;
+    char err[256];
+    static char *kwlist[] = {"julday", "planet", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|i", kwlist,
+        &jd, &plt, &flag))
+        return NULL;
+    res = swe_pheno(jd, plt, flag, attr, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(fffff)", attr[0],attr[1],attr[2],attr[3],attr[4]);
+}
+
+/* swisseph.pheno_ut */
+static char pyswe_pheno_ut__doc__[] =
+"Calculate planetary phenomena (UTC).\n\n"
+"Args: float julday, int planet, int flag=FLG_SWIEPH\n"
+"Return: tuple of results";
+
+static PyObject * pyswe_pheno_ut FUNCARGS_KEYWDS
+{
+    double jd, attr[20];
+    int res, plt, flag = SEFLG_SWIEPH;
+    char err[256];
+    static char *kwlist[] = {"julday", "planet", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|i", kwlist,
+        &jd, &plt, &flag))
+        return NULL;
+    res = swe_pheno(jd, plt, flag, attr, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(fffff)", attr[0],attr[1],attr[2],attr[3],attr[4]);
+}
+
+/* swisseph.rad_midp */
+static char pyswe_rad_midp__doc__[] =
+"Calculate midpoint (in radians).\n\n"
+"Args: float x, float y\n"
+"Return: float";
+
+static PyObject * pyswe_rad_midp FUNCARGS_KEYWDS
+{
+    double x, y;
+    static char *kwlist[] = {"x", "y", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &x, &y))
+        return NULL;
+    return Py_BuildValue("f", swe_rad_midp(x, y));
+}
+
+/* swisseph.radnorm */
+static char pyswe_radnorm__doc__[] =
+"Normalization of any radian number to the range [0;2*pi].\n\n"
+"Args: float x\n"
+"Return: float";
+
+static PyObject * pyswe_radnorm FUNCARGS_KEYWDS
+{
+    double x;
+    static char *kwlist[] = {"x", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &x))
+        return NULL;
+    return Py_BuildValue("f", swe_radnorm(x));
+}
+
+/* swisseph.refrac */
+static char pyswe_refrac__doc__[] =
+"Calculate either true altitude from apparent altitude, or apparent altitude"
+" from true altitude.\n\n"
+"Args: float alt, float press=0.0, float temp=0.0, int flag=TRUE_TO_APP\n"
+"Return: float";
+
+static PyObject * pyswe_refrac FUNCARGS_KEYWDS
+{
+    double alt, press = 0.0, temp = 0.0;
+    int flag = SE_TRUE_TO_APP;
+    static char *kwlist[] = {"alt", "press", "temp", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|ddi", kwlist,
+        &alt, &press, &temp, &flag))
+        return NULL;
+    return Py_BuildValue("f", swe_refrac(alt, press, temp, flag));
+}
+
+/* swisseph.refrac_extended */
+static char pyswe_refrac_extended__doc__[] =
+"Calculate either true altitude from apparent altitude, or apparent altitude"
+" from true altitude, for geographical altitudes above sea level.\n\n"
+"Args: float alt, float geoalt, float lrate, float press=0.0, float temp=0.0,"
+" int flag=TRUE_TO_APP\n"
+"Return: 2 tuples of 1 and 4 float";
+
+static PyObject * pyswe_refrac_extended FUNCARGS_KEYWDS
+{
+    double alt, geoalt, lapserate, ret, dret[4], press = 0.0, temp = 0.0;
+    int flag = SE_TRUE_TO_APP;
+    static char *kwlist[] = {"alt", "geoalt", "lrate", "press",
+        "temp", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|ddi", kwlist,
+        &alt, &geoalt, &lapserate, &press, &temp, &flag))
+        return NULL;
+    ret = swe_refrac_extended(alt, geoalt, press, temp, lapserate, flag, dret);
+    return Py_BuildValue("(f)(ffff)", ret, dret[0], dret[1], dret[2], dret[3]);
+}
+
+/* swisseph.revjul */
+static char pyswe_revjul__doc__[] =
+"Calculate year, month, day, hour from Julian day number.\n\n"
+"Args: float julday, int cal=GREG_CAL\n"
+"Return: tuple of 3 int and 1 float";
+
+static PyObject * pyswe_revjul FUNCARGS_KEYWDS
+{
+    int year, month, day, cal = SE_GREG_CAL;
+    double hour, jd;
+    static char *kwlist[] = {"julday", "cal", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist,
+        &jd, &cal))
+        return NULL;
+    swe_revjul(jd, cal, &year, &month, &day, &hour);
+    return Py_BuildValue("(iiif)", year, month, day, hour);
+}
+
+/* swisseph.rise_trans */
+static char pyswe_rise_trans__doc__[] =
+"Calculate times of rising, setting and meridian transits.\n\n"
+"Args: float jd_start, int or str body, float lon, float lat, float alt=0.0,"
+" float press=0.0, float temp=0.0, int rsmi=0, int flag=FLG_SWIEPH\n"
+"Return: tuple of results";
+
+static PyObject * pyswe_rise_trans FUNCARGS_KEYWDS
+{
+    double jd, tret[10], press = 0.0, temp = 0.0, geopos[3] = {0.0, 0.0, 0.0};
+    int res, plt, rsmi = 0, flag = SEFLG_SWIEPH;
+    char *star = "", err[256];
+    PyObject *body;
+    static char *kwlist[] = {"jd_start", "body", "lon", "lat", "alt", "press",
+        "temp", "rsmi", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOdd|dddii", kwlist,
+        &jd, &body, &geopos[0], &geopos[1], &geopos[2], &press, &temp, &rsmi, &flag))
+        return NULL;
+    if (PyLong_CheckExact(body)) /* long -> planet */
+    {
+        plt = (int) PyLong_AsLong(body);
+    }
+#if PY_MAJOR_VERSION >= 3
+    else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
+    {
+        plt = 0;
+        star = (char*) PyUnicode_AS_DATA(body);
+    }
+#elif PY_MAJOR_VERSION < 3
+    else if (PyInt_CheckExact(body)) /* int -> planet */
+    {
+        plt = (int) PyInt_AsLong(body);
+    }
+    else if (PyString_CheckExact(body)) /* str -> fixed star */
+    {
+        plt = 0;
+        star = PyString_AsString(body);
+    }
+#endif
+    else
+    {
+        PyErr_SetString(pyswe_Error, "swisseph.rise_trans: Invalid body type");
+        return NULL;
+    }
+    res = swe_rise_trans(jd, plt, star, flag, rsmi, geopos, press, temp, tret, err);
+    if (res == -1)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(i)(ffffffffff)", res,tret[0],tret[1],tret[2],
+        tret[3],tret[4],tret[5],tret[6],tret[7],tret[8],tret[9]);
+}
+
+/* swisseph.set_ephe_path */
+static char pyswe_set_ephe_path__doc__[] =
+"Set ephemeris files path.\n\n"
+"Args: str path=\"" PYSWE_DEFAULT_EPHE_PATH "\"\n"
+"Return: None";
+
+static PyObject * pyswe_set_ephe_path FUNCARGS_KEYWDS
+{
+    char *path = PYSWE_DEFAULT_EPHE_PATH;
+    static char *kwlist[] = {"path", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "|s", kwlist, &path))
+        return NULL;
+    swe_set_ephe_path(path);
+    Py_RETURN_NONE;
+}
+
+/* swisseph.set_jpl_file */
+static char pyswe_set_jpl_file__doc__[] =
+"Set JPL file path.\n\n"
+"Args: str path\n"
+"Return: None";
+
+static PyObject * pyswe_set_jpl_file FUNCARGS_KEYWDS
+{
+    char *path;
+    static char *kwlist[] = {"path", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &path))
+        return NULL;
+    swe_set_jpl_file(path);
+    Py_RETURN_NONE;
+}
+
+/* swisseph.set_lapse_rate */
+static char pyswe_set_lapse_rate__doc__[] =
+"Set lapse rate.\n\nArgs: float lrate\nReturn: None";
+
+static PyObject * pyswe_set_lapse_rate FUNCARGS_KEYWDS
+{
+    double lapserate;
+    static char *kwlist[] = {"lrate", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist,
+        &lapserate))
+        return NULL;
+    swe_set_lapse_rate(lapserate);
+    Py_RETURN_NONE;
+}
+
+/* swisseph.set_sid_mode */
+static char pyswe_set_sid_mode__doc__[] =
+"Set sidereal mode.\n\n"
+"Args: int mode, float t0=0.0, float ayan_t0=0.0\n"
+"Return: None";
+
+static PyObject * pyswe_set_sid_mode FUNCARGS_KEYWDS
+{
+    int mode;
+    double t0 = 0.0, ayan_t0 = 0.0;
+    static char *kwlist[] = {"mode", "t0", "ayan_t0", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i|dd", kwlist,
+        &mode, &t0, &ayan_t0))
+        return NULL;
+    swe_set_sid_mode(mode, t0, ayan_t0);
+    Py_RETURN_NONE;
+}
+
+/* swisseph.set_tid_acc */
+static char pyswe_set_tid_acc__doc__[] =
+"Set tidal acceleration.\n\n"
+"Args: float acc\n"
+"Return: None";
+
+static PyObject * pyswe_set_tid_acc FUNCARGS_KEYWDS
+{
+    double acc;
+    static char *kwlist[] = {"acc", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &acc))
+        return NULL;
+    swe_set_tid_acc(acc);
+    Py_RETURN_NONE;
+}
+
+/* swisseph.set_topo */
+static char pyswe_set_topo__doc__[] =
+"Set topocentric parameters.\n\n"
+"Args: float lon, float lat, float alt=0.0\n"
+"Return: None";
+
+static PyObject * pyswe_set_topo FUNCARGS_KEYWDS
+{
+    double lon, lat, alt = 0.0;
+    static char *kwlist[] = {"lon", "lat", "alt", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|d", kwlist,
+        &lon, &lat, &alt))
+        return NULL;
+    swe_set_topo(lon, lat, alt);
+    Py_RETURN_NONE;
+}
+
+/* swisseph.sidtime */
+static char pyswe_sidtime__doc__[] =
+"Calculate sidereal time (UT).\n\n"
+"Args: float julday\n"
+"Return: float";
+
+static PyObject * pyswe_sidtime FUNCARGS_KEYWDS
+{
+    double jd, ret;
+    static char *kwlist[] = {"julday", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
+        return NULL;
+    ret = swe_sidtime(jd);
+    return Py_BuildValue("f", ret);
+}
+
+/* swisseph.sidtime0 */
+static char pyswe_sidtime0__doc__[] =
+"Calculate sidereal time, given obliquity and nutation (UT).\n\n"
+"Args: float julday, float obliquity, float nutation\n"
+"Return: float";
+
+static PyObject * pyswe_sidtime0 FUNCARGS_KEYWDS
+{
+    double jd, ret, obliquity, nutation;
+    static char *kwlist[] = {"julday", "obliquity", "nutation", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd", kwlist,
+        &jd, &obliquity, &nutation))
+        return NULL;
+    ret = swe_sidtime0(jd, obliquity, nutation);
+    return Py_BuildValue("f", ret);
+}
+
+/* swisseph.sol_eclipse_how */
+static char pyswe_sol_eclipse_how__doc__[] =
+"Calculate attributes of a solar eclipse.\n\n"
+"Args: float julday, float lon, float lat, float alt=0.0, int flag=FLG_SWIEPH\n"
+"Return: tuples (retflag)(attr)";
+
+static PyObject * pyswe_sol_eclipse_how FUNCARGS_KEYWDS
+{
+    double jd, geopos[3] = {0, 0, 0};
+    double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    int res, flag = SEFLG_SWIEPH;
+    char err[256];
+    static char *kwlist[] = {"julday", "lon", "lat", "alt", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|di", kwlist,
+        &jd, &geopos[0], &geopos[1], &geopos[2], &flag))
+        return NULL;
+    res = swe_sol_eclipse_how(jd, flag, geopos, attr, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(i)(fffffffffff)", res,attr[0],attr[1],attr[2],attr[3],
+        attr[4],attr[5],attr[6],attr[7],attr[8],attr[9],attr[10]);
+}
+
+/* swisseph.sol_eclipse_when_glob */
+static char pyswe_sol_eclipse_when_glob__doc__[] =
+"Find the next solar eclipse globally (UTC).\n\n"
+"Args: float jd_start, ecl_type=0, bool backward=False, int flag=FLG_SWIEPH\n"
+"Return: tuples (retflag)(tret)";
+
+static PyObject * pyswe_sol_eclipse_when_glob FUNCARGS_KEYWDS
+{
+    double jd, tret[10] = {0,0,0,0,0,0,0,0,0,0};
+    int res, ecltype = 0, backward = 0, flag = SEFLG_SWIEPH;
+    char err[256];
+    static char *kwlist[] = {"jd_start", "ecl_type", "backward", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|iii", kwlist,
+        &jd, &ecltype, &backward, &flag))
+        return NULL;
+    res = swe_sol_eclipse_when_glob(jd, flag, ecltype, tret, backward, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(i)(ffffffffff)", res,tret[0],tret[1],tret[2],tret[3],
+        tret[4],tret[5],tret[6],tret[7],tret[8],tret[9]);
+}
+
+/* swisseph.sol_eclipse_when_loc */
+static char pyswe_sol_eclipse_when_loc__doc__[] =
+"Find the next solar eclipse for a given geographic position (UTC).\n\n"
+"Args: float julday, float lon, float lat, float alt=0.0, bool backward=False,"
+" int flag=FLG_SWIEPH\n"
+"Return: tuples (retflag)(tret)(attr)";
+
+static PyObject * pyswe_sol_eclipse_when_loc FUNCARGS_KEYWDS
+{
+    double jd, geopos[3] = {0, 0, 0};
+    double tret[10] = {0,0,0,0,0,0,0,0,0,0};
+    double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    int res, backward = 0, flag = SEFLG_SWIEPH;
+    char err[256];
+    static char *kwlist[] = {"julday", "lon", "lat", "alt", "backward", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|dii", kwlist,
+        &jd, &geopos[0], &geopos[1], &geopos[2], &backward, &flag))
+        return NULL;
+    res = swe_sol_eclipse_when_loc(jd, flag, geopos, tret, attr, backward, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(i)(fffffff)(fffffffffff)", res,
+        tret[0],tret[1],tret[2],tret[3],tret[4],tret[5],tret[6],
+        attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],attr[7],attr[8],
+        attr[9],attr[10]);
+}
+
+/* swisseph.sol_eclipse_where */
+static char pyswe_sol_eclipse_where__doc__[] =
+"Find where a solar eclipse is central or maximal (UTC).\n\n"
+"Args: float julday, int flag=FLG_SWIEPH\n"
+"Return: tuples (retval)(geopos)(attr)";
+
+static PyObject * pyswe_sol_eclipse_where FUNCARGS_KEYWDS
+{
+    double jd, geopos[10] = {0,0,0,0,0,0,0,0,0,0};
+    double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    int res, flag = SEFLG_SWIEPH;
+    char err[256];
+    static char *kwlist[] = {"julday", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist, &jd, &flag))
+        return NULL;
+    res = swe_sol_eclipse_where(jd, flag, geopos, attr, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(i)(ffffffffff)(fffffffffff)", res,geopos[0],geopos[1],
+        geopos[2],geopos[3],geopos[4],geopos[5],geopos[6],geopos[7],geopos[8],
+        geopos[9],attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],
+        attr[7],attr[8],attr[9],attr[10]);
+}
+
+/* swisseph.split_deg */
+static char pyswe_split_deg__doc__[] =
+"Split centiseconds in degrees, minutes, seconds, fraction of seconds, zodiac sign number.\n\n"
+"Args: float ddeg, int roundflag\n"
+"Return: tuple";
+
+static PyObject * pyswe_split_deg FUNCARGS_KEYWDS
+{
+    double ddeg, secfr;
+    int deg, min, sec, sign, flag;
+    static char *kwlist[] = {"ddeg", "roundflag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di", kwlist, &ddeg, &flag))
+        return NULL;
+    swe_split_deg(ddeg, flag, &deg, &min, &sec, &secfr, &sign);
+    return Py_BuildValue("(iiidi)", deg, min, sec, secfr, sign);
+}
+
+/* swisseph.time_equ */
+static char pyswe_time_equ__doc__[] =
+"Calculate equation of time (UT).\n\n"
+"Args: float julday\n"
+"Return: float";
+
+static PyObject * pyswe_time_equ FUNCARGS_KEYWDS
+{
+    int res;
+    double jd, ret;
+    char err[256];
+    static char *kwlist[] = {"julday", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
+        return NULL;
+    res = swe_time_equ(jd, &ret, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("f", ret);
+}
+
+/* swisseph.utc_time_zone */
+static char pyswe_utc_time_zone__doc__[] =
+"Transform local time to UTC or UTC to local time.\n\n"
+"Args: int year, int month, int day, int hour, int minutes, int seconds, float offset\n"
+"Return: tuple (year, month, day, hour, minutes, seconds)";
+
+static PyObject * pyswe_utc_time_zone FUNCARGS_KEYWDS
+{
+    int y, m, d, h, mi, y2, m2, d2, h2, mi2;
+    double s, tz, s2;
+    static char *kwlist[] = {"year", "month", "day", "hour", "minutes",
+        "seconds", "offset", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iiiiiid", kwlist,
+        &y, &m, &d, &h, &mi, &s, &tz))
+        return NULL;
+    swe_utc_time_zone(y, m, d, h, mi, s, tz, &y2, &m2, &d2, &h2, &mi2, &s2);
+    return Py_BuildValue("(iiiiid)", y2, m2, d2, h2, mi2, s2);
+}
+
+/* swisseph.utc_to_jd */
+static char pyswe_utc_to_jd__doc__ [] =
+"Convert UTC to julian day.\n\n"
+"Args: int year, int month, int day, int hour, int minutes, float seconds, int flag\n"
+"Return: tuple (float et, float ut)";
+
+static PyObject * pyswe_utc_to_jd FUNCARGS_KEYWDS
+{
+    int i, y, m, d, h, mi, flg;
+    double s, dret[2];
+    char serr[255];
+    static char *kwlist[] = {"year", "month", "day", "hour", "minutes",
+        "seconds", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iiiiidi", kwlist,
+        &y, &m, &d, &h, &mi, &s, &flg))
+        return NULL;
+    i = swe_utc_to_jd(y, m, d, h, mi, s, flg, dret, serr);
+    if (i < 0)
+    {
+        PyErr_SetString(pyswe_Error, serr);
+        return NULL;
+    }
+    return Py_BuildValue("dd", dret[0], dret[1]);
 }
 
 /* swisseph.vis_limit_mag */
@@ -3037,54 +3035,6 @@ There is no guarantee that these functions are accurate. Use at your own risks.
 
 */
 
-/* swisseph._jdnow */
-static char pyswe__jdnow__doc__[] =
-"Get current Julian day number (Gregorian calendar, UTC).\n\n"
-"Args: -\n"
-"Return: float";
-
-static PyObject * pyswe__jdnow FUNCARGS_SELF
-{
-    return Py_BuildValue("f", swh_jdnow());
-}
-
-/* swisseph._julday */
-static char pyswe__julday__doc__[] =
-"Get Julian day number (UTC), without having to calculate hour in decimal.\n\n"
-"Args: int year, int month, int day, int hour=12, int minutes=0, int seconds=0,"
-" int flag=GREG_FLAG\n"
-"Return: float";
-
-static PyObject * pyswe__julday FUNCARGS_KEYWDS
-{
-    int year, mon, day, hour=12, min=0, sec=0, flag=SE_GREG_CAL;
-    static char *kwlist[] = {"year", "month", "day", "hour", "minutes",
-        "seconds", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iii|iiii", kwlist,
-        &year, &mon, &day, &hour, &min, &sec, &flag))
-        return NULL;
-    return Py_BuildValue("f", swh_julday(year, mon, day, hour,
-        min, sec, flag));
-}
-
-/* swisseph._revjul */
-static char pyswe__revjul__doc__[] =
-"Reverse Julian day to date & time (UTC).\n\n"
-"Args: double julday, int flag=GREG_CAL\n"
-"Return: tuple of 6 int";
-
-static PyObject * pyswe__revjul FUNCARGS_KEYWDS
-{
-    int dt[6], flag=SE_GREG_CAL;
-    double jd;
-    static char *kwlist[] = {"julday", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist,
-        &jd, &flag))
-        return NULL;
-    swh_revjul(jd, flag, dt);
-    return Py_BuildValue("(iiiiii)", dt[0], dt[1], dt[2], dt[3], dt[4], dt[5]);
-}
-
 /* swisseph._degsplit */
 static char pyswe__degsplit__doc__[] =
 "Get degrees, sign number [0;11], minutes, seconds, from a longitude position in [0;360[.\n\n"
@@ -3102,132 +3052,95 @@ static PyObject * pyswe__degsplit FUNCARGS_KEYWDS
     return Py_BuildValue("(iiii)", ret[0], ret[1], ret[2], ret[3]);
 }
 
-/* swisseph._signtostr */
-static char pyswe__signtostr__doc__[] =
-"Get a 3-letters string representing the sign number [0;11].\n\n"
-"Args: int sign\n"
-"Return: str";
+/* swisseph._geoc2d */
+static char pyswe__geoc2d__doc__[] =
+"Get float from given string meant as a geographical coordinates, examples:"
+" \"022:W:25\", \"46:N:02:0\", \"6:E:55:00\".\n\n"
+"Args: str coord\n"
+"Return: float";
 
-static PyObject * pyswe__signtostr FUNCARGS_KEYWDS
-{
-    int res, sign;
-    char str[4];
-    static char *kwlist[] = {"sign", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &sign))
-        return NULL;
-    res = swh_signtostr(sign, str);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, "swisseph._signtostr: invalid sign number");
-        return NULL;
-    }
-    return Py_BuildValue("s", str);
-}
-
-/* swisseph._house_system_name */
-static char pyswe__house_system_name__doc__[] =
-"Get house system name.\n\n"
-"Args: char hsys\n"
-"Return: str";
-
-static PyObject * pyswe__house_system_name FUNCARGS_KEYWDS
+static PyObject * pyswe__geoc2d FUNCARGS_KEYWDS
 {
     int res;
-    char hsys, str[25];
-    static char *kwlist[] = {"hsys", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "c", kwlist, &hsys))
+    double ret;
+    char *coord;
+    static char *kwlist[] = {"coord", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &coord))
         return NULL;
-    res = swh_house_system_name(hsys, str);
-    if (res < 0)
+    res = swh_geoc2d(coord, &ret);
+    if (res == -1)
     {
-        PyErr_SetString(pyswe_Error, "swisseph._house_system_name: invalid house system");
+        PyErr_SetString(pyswe_Error, "swisseph._geoc2d: Invalid coord string");
         return NULL;
     }
-    return Py_BuildValue("s", str);
+    return Py_BuildValue("f", ret);
 }
 
-/* swisseph._min_retro_time */
-static char pyswe__min_retro_time__doc__[] =
-"Get approximate minimum retrogradation time of a planet, in days.\n\n"
-"Args: int planet\n"
-"Return: int";
+/* swisseph._geolat2c */
+static char pyswe__geolat2c__doc__[] =
+"Get formated string of given geographical latitude.\n\n"
+"Args: float lat\n"
+"Return: str";
 
-static PyObject * pyswe__min_retro_time FUNCARGS_KEYWDS
+static PyObject * pyswe__geolat2c FUNCARGS_KEYWDS
 {
-    int plnt, res;
-    char err[64];
-    static char *kwlist[] = {"planet", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &plnt))
+    int res;
+    double lat;
+    char ret[11];
+    static char *kwlist[] = {"lat", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &lat))
         return NULL;
-    res = swh_min_retro_time(plnt, err);
-    if (res < 0)
+    res = swh_geolat2c(lat, ret);
+    if (res == -1)
     {
-        PyErr_SetString(pyswe_Error, err);
+        PyErr_SetString(pyswe_Error, "swisseph._geolat2c: Invalid latitude");
         return NULL;
     }
-    return Py_BuildValue("i", res);
+    return Py_BuildValue("s", ret);
 }
 
-/* swisseph._max_retro_time */
-static char pyswe__max_retro_time__doc__[] =
-"Get approximate maximum retrogradation time of a planet, in days.\n\n"
-"Args: int planet\n"
-"Return: int";
+/* swisseph._geolon2c */
+static char pyswe__geolon2c__doc__[] =
+"Get formated string of given geographical longitude.\n\n"
+"Args: float lon\n"
+"Return: str";
 
-static PyObject * pyswe__max_retro_time FUNCARGS_KEYWDS
+static PyObject * pyswe__geolon2c FUNCARGS_KEYWDS
 {
-    int plnt, res;
-    char err[64];
-    static char *kwlist[] = {"planet", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &plnt))
+    int res;
+    double lon;
+    char ret[12];
+    static char *kwlist[] = {"lon", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &lon))
         return NULL;
-    res = swh_max_retro_time(plnt, err);
-    if (res < 0)
+    res = swh_geolon2c(lon, ret);
+    if (res == -1)
     {
-        PyErr_SetString(pyswe_Error, err);
+        PyErr_SetString(pyswe_Error, "swisseph._geolon2c: Invalid longitude");
         return NULL;
     }
-    return Py_BuildValue("i", res);
+    return Py_BuildValue("s", ret);
 }
 
-/* swisseph._next_retro */
-static char pyswe__next_retro__doc__[] =
-"Find next direction changing of object.\n\n"
-"If daystep=0, use predefined step.\n"
-"Flag should include FLG_SPEED, and FLG_NOGDEFL to avoid bad surprises;"
-" alternatively use true positions.\n"
-"If dayspan != 0, can return None if limit has been reached.\n\n"
-"Args: int planet, float jd_start, float daystep=0, bool backward=False,"
-" float dayspan=0, int flag=FLG_SWIEPH+FLG_SPEED+FLG_NOGDEFL\n"
-"Return: 2 tuples Julian day, positions (or None if time limit has been reached)";
+/* swisseph._get_nakshatra_name */
+static char pyswe__get_nakshatra_name__doc__[] =
+"Get nakshatra name from nakshatra number [0:26].\n\n"
+"Args: int nakshatra\n"
+"Return: str";
 
-static PyObject * pyswe__next_retro FUNCARGS_KEYWDS
+static PyObject * pyswe__get_nakshatra_name FUNCARGS_KEYWDS
 {
-    int res, plnt, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED+SEFLG_NOGDEFL;
-    double jd, step=0.0, trange=0, jdret, posret[6];
-    char err[256];
-    static char *kwlist[] = {"planet", "jd_start", "daystep", "backward",
-        "dayspan", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "id|didi", kwlist,
-        &plnt, &jd, &step, &backw, &trange, &flag))
+    char ret[15];
+    int nak;
+    static char *kwlist[] = {"nakshatra", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &nak))
         return NULL;
-    res = swh_next_retro(plnt, jd, step, backw, trange, flag,
-        &jdret, posret, err);
-    if (res < 0)
+    if (swh_get_nakshatra_name(nak, ret) == -1)
     {
-        PyErr_SetString(pyswe_Error, err);
+        PyErr_SetString(pyswe_Error, "swisseph._get_nakshatra_name: Invalid nakshatra number");
         return NULL;
     }
-    else if (res > 0) /* time limit reached */
-    {
-        return Py_BuildValue("(O)(OOOOOO)", Py_None, Py_None, Py_None, Py_None,
-        Py_None, Py_None, Py_None);
-    }
-    else
-    {
-        return Py_BuildValue("(f)(ffffff)", jdret, posret[0], posret[1],
-        posret[2], posret[3], posret[4], posret[5]);
-    }
+    return Py_BuildValue("s", ret);
 }
 
 /* swisseph._go_past */
@@ -3258,6 +3171,303 @@ static PyObject * pyswe__go_past FUNCARGS_KEYWDS
     }
     return Py_BuildValue("(f)(ffffff)", jdret, posret[0], posret[1], posret[2],
         posret[3], posret[4], posret[5]);
+}
+
+/* swisseph._house_system_name */
+static char pyswe__house_system_name__doc__[] =
+"Get house system name.\n\n"
+"Args: char hsys\n"
+"Return: str";
+
+static PyObject * pyswe__house_system_name FUNCARGS_KEYWDS
+{
+    int res;
+    char hsys, str[25];
+    static char *kwlist[] = {"hsys", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "c", kwlist, &hsys))
+        return NULL;
+    res = swh_house_system_name(hsys, str);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, "swisseph._house_system_name: invalid house system");
+        return NULL;
+    }
+    return Py_BuildValue("s", str);
+}
+
+/* swisseph._jdnow */
+static char pyswe__jdnow__doc__[] =
+"Get current Julian day number (Gregorian calendar, UTC).\n\n"
+"Args: -\n"
+"Return: float";
+
+static PyObject * pyswe__jdnow FUNCARGS_SELF
+{
+    return Py_BuildValue("f", swh_jdnow());
+}
+
+/* swisseph._julday */
+static char pyswe__julday__doc__[] =
+"Get Julian day number (UTC), without having to calculate hour in decimal.\n\n"
+"Args: int year, int month, int day, int hour=12, int minutes=0, int seconds=0,"
+" int flag=GREG_FLAG\n"
+"Return: float";
+
+static PyObject * pyswe__julday FUNCARGS_KEYWDS
+{
+    int year, mon, day, hour=12, min=0, sec=0, flag=SE_GREG_CAL;
+    static char *kwlist[] = {"year", "month", "day", "hour", "minutes",
+        "seconds", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iii|iiii", kwlist,
+        &year, &mon, &day, &hour, &min, &sec, &flag))
+        return NULL;
+    return Py_BuildValue("f", swh_julday(year, mon, day, hour,
+        min, sec, flag));
+}
+
+/* swisseph._long2nakshatra */
+static char pyswe__long2nakshatra__doc__[] =
+"Get nakshatra and pada from ecliptical longitude.\n\n"
+"Args: float lon\n"
+"Return: 2 int";
+
+static PyObject * pyswe__long2nakshatra FUNCARGS_KEYWDS
+{
+    int ret[2];
+    double lon;
+    static char *kwlist[] = {"lon", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &lon))
+        return NULL;
+    swh_long2nakshatra(lon, ret);
+    return Py_BuildValue("ii", ret[0], ret[1]);
+}
+
+/* swisseph._long2navamsa */
+static char pyswe__long2navamsa__doc__[] =
+"Get navamsa from ecliptical longitude.\n\n"
+"Args: float lon\n"
+"Return: int";
+
+static PyObject * pyswe__long2navamsa FUNCARGS_KEYWDS
+{
+    double lon;
+    static char *kwlist[] = {"lon", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &lon))
+        return NULL;
+    return Py_BuildValue("i", swh_long2navamsa(lon));
+}
+
+/* swisseph._long2rasi */
+static char pyswe__long2rasi__doc__[] =
+"Get rasi number from ecliptical longitude.\n\n"
+"Args: float lon\n"
+"Return: int";
+
+static PyObject * pyswe__long2rasi FUNCARGS_KEYWDS
+{
+    double lon;
+    static char *kwlist[] = {"lon", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &lon))
+        return NULL;
+    return Py_BuildValue("i", swh_long2rasi(lon));
+}
+
+/* swisseph._lord */
+static char pyswe__lord__doc__[] =
+"Get sign lord.\n\n"
+"Args: int sign [0:11]\n"
+"Return: int planet number";
+
+static PyObject * pyswe__lord FUNCARGS_KEYWDS
+{
+    int sign, i;
+    static char *kwlist[] = {"sign", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &sign))
+        return NULL;
+    i = swh_lord(sign);
+    if (i == -1)
+    {
+        PyErr_SetString(pyswe_Error, "swisseph._lord: Invalid sign number");
+        return NULL;
+    }
+    return Py_BuildValue("i", i);
+}
+
+/* swisseph._match_aspect */
+static char pyswe__match_aspect__doc__[] =
+"Check if the two given positions match the aspect within the given orb.\n\n"
+"If so return a tuple with difference, a value for application (True),"
+" separation (False) or equal speeds (None), and an aspect strength factor;"
+" else return three None.\n"
+"Aspect in range [0;360[.\n\n"
+"Args: float pos1, float speed1, float pos2, float speed2, float aspect,"
+" float orb\nReturn: tuple (difference, application, factor)";
+
+static PyObject * pyswe__match_aspect FUNCARGS_KEYWDS
+{
+    int applic;
+    double res, pos0, pos1, sp0, sp1, asp, orb, ret, ftor;
+    static char *kwlist[] = {"pos1", "speed1", "pos2", "speed2", "aspect",
+        "orb", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddd", kwlist,
+        &pos0, &sp0, &pos1, &sp1, &asp, &orb))
+        return NULL;
+    res = swh_match_aspect(pos0, sp0, pos1, sp1, asp, orb, &ret, &applic, &ftor);
+    if (res < 0)
+        return Py_BuildValue("(OOO)", Py_None, Py_None, Py_None);
+    else if (applic == 1)
+        return Py_BuildValue("(fOf)", ret, Py_False, ftor);
+    else if (applic == -1)
+        return Py_BuildValue("(fOf)", ret, Py_True, ftor);
+    else
+        return Py_BuildValue("(fOf)", ret, Py_None, ftor);
+}
+
+/* swisseph._match_aspect2 */
+static char pyswe__match_aspect2__doc__[] =
+"Same as _match_aspect, but with aspect in range [0;180].\n\n"
+"Args: float pos1, float speed1, float pos2, float speed2, float aspect, float orb\n"
+"Return: tuple (difference, application, factor)";
+
+static PyObject * pyswe__match_aspect2 FUNCARGS_KEYWDS
+{
+    int applic;
+    double res, pos0, pos1, sp0, sp1, asp, orb, ret, ftor;
+    static char *kwlist[] = {"pos1", "speed1", "pos2", "speed2", "aspect",
+        "orb", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddd", kwlist,
+        &pos0, &sp0, &pos1, &sp1, &asp, &orb))
+        return NULL;
+    res = swh_match_aspect2(pos0, sp0, pos1, sp1, asp, orb, &ret, &applic, &ftor);
+    if (res < 0)
+        return Py_BuildValue("(OOO)", Py_None, Py_None, Py_None);
+    else if (applic == 1)
+        return Py_BuildValue("(fOf)", ret, Py_False, ftor);
+    else if (applic == -1)
+        return Py_BuildValue("(fOf)", ret, Py_True, ftor);
+    else
+        return Py_BuildValue("(fOf)", ret, Py_None, ftor);
+}
+
+/* swisseph._match_aspect3 */
+static char pyswe__match_aspect3__doc__[] =
+"Same as _match_aspect, but with specific orbs for applying/separating/stable aspects.\n\n"
+"Args: float pos1, float speed1, float pos2, float speed2, float aspect, "
+"float app_orb, float sep_orb, float sta_orb\n"
+"Return: tuple (delta, applying, factor)";
+
+static PyObject * pyswe__match_aspect3 FUNCARGS_KEYWDS
+{
+    int applic;
+    double res, pos0, pos1, sp0, sp1, asp, app_orb, sep_orb, sta_orb, ret, ftor;
+    static char *kwlist[] = {"pos1", "speed1", "pos2", "speed2", "aspect",
+        "app_orb", "sep_orb", "sta_orb", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddddd", kwlist,
+        &pos0, &sp0, &pos1, &sp1, &asp, &app_orb, &sep_orb, &sta_orb))
+        return NULL;
+    res = swh_match_aspect3(pos0, sp0, pos1, sp1, asp, app_orb, sep_orb, sta_orb,
+        &ret, &applic, &ftor);
+    if (res < 0)
+        return Py_BuildValue("(OOO)", Py_None, Py_None, Py_None);
+    else if (applic == 1)
+        return Py_BuildValue("(fOf)", ret, Py_False, ftor);
+    else if (applic == -1)
+        return Py_BuildValue("(fOf)", ret, Py_True, ftor);
+    else
+        return Py_BuildValue("(fOf)", ret, Py_None, ftor);
+}
+
+/* swisseph._match_aspect4 */
+static char pyswe__match_aspect4__doc__[] =
+"Same as _match_aspect2, but with specific orbs for applying/separating/stable aspects.\n\n"
+"Args: float pos1, float speed1, float pos2, float speed2, float aspect, "
+"float app_orb, float sep_orb, float sta_orb\n"
+"Return: tuple (delta, applying, factor)";
+
+static PyObject * pyswe__match_aspect4 FUNCARGS_KEYWDS
+{
+    int applic;
+    double res, pos0, pos1, sp0, sp1, asp, app_orb, sep_orb, sta_orb, ret, ftor;
+    static char *kwlist[] = {"pos1", "speed1", "pos2", "speed2", "aspect",
+        "app_orb", "sep_orb", "sta_orb", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddddd", kwlist,
+        &pos0, &sp0, &pos1, &sp1, &asp, &app_orb, &sep_orb, &sta_orb))
+        return NULL;
+    res = swh_match_aspect4(pos0, sp0, pos1, sp1, asp, app_orb, sep_orb, sta_orb,
+        &ret, &applic, &ftor);
+    if (res < 0)
+        return Py_BuildValue("(OOO)", Py_None, Py_None, Py_None);
+    else if (applic == 1)
+        return Py_BuildValue("(fOf)", ret, Py_False, ftor);
+    else if (applic == -1)
+        return Py_BuildValue("(fOf)", ret, Py_True, ftor);
+    else
+        return Py_BuildValue("(fOf)", ret, Py_None, ftor);
+}
+
+/* swisseph._max_retro_time */
+static char pyswe__max_retro_time__doc__[] =
+"Get approximate maximum retrogradation time of a planet, in days.\n\n"
+"Args: int planet\n"
+"Return: int";
+
+static PyObject * pyswe__max_retro_time FUNCARGS_KEYWDS
+{
+    int plnt, res;
+    char err[64];
+    static char *kwlist[] = {"planet", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &plnt))
+        return NULL;
+    res = swh_max_retro_time(plnt, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("i", res);
+}
+
+/* swisseph._min_retro_time */
+static char pyswe__min_retro_time__doc__[] =
+"Get approximate minimum retrogradation time of a planet, in days.\n\n"
+"Args: int planet\n"
+"Return: int";
+
+static PyObject * pyswe__min_retro_time FUNCARGS_KEYWDS
+{
+    int plnt, res;
+    char err[64];
+    static char *kwlist[] = {"planet", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &plnt))
+        return NULL;
+    res = swh_min_retro_time(plnt, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("i", res);
+}
+
+/* swisseph._naisargika_relation */
+static char pyswe__naisargika_relation__doc__[] =
+"Get the naisargika relation between two planets.\n\n"
+"Args: int gr1, int gr2\n"
+"Return: int 1 (Mitra) 0 (Sama) or -1 (Satru)";
+
+static PyObject * pyswe__naisargika_relation FUNCARGS_KEYWDS
+{
+    int gr1, gr2, i, ret;
+    static char *kwlist[] = {"gr1", "gr2", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ii", kwlist, &gr1, &gr2))
+        return NULL;
+    i = swh_naisargika_relation(gr1, gr2, &ret);
+    if (i == -1)
+    {
+        PyErr_SetString(pyswe_Error, "swisseph._naisargika_relation: Invalid planet");
+        return NULL;
+    }
+    return Py_BuildValue("i", ret);
 }
 
 /* swisseph._next_aspect */
@@ -3336,145 +3546,6 @@ static PyObject * pyswe__next_aspect2 FUNCARGS_KEYWDS
     {
         return Py_BuildValue("(f)(ffffff)", jdret, posret[0], posret[1],
         posret[2], posret[3], posret[4], posret[5]);
-    }
-}
-
-/* swisseph._next_aspect_with */
-static char pyswe__next_aspect_with__doc__[] =
-"Get Julian day number and positions when celestial object makes longitudinal"
-" aspect to another moving object.\n\n"
-"Aspect in the range [0;360[.\n"
-"Other object can be a fixed star.\n"
-"If dayspan != 0, can return None if limit has been reached.\n\n"
-"Args: int planet, float aspect, int or str other, float jd_start,"
-" float daystep=10, bool backward=False, float dayspan=0, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: 3 tuples Julian day, planet positions, other positions (or None if limit has been reached)";
-
-static PyObject * pyswe__next_aspect_with FUNCARGS_KEYWDS
-{
-    int res, plnt, other, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
-    double asp, jd, step=10, trange=0, jdret, posret0[6], posret1[6];
-    char err[256], *star="";
-    PyObject *body;
-    static char *kwlist[] = {"planet", "aspect", "other", "jd_start",
-        "daystep", "backward", "dayspan", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "idOd|didi", kwlist,
-        &plnt, &asp, &body, &jd, &step, &backw, &trange, &flag))
-        return NULL;
-    if (PyLong_CheckExact(body)) /* long -> planet */
-    {
-        other = (int) PyLong_AsLong(body);
-    }
-#if PY_MAJOR_VERSION >= 3
-    else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
-    {
-        other = 0;
-        star = (char*) PyUnicode_AS_DATA(body);
-    }
-#elif PY_MAJOR_VERSION < 3
-    else if (PyInt_CheckExact(body)) /* int -> planet */
-    {
-        other = (int) PyInt_AsLong(body);
-    }
-    else if (PyString_CheckExact(body)) /* str -> fixed star */
-    {
-        other = 0;
-        star = PyString_AsString(body);
-    }
-#endif
-    else
-    {
-        PyErr_SetString(pyswe_Error,
-            "swisseph._next_aspect_with: Invalid body type");
-        return NULL;
-    }
-    res = swh_next_aspect_with(plnt, asp, other, star, jd, step, backw, trange,
-        flag, &jdret, posret0, posret1, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    else if (res > 0) /* time limit reached */
-    {
-        return Py_BuildValue("(O)(OOOOOO)(OOOOOO)", Py_None, Py_None, Py_None,
-        Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None,
-        Py_None, Py_None);
-    }
-    else
-    {
-        return Py_BuildValue("(f)(ffffff)(ffffff)", jdret, posret0[0],
-        posret0[1], posret0[2], posret0[3], posret0[4], posret0[5], posret1[0],
-        posret1[1], posret1[2], posret1[3], posret1[4], posret1[5]);
-    }
-}
-
-/* swisseph._next_aspect_with2 */
-static char pyswe__next_aspect_with2__doc__[] =
-"Same as _next_aspect_with, but aspect in range [0;180].\n\n"
-"If aspect is not 0 or 180, it will try the two aspects in [0;360[, and return"
-" the nearest from jd_start. It may then be faster to use _next_aspect_with"
-" several times, especially when scanning long periods of time.\n\n"
-"Args: int planet, float aspect, int or str other, float jd_start,"
-" float daystep=10, bool backward=False, float dayspan=0, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: 3 tuples Julian day, planet positions, other positions (or None if limit has been reached)";
-
-static PyObject * pyswe__next_aspect_with2 FUNCARGS_KEYWDS
-{
-    int res, plnt, other, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
-    double asp, jd, step=10, trange=0, jdret, posret0[6], posret1[6];
-    char err[256], *star="";
-    PyObject *body;
-    static char *kwlist[] = {"planet", "aspect", "other", "jd_start",
-        "daystep", "backward", "dayspan", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "idOd|didi", kwlist,
-        &plnt, &asp, &body, &jd, &step, &backw, &trange, &flag))
-        return NULL;
-    if (PyLong_CheckExact(body)) /* long -> planet */
-    {
-        other = (int) PyLong_AsLong(body);
-    }
-#if PY_MAJOR_VERSION >= 3
-    else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
-    {
-        other = 0;
-        star = (char*) PyUnicode_AS_DATA(body);
-    }
-#elif PY_MAJOR_VERSION < 3
-    else if (PyInt_CheckExact(body)) /* int -> planet */
-    {
-        other = (int) PyInt_AsLong(body);
-    }
-    else if (PyString_CheckExact(body)) /* str -> fixed star */
-    {
-        other = 0;
-        star = PyString_AsString(body);
-    }
-#endif
-    else
-    {
-        PyErr_SetString(pyswe_Error,
-            "swisseph._next_aspect_with2: Invalid body type");
-        return NULL;
-    }
-    res = swh_next_aspect_with2(plnt, asp, other, star, jd, step, backw, trange,
-        flag, &jdret, posret0, posret1, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    else if (res > 0) /* time limit reached */
-    {
-        return Py_BuildValue("(O)(OOOOOO)(OOOOOO)", Py_None, Py_None, Py_None,
-        Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None,
-        Py_None, Py_None);
-    }
-    else
-    {
-        return Py_BuildValue("(f)(ffffff)(ffffff)", jdret, posret0[0],
-        posret0[1], posret0[2], posret0[3], posret0[4], posret0[5], posret1[0],
-        posret1[1], posret1[2], posret1[3], posret1[4], posret1[5]);
     }
 }
 
@@ -3640,210 +3711,205 @@ static PyObject * pyswe__next_aspect_cusp2 FUNCARGS_KEYWDS
     }
 }
 
-/* swisseph._match_aspect */
-static char pyswe__match_aspect__doc__[] =
-"Check if the two given positions match the aspect within the given orb.\n\n"
-"If so return a tuple with difference, a value for application (True),"
-" separation (False) or equal speeds (None), and an aspect strength factor;"
-" else return three None.\n"
-"Aspect in range [0;360[.\n\n"
-"Args: float pos1, float speed1, float pos2, float speed2, float aspect,"
-" float orb\nReturn: tuple (difference, application, factor)";
+/* swisseph._next_aspect_with */
+static char pyswe__next_aspect_with__doc__[] =
+"Get Julian day number and positions when celestial object makes longitudinal"
+" aspect to another moving object.\n\n"
+"Aspect in the range [0;360[.\n"
+"Other object can be a fixed star.\n"
+"If dayspan != 0, can return None if limit has been reached.\n\n"
+"Args: int planet, float aspect, int or str other, float jd_start,"
+" float daystep=10, bool backward=False, float dayspan=0, int flag=FLG_SWIEPH+FLG_SPEED\n"
+"Return: 3 tuples Julian day, planet positions, other positions (or None if limit has been reached)";
 
-static PyObject * pyswe__match_aspect FUNCARGS_KEYWDS
+static PyObject * pyswe__next_aspect_with FUNCARGS_KEYWDS
 {
-    int applic;
-    double res, pos0, pos1, sp0, sp1, asp, orb, ret, ftor;
-    static char *kwlist[] = {"pos1", "speed1", "pos2", "speed2", "aspect",
-        "orb", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddd", kwlist,
-        &pos0, &sp0, &pos1, &sp1, &asp, &orb))
+    int res, plnt, other, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
+    double asp, jd, step=10, trange=0, jdret, posret0[6], posret1[6];
+    char err[256], *star="";
+    PyObject *body;
+    static char *kwlist[] = {"planet", "aspect", "other", "jd_start",
+        "daystep", "backward", "dayspan", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "idOd|didi", kwlist,
+        &plnt, &asp, &body, &jd, &step, &backw, &trange, &flag))
         return NULL;
-    res = swh_match_aspect(pos0, sp0, pos1, sp1, asp, orb, &ret, &applic, &ftor);
-    if (res < 0)
-        return Py_BuildValue("(OOO)", Py_None, Py_None, Py_None);
-    else if (applic == 1)
-        return Py_BuildValue("(fOf)", ret, Py_False, ftor);
-    else if (applic == -1)
-        return Py_BuildValue("(fOf)", ret, Py_True, ftor);
+    if (PyLong_CheckExact(body)) /* long -> planet */
+    {
+        other = (int) PyLong_AsLong(body);
+    }
+#if PY_MAJOR_VERSION >= 3
+    else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
+    {
+        other = 0;
+        star = (char*) PyUnicode_AS_DATA(body);
+    }
+#elif PY_MAJOR_VERSION < 3
+    else if (PyInt_CheckExact(body)) /* int -> planet */
+    {
+        other = (int) PyInt_AsLong(body);
+    }
+    else if (PyString_CheckExact(body)) /* str -> fixed star */
+    {
+        other = 0;
+        star = PyString_AsString(body);
+    }
+#endif
     else
-        return Py_BuildValue("(fOf)", ret, Py_None, ftor);
-}
-
-/* swisseph._match_aspect2 */
-static char pyswe__match_aspect2__doc__[] =
-"Same as _match_aspect, but with aspect in range [0;180].\n\n"
-"Args: float pos1, float speed1, float pos2, float speed2, float aspect, float orb\n"
-"Return: tuple (difference, application, factor)";
-
-static PyObject * pyswe__match_aspect2 FUNCARGS_KEYWDS
-{
-    int applic;
-    double res, pos0, pos1, sp0, sp1, asp, orb, ret, ftor;
-    static char *kwlist[] = {"pos1", "speed1", "pos2", "speed2", "aspect",
-        "orb", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddd", kwlist,
-        &pos0, &sp0, &pos1, &sp1, &asp, &orb))
+    {
+        PyErr_SetString(pyswe_Error,
+            "swisseph._next_aspect_with: Invalid body type");
         return NULL;
-    res = swh_match_aspect2(pos0, sp0, pos1, sp1, asp, orb, &ret, &applic, &ftor);
-    if (res < 0)
-        return Py_BuildValue("(OOO)", Py_None, Py_None, Py_None);
-    else if (applic == 1)
-        return Py_BuildValue("(fOf)", ret, Py_False, ftor);
-    else if (applic == -1)
-        return Py_BuildValue("(fOf)", ret, Py_True, ftor);
-    else
-        return Py_BuildValue("(fOf)", ret, Py_None, ftor);
-}
-
-/* swisseph._match_aspect3 */
-static char pyswe__match_aspect3__doc__[] =
-"Same as _match_aspect, but with specific orbs for applying/separating/stable aspects.\n\n"
-"Args: float pos1, float speed1, float pos2, float speed2, float aspect, "
-"float app_orb, float sep_orb, float sta_orb\n"
-"Return: tuple (delta, applying, factor)";
-
-static PyObject * pyswe__match_aspect3 FUNCARGS_KEYWDS
-{
-    int applic;
-    double res, pos0, pos1, sp0, sp1, asp, app_orb, sep_orb, sta_orb, ret, ftor;
-    static char *kwlist[] = {"pos1", "speed1", "pos2", "speed2", "aspect",
-        "app_orb", "sep_orb", "sta_orb", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddddd", kwlist,
-        &pos0, &sp0, &pos1, &sp1, &asp, &app_orb, &sep_orb, &sta_orb))
-        return NULL;
-    res = swh_match_aspect3(pos0, sp0, pos1, sp1, asp, app_orb, sep_orb, sta_orb,
-        &ret, &applic, &ftor);
-    if (res < 0)
-        return Py_BuildValue("(OOO)", Py_None, Py_None, Py_None);
-    else if (applic == 1)
-        return Py_BuildValue("(fOf)", ret, Py_False, ftor);
-    else if (applic == -1)
-        return Py_BuildValue("(fOf)", ret, Py_True, ftor);
-    else
-        return Py_BuildValue("(fOf)", ret, Py_None, ftor);
-}
-
-/* swisseph._match_aspect4 */
-static char pyswe__match_aspect4__doc__[] =
-"Same as _match_aspect2, but with specific orbs for applying/separating/stable aspects.\n\n"
-"Args: float pos1, float speed1, float pos2, float speed2, float aspect, "
-"float app_orb, float sep_orb, float sta_orb\n"
-"Return: tuple (delta, applying, factor)";
-
-static PyObject * pyswe__match_aspect4 FUNCARGS_KEYWDS
-{
-    int applic;
-    double res, pos0, pos1, sp0, sp1, asp, app_orb, sep_orb, sta_orb, ret, ftor;
-    static char *kwlist[] = {"pos1", "speed1", "pos2", "speed2", "aspect",
-        "app_orb", "sep_orb", "sta_orb", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddddd", kwlist,
-        &pos0, &sp0, &pos1, &sp1, &asp, &app_orb, &sep_orb, &sta_orb))
-        return NULL;
-    res = swh_match_aspect4(pos0, sp0, pos1, sp1, asp, app_orb, sep_orb, sta_orb,
-        &ret, &applic, &ftor);
-    if (res < 0)
-        return Py_BuildValue("(OOO)", Py_None, Py_None, Py_None);
-    else if (applic == 1)
-        return Py_BuildValue("(fOf)", ret, Py_False, ftor);
-    else if (applic == -1)
-        return Py_BuildValue("(fOf)", ret, Py_True, ftor);
-    else
-        return Py_BuildValue("(fOf)", ret, Py_None, ftor);
-}
-
-/* swisseph._years_diff */
-static char pyswe__years_diff__doc__[] =
-"Get number of 'astrological' years between two Julian days.\n\n"
-"Args: float jd1, float jd2, int flag=FLG_SWIEPH\n"
-"Return: float";
-
-static PyObject * pyswe__years_diff FUNCARGS_KEYWDS
-{
-    double jd1, jd2, years;
-    int flag = SEFLG_SWIEPH, res;
-    char err[256];
-    static char *kwlist[] = {"jd1", "jd2", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|i", kwlist,
-        &jd1, &jd2, &flag))
-        return NULL;
-    res = swh_years_diff(jd1, jd2, flag, &years, err);
+    }
+    res = swh_next_aspect_with(plnt, asp, other, star, jd, step, backw, trange,
+        flag, &jdret, posret0, posret1, err);
     if (res < 0)
     {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("f", years);
+    else if (res > 0) /* time limit reached */
+    {
+        return Py_BuildValue("(O)(OOOOOO)(OOOOOO)", Py_None, Py_None, Py_None,
+        Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None,
+        Py_None, Py_None);
+    }
+    else
+    {
+        return Py_BuildValue("(f)(ffffff)(ffffff)", jdret, posret0[0],
+        posret0[1], posret0[2], posret0[3], posret0[4], posret0[5], posret1[0],
+        posret1[1], posret1[2], posret1[3], posret1[4], posret1[5]);
+    }
 }
 
-/* swisseph._geoc2d */
-static char pyswe__geoc2d__doc__[] =
-"Get float from given string meant as a geographical coordinates, examples:"
-" \"022:W:25\", \"46:N:02:0\", \"6:E:55:00\".\n\n"
-"Args: str coord\n"
-"Return: float";
+/* swisseph._next_aspect_with2 */
+static char pyswe__next_aspect_with2__doc__[] =
+"Same as _next_aspect_with, but aspect in range [0;180].\n\n"
+"If aspect is not 0 or 180, it will try the two aspects in [0;360[, and return"
+" the nearest from jd_start. It may then be faster to use _next_aspect_with"
+" several times, especially when scanning long periods of time.\n\n"
+"Args: int planet, float aspect, int or str other, float jd_start,"
+" float daystep=10, bool backward=False, float dayspan=0, int flag=FLG_SWIEPH+FLG_SPEED\n"
+"Return: 3 tuples Julian day, planet positions, other positions (or None if limit has been reached)";
 
-static PyObject * pyswe__geoc2d FUNCARGS_KEYWDS
+static PyObject * pyswe__next_aspect_with2 FUNCARGS_KEYWDS
 {
-    int res;
-    double ret;
-    char *coord;
-    static char *kwlist[] = {"coord", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &coord))
+    int res, plnt, other, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
+    double asp, jd, step=10, trange=0, jdret, posret0[6], posret1[6];
+    char err[256], *star="";
+    PyObject *body;
+    static char *kwlist[] = {"planet", "aspect", "other", "jd_start",
+        "daystep", "backward", "dayspan", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "idOd|didi", kwlist,
+        &plnt, &asp, &body, &jd, &step, &backw, &trange, &flag))
         return NULL;
-    res = swh_geoc2d(coord, &ret);
-    if (res == -1)
+    if (PyLong_CheckExact(body)) /* long -> planet */
     {
-        PyErr_SetString(pyswe_Error, "swisseph._geoc2d: Invalid coord string");
+        other = (int) PyLong_AsLong(body);
+    }
+#if PY_MAJOR_VERSION >= 3
+    else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
+    {
+        other = 0;
+        star = (char*) PyUnicode_AS_DATA(body);
+    }
+#elif PY_MAJOR_VERSION < 3
+    else if (PyInt_CheckExact(body)) /* int -> planet */
+    {
+        other = (int) PyInt_AsLong(body);
+    }
+    else if (PyString_CheckExact(body)) /* str -> fixed star */
+    {
+        other = 0;
+        star = PyString_AsString(body);
+    }
+#endif
+    else
+    {
+        PyErr_SetString(pyswe_Error,
+            "swisseph._next_aspect_with2: Invalid body type");
         return NULL;
     }
-    return Py_BuildValue("f", ret);
+    res = swh_next_aspect_with2(plnt, asp, other, star, jd, step, backw, trange,
+        flag, &jdret, posret0, posret1, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    else if (res > 0) /* time limit reached */
+    {
+        return Py_BuildValue("(O)(OOOOOO)(OOOOOO)", Py_None, Py_None, Py_None,
+        Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None,
+        Py_None, Py_None);
+    }
+    else
+    {
+        return Py_BuildValue("(f)(ffffff)(ffffff)", jdret, posret0[0],
+        posret0[1], posret0[2], posret0[3], posret0[4], posret0[5], posret1[0],
+        posret1[1], posret1[2], posret1[3], posret1[4], posret1[5]);
+    }
 }
 
-/* swisseph._geolat2c */
-static char pyswe__geolat2c__doc__[] =
-"Get formated string of given geographical latitude.\n\n"
-"Args: float lat\n"
-"Return: str";
+/* swisseph._next_retro */
+static char pyswe__next_retro__doc__[] =
+"Find next direction changing of object.\n\n"
+"If daystep=0, use predefined step.\n"
+"Flag should include FLG_SPEED, and FLG_NOGDEFL to avoid bad surprises;"
+" alternatively use true positions.\n"
+"If dayspan != 0, can return None if limit has been reached.\n\n"
+"Args: int planet, float jd_start, float daystep=0, bool backward=False,"
+" float dayspan=0, int flag=FLG_SWIEPH+FLG_SPEED+FLG_NOGDEFL\n"
+"Return: 2 tuples Julian day, positions (or None if time limit has been reached)";
 
-static PyObject * pyswe__geolat2c FUNCARGS_KEYWDS
+static PyObject * pyswe__next_retro FUNCARGS_KEYWDS
 {
-    int res;
-    double lat;
-    char ret[11];
-    static char *kwlist[] = {"lat", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &lat))
+    int res, plnt, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED+SEFLG_NOGDEFL;
+    double jd, step=0.0, trange=0, jdret, posret[6];
+    char err[256];
+    static char *kwlist[] = {"planet", "jd_start", "daystep", "backward",
+        "dayspan", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "id|didi", kwlist,
+        &plnt, &jd, &step, &backw, &trange, &flag))
         return NULL;
-    res = swh_geolat2c(lat, ret);
-    if (res == -1)
+    res = swh_next_retro(plnt, jd, step, backw, trange, flag,
+        &jdret, posret, err);
+    if (res < 0)
     {
-        PyErr_SetString(pyswe_Error, "swisseph._geolat2c: Invalid latitude");
+        PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("s", ret);
+    else if (res > 0) /* time limit reached */
+    {
+        return Py_BuildValue("(O)(OOOOOO)", Py_None, Py_None, Py_None, Py_None,
+        Py_None, Py_None, Py_None);
+    }
+    else
+    {
+        return Py_BuildValue("(f)(ffffff)", jdret, posret[0], posret[1],
+        posret[2], posret[3], posret[4], posret[5]);
+    }
 }
 
-/* swisseph._geolon2c */
-static char pyswe__geolon2c__doc__[] =
-"Get formated string of given geographical longitude.\n\n"
-"Args: float lon\n"
-"Return: str";
+/* swisseph._ochchabala */
+static char pyswe__ochchabala__doc__[] =
+"Get the ochchabala for a planet.\n\n"
+"Args: int pl, float longitude\n"
+"Return: float shashtiamsa";
 
-static PyObject * pyswe__geolon2c FUNCARGS_KEYWDS
+static PyObject * pyswe__ochchabala FUNCARGS_KEYWDS
 {
-    int res;
-    double lon;
-    char ret[12];
-    static char *kwlist[] = {"lon", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &lon))
+    int ipl;
+    double lon, d;
+    static char *kwlist[] = {"pl", "longitude", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "id", kwlist, &ipl, &lon))
         return NULL;
-    res = swh_geolon2c(lon, ret);
-    if (res == -1)
+    d = swh_ochchabala(ipl, lon);
+    if (d == -1)
     {
-        PyErr_SetString(pyswe_Error, "swisseph._geolon2c: Invalid longitude");
+        PyErr_SetString(pyswe_Error, "swisseph._ochchabala: Invalid planet");
         return NULL;
     }
-    return Py_BuildValue("s", ret);
+    return Py_BuildValue("f", d);
 }
 
 /* swisseph._raman_houses */
@@ -3862,110 +3928,6 @@ static PyObject * pyswe__raman_houses FUNCARGS_KEYWDS
     swh_raman_houses(asc, mc, ret, sdi);
     return Py_BuildValue("ffffffffffff", ret[0],ret[1],ret[2],ret[3],ret[4],
         ret[5],ret[6],ret[7],ret[8],ret[9],ret[10],ret[11]);
-}
-
-/* swisseph._lord */
-static char pyswe__lord__doc__[] =
-"Get sign lord.\n\n"
-"Args: int sign [0:11]\n"
-"Return: int planet number";
-
-static PyObject * pyswe__lord FUNCARGS_KEYWDS
-{
-    int sign, i;
-    static char *kwlist[] = {"sign", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &sign))
-        return NULL;
-    i = swh_lord(sign);
-    if (i == -1)
-    {
-        PyErr_SetString(pyswe_Error, "swisseph._lord: Invalid sign number");
-        return NULL;
-    }
-    return Py_BuildValue("i", i);
-}
-
-/* swisseph._long2rasi */
-static char pyswe__long2rasi__doc__[] =
-"Get rasi number from ecliptical longitude.\n\n"
-"Args: float lon\n"
-"Return: int";
-
-static PyObject * pyswe__long2rasi FUNCARGS_KEYWDS
-{
-    double lon;
-    static char *kwlist[] = {"lon", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &lon))
-        return NULL;
-    return Py_BuildValue("i", swh_long2rasi(lon));
-}
-
-/* swisseph._long2navamsa */
-static char pyswe__long2navamsa__doc__[] =
-"Get navamsa from ecliptical longitude.\n\n"
-"Args: float lon\n"
-"Return: int";
-
-static PyObject * pyswe__long2navamsa FUNCARGS_KEYWDS
-{
-    double lon;
-    static char *kwlist[] = {"lon", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &lon))
-        return NULL;
-    return Py_BuildValue("i", swh_long2navamsa(lon));
-}
-
-/* swisseph._long2nakshatra */
-static char pyswe__long2nakshatra__doc__[] =
-"Get nakshatra and pada from ecliptical longitude.\n\n"
-"Args: float lon\n"
-"Return: 2 int";
-
-static PyObject * pyswe__long2nakshatra FUNCARGS_KEYWDS
-{
-    int ret[2];
-    double lon;
-    static char *kwlist[] = {"lon", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &lon))
-        return NULL;
-    swh_long2nakshatra(lon, ret);
-    return Py_BuildValue("ii", ret[0], ret[1]);
-}
-
-/* swisseph._get_nakshatra_name */
-static char pyswe__get_nakshatra_name__doc__[] =
-"Get nakshatra name from nakshatra number [0:26].\n\n"
-"Args: int nakshatra\n"
-"Return: str";
-
-static PyObject * pyswe__get_nakshatra_name FUNCARGS_KEYWDS
-{
-    char ret[15];
-    int nak;
-    static char *kwlist[] = {"nakshatra", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &nak))
-        return NULL;
-    if (swh_get_nakshatra_name(nak, ret) == -1)
-    {
-        PyErr_SetString(pyswe_Error, "swisseph._get_nakshatra_name: Invalid nakshatra number");
-        return NULL;
-    }
-    return Py_BuildValue("s", ret);
-}
-
-/* swisseph._rasinorm */
-static char pyswe__rasinorm__doc__[] =
-"Get a normalized rasi number between 0 and 11.\n\n"
-"Args: int rasi\n"
-"Return: int";
-
-static PyObject * pyswe__rasinorm FUNCARGS_KEYWDS
-{
-    int rasi;
-    static char *kwlist[] = {"rasi", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &rasi))
-        return NULL;
-    return Py_BuildValue("i", swh_rasinorm(rasi));
 }
 
 /* swisseph._rasi_dif */
@@ -3998,40 +3960,19 @@ static PyObject * pyswe__rasi_dif2 FUNCARGS_KEYWDS
     return Py_BuildValue("i", swh_rasi_dif2(r1, r2));
 }
 
-/* swisseph._tatkalika_relation */
-static char pyswe__tatkalika_relation__doc__[] =
-"Get the tatkalika relation between two planets, given their rasi numbers.\n\n"
-"Args: int r1, int r2\n"
-"Return: int 1 (Mitra) or -1 (Satru)";
+/* swisseph._rasinorm */
+static char pyswe__rasinorm__doc__[] =
+"Get a normalized rasi number between 0 and 11.\n\n"
+"Args: int rasi\n"
+"Return: int";
 
-static PyObject * pyswe__tatkalika_relation FUNCARGS_KEYWDS
+static PyObject * pyswe__rasinorm FUNCARGS_KEYWDS
 {
-    int r1, r2;
-    static char *kwlist[] = {"r1", "r2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ii", kwlist, &r1, &r2))
+    int rasi;
+    static char *kwlist[] = {"rasi", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &rasi))
         return NULL;
-    return Py_BuildValue("i", swh_tatkalika_relation(r1, r2));
-}
-
-/* swisseph._naisargika_relation */
-static char pyswe__naisargika_relation__doc__[] =
-"Get the naisargika relation between two planets.\n\n"
-"Args: int gr1, int gr2\n"
-"Return: int 1 (Mitra) 0 (Sama) or -1 (Satru)";
-
-static PyObject * pyswe__naisargika_relation FUNCARGS_KEYWDS
-{
-    int gr1, gr2, i, ret;
-    static char *kwlist[] = {"gr1", "gr2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ii", kwlist, &gr1, &gr2))
-        return NULL;
-    i = swh_naisargika_relation(gr1, gr2, &ret);
-    if (i == -1)
-    {
-        PyErr_SetString(pyswe_Error, "swisseph._naisargika_relation: Invalid planet");
-        return NULL;
-    }
-    return Py_BuildValue("i", ret);
+    return Py_BuildValue("i", swh_rasinorm(rasi));
 }
 
 /* swisseph._residential_strength */
@@ -4086,26 +4027,22 @@ static PyObject * pyswe__residential_strength FUNCARGS_KEYWDS
     return Py_BuildValue("f", ret);
 }
 
-/* swisseph._ochchabala */
-static char pyswe__ochchabala__doc__[] =
-"Get the ochchabala for a planet.\n\n"
-"Args: int pl, float longitude\n"
-"Return: float shashtiamsa";
+/* swisseph._revjul */
+static char pyswe__revjul__doc__[] =
+"Reverse Julian day to date & time (UTC).\n\n"
+"Args: double julday, int flag=GREG_CAL\n"
+"Return: tuple of 6 int";
 
-static PyObject * pyswe__ochchabala FUNCARGS_KEYWDS
+static PyObject * pyswe__revjul FUNCARGS_KEYWDS
 {
-    int ipl;
-    double lon, d;
-    static char *kwlist[] = {"pl", "longitude", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "id", kwlist, &ipl, &lon))
+    int dt[6], flag=SE_GREG_CAL;
+    double jd;
+    static char *kwlist[] = {"julday", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist,
+        &jd, &flag))
         return NULL;
-    d = swh_ochchabala(ipl, lon);
-    if (d == -1)
-    {
-        PyErr_SetString(pyswe_Error, "swisseph._ochchabala: Invalid planet");
-        return NULL;
-    }
-    return Py_BuildValue("f", d);
+    swh_revjul(jd, flag, dt);
+    return Py_BuildValue("(iiiiii)", dt[0], dt[1], dt[2], dt[3], dt[4], dt[5]);
 }
 
 /* swisseph._saturn_4_stars */
@@ -4131,6 +4068,67 @@ static PyObject * pyswe__saturn_4_stars FUNCARGS_KEYWDS
     return Py_BuildValue("(ffffff)", ret[0],ret[1],ret[2],ret[3],ret[4],ret[5]);
 }
 
+/* swisseph._signtostr */
+static char pyswe__signtostr__doc__[] =
+"Get a 3-letters string representing the sign number [0;11].\n\n"
+"Args: int sign\n"
+"Return: str";
+
+static PyObject * pyswe__signtostr FUNCARGS_KEYWDS
+{
+    int res, sign;
+    char str[4];
+    static char *kwlist[] = {"sign", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &sign))
+        return NULL;
+    res = swh_signtostr(sign, str);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, "swisseph._signtostr: invalid sign number");
+        return NULL;
+    }
+    return Py_BuildValue("s", str);
+}
+
+/* swisseph._tatkalika_relation */
+static char pyswe__tatkalika_relation__doc__[] =
+"Get the tatkalika relation between two planets, given their rasi numbers.\n\n"
+"Args: int r1, int r2\n"
+"Return: int 1 (Mitra) or -1 (Satru)";
+
+static PyObject * pyswe__tatkalika_relation FUNCARGS_KEYWDS
+{
+    int r1, r2;
+    static char *kwlist[] = {"r1", "r2", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ii", kwlist, &r1, &r2))
+        return NULL;
+    return Py_BuildValue("i", swh_tatkalika_relation(r1, r2));
+}
+
+/* swisseph._years_diff */
+static char pyswe__years_diff__doc__[] =
+"Get number of 'astrological' years between two Julian days.\n\n"
+"Args: float jd1, float jd2, int flag=FLG_SWIEPH\n"
+"Return: float";
+
+static PyObject * pyswe__years_diff FUNCARGS_KEYWDS
+{
+    double jd1, jd2, years;
+    int flag = SEFLG_SWIEPH, res;
+    char err[256];
+    static char *kwlist[] = {"jd1", "jd2", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|i", kwlist,
+        &jd1, &jd2, &flag))
+        return NULL;
+    res = swh_years_diff(jd1, jd2, flag, &years, err);
+    if (res < 0)
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("f", years);
+}
+
 #if SWH_USE_THREADS
 
 /* swisseph._lock */
@@ -4140,16 +4138,6 @@ static char pyswe__lock__doc__[] =
 static PyObject * pyswe__lock FUNCARGS_SELF
 {
     swh_lock();
-    Py_RETURN_NONE;
-}
-
-/* swisseph._unlock */
-static char pyswe__unlock__doc__[] =
-"Unlock pyswisseph.\n\nArgs: -\nReturn: None";
-
-static PyObject * pyswe__unlock FUNCARGS_SELF
-{
-    swh_unlock();
     Py_RETURN_NONE;
 }
 
@@ -4169,206 +4157,210 @@ static PyObject * pyswe__trylock FUNCARGS_SELF
     }
 }
 
+/* swisseph._unlock */
+static char pyswe__unlock__doc__[] =
+"Unlock pyswisseph.\n\nArgs: -\nReturn: None";
+
+static PyObject * pyswe__unlock FUNCARGS_SELF
+{
+    swh_unlock();
+    Py_RETURN_NONE;
+}
+
 #endif /* SWH_USE_THREADS */
 #endif /* PYSWE_USE_SWEPHELP */
 
 /* Methods */
 static struct PyMethodDef pyswe_methods[] = {
-    {"set_ephe_path", (PyCFunction) pyswe_set_ephe_path,
-        METH_VARARGS|METH_KEYWORDS, pyswe_set_ephe_path__doc__},
-    {"set_jpl_file", (PyCFunction) pyswe_set_jpl_file,
-        METH_VARARGS|METH_KEYWORDS, pyswe_set_jpl_file__doc__},
-    {"set_topo", (PyCFunction) pyswe_set_topo,
-        METH_VARARGS|METH_KEYWORDS, pyswe_set_topo__doc__},
-    {"set_sid_mode", (PyCFunction) pyswe_set_sid_mode,
-        METH_VARARGS|METH_KEYWORDS, pyswe_set_sid_mode__doc__},
-    {"get_ayanamsa", (PyCFunction) pyswe_get_ayanamsa,
-        METH_VARARGS|METH_KEYWORDS, pyswe_get_ayanamsa__doc__},
-    {"get_ayanamsa_ut", (PyCFunction) pyswe_get_ayanamsa_ut,
-        METH_VARARGS|METH_KEYWORDS, pyswe_get_ayanamsa_ut__doc__},
-    {"get_ayanamsa_name", (PyCFunction) pyswe_get_ayanamsa_name,
-        METH_VARARGS|METH_KEYWORDS, pyswe_get_ayanamsa_name__doc__},
-    {"close", (PyCFunction) pyswe_close,
-        METH_NOARGS, pyswe_close__doc__},
-    {"get_planet_name", (PyCFunction) pyswe_get_planet_name,
-        METH_VARARGS|METH_KEYWORDS, pyswe_get_planet_name__doc__},
-    {"calc", (PyCFunction) pyswe_calc,
-        METH_VARARGS|METH_KEYWORDS, pyswe_calc__doc__},
-    {"calc_ut", (PyCFunction) pyswe_calc_ut,
-        METH_VARARGS|METH_KEYWORDS, pyswe_calc_ut__doc__},
-    {"fixstar", (PyCFunction) pyswe_fixstar,
-        METH_VARARGS|METH_KEYWORDS, pyswe_fixstar__doc__},
-    {"fixstar_ut", (PyCFunction) pyswe_fixstar_ut,
-        METH_VARARGS|METH_KEYWORDS, pyswe_fixstar_ut__doc__},
-    {"fixstar2", (PyCFunction) pyswe_fixstar2,
-        METH_VARARGS|METH_KEYWORDS, pyswe_fixstar2__doc__},
-    {"fixstar2_ut", (PyCFunction) pyswe_fixstar2_ut,
-        METH_VARARGS|METH_KEYWORDS, pyswe_fixstar2_ut__doc__},
-    {"nod_aps", (PyCFunction) pyswe_nod_aps,
-        METH_VARARGS|METH_KEYWORDS, pyswe_nod_aps__doc__},
-    {"nod_aps_ut", (PyCFunction) pyswe_nod_aps_ut,
-        METH_VARARGS|METH_KEYWORDS, pyswe_nod_aps_ut__doc__},
-    {"sidtime", (PyCFunction) pyswe_sidtime,
-        METH_VARARGS|METH_KEYWORDS, pyswe_sidtime__doc__},
-    {"sidtime0", (PyCFunction) pyswe_sidtime0,
-        METH_VARARGS|METH_KEYWORDS, pyswe_sidtime0__doc__},
-    {"houses_armc", (PyCFunction) pyswe_houses_armc,
-        METH_VARARGS|METH_KEYWORDS, pyswe_houses_armc__doc__},
-    {"houses_ex", (PyCFunction) pyswe_houses_ex,
-        METH_VARARGS|METH_KEYWORDS, pyswe_houses_ex__doc__},
-    {"house_pos", (PyCFunction) pyswe_house_pos,
-        METH_VARARGS|METH_KEYWORDS, pyswe_house_pos__doc__},
-    {"gauquelin_sector", (PyCFunction) pyswe_gauquelin_sector,
-        METH_VARARGS|METH_KEYWORDS, pyswe_gauquelin_sector__doc__},
-    {"house_name", (PyCFunction) pyswe_house_name,
-        METH_VARARGS|METH_KEYWORDS, pyswe_house_name__doc__},
-    {"julday", (PyCFunction) pyswe_julday,
-        METH_VARARGS|METH_KEYWORDS, pyswe_julday__doc__},
-    {"date_conversion", (PyCFunction) pyswe_date_conversion,
-        METH_VARARGS|METH_KEYWORDS, pyswe_date_conversion__doc__},
-    {"revjul", (PyCFunction) pyswe_revjul,
-        METH_VARARGS|METH_KEYWORDS, pyswe_revjul__doc__},
-    {"utc_to_jd", (PyCFunction) pyswe_utc_to_jd,
-        METH_VARARGS|METH_KEYWORDS, pyswe_utc_to_jd__doc__},
-    {"jdet_to_utc", (PyCFunction) pyswe_jdet_to_utc,
-        METH_VARARGS|METH_KEYWORDS, pyswe_jdet_to_utc__doc__},
-    {"jdut1_to_utc", (PyCFunction) pyswe_jdut1_to_utc,
-        METH_VARARGS|METH_KEYWORDS, pyswe_jdut1_to_utc__doc__},
-    {"utc_time_zone", (PyCFunction) pyswe_utc_time_zone,
-        METH_VARARGS|METH_KEYWORDS, pyswe_utc_time_zone__doc__},
-    {"deltat", (PyCFunction) pyswe_deltat,
-        METH_VARARGS|METH_KEYWORDS, pyswe_deltat__doc__},
-    {"get_tid_acc", (PyCFunction) pyswe_get_tid_acc,
-        METH_NOARGS, pyswe_get_tid_acc__doc__},
-    {"set_tid_acc", (PyCFunction) pyswe_set_tid_acc,
-        METH_VARARGS|METH_KEYWORDS, pyswe_set_tid_acc__doc__},
-    {"houses", (PyCFunction) pyswe_houses,
-        METH_VARARGS|METH_KEYWORDS, pyswe_houses__doc__},
-    {"time_equ", (PyCFunction) pyswe_time_equ,
-        METH_VARARGS|METH_KEYWORDS, pyswe_time_equ__doc__},
-    {"lmt_to_lat", (PyCFunction) pyswe_lmt_to_lat,
-        METH_VARARGS|METH_KEYWORDS, pyswe_lmt_to_lat__doc__},
-    {"lat_to_lmt", (PyCFunction) pyswe_lat_to_lmt,
-        METH_VARARGS|METH_KEYWORDS, pyswe_lat_to_lmt__doc__},
-    {"sol_eclipse_when_loc", (PyCFunction) pyswe_sol_eclipse_when_loc,
-        METH_VARARGS|METH_KEYWORDS, pyswe_sol_eclipse_when_loc__doc__},
-    {"lun_occult_when_loc", (PyCFunction) pyswe_lun_occult_when_loc,
-        METH_VARARGS|METH_KEYWORDS, pyswe_lun_occult_when_loc__doc__},
-    {"sol_eclipse_when_glob", (PyCFunction) pyswe_sol_eclipse_when_glob,
-        METH_VARARGS|METH_KEYWORDS, pyswe_sol_eclipse_when_glob__doc__},
-    {"sol_eclipse_how", (PyCFunction) pyswe_sol_eclipse_how,
-        METH_VARARGS|METH_KEYWORDS, pyswe_sol_eclipse_how__doc__},
-    {"sol_eclipse_where", (PyCFunction) pyswe_sol_eclipse_where,
-        METH_VARARGS|METH_KEYWORDS, pyswe_sol_eclipse_where__doc__},
-    {"lun_occult_when_glob", (PyCFunction) pyswe_lun_occult_when_glob,
-        METH_VARARGS|METH_KEYWORDS, pyswe_lun_occult_when_glob__doc__},
-    {"lun_occult_where", (PyCFunction) pyswe_lun_occult_where,
-        METH_VARARGS|METH_KEYWORDS, pyswe_lun_occult_where__doc__},
-    {"lun_eclipse_when", (PyCFunction) pyswe_lun_eclipse_when,
-        METH_VARARGS|METH_KEYWORDS, pyswe_lun_eclipse_when__doc__},
-    {"lun_eclipse_when_loc", (PyCFunction) pyswe_lun_eclipse_when_loc,
-        METH_VARARGS|METH_KEYWORDS, pyswe_lun_eclipse_when_loc__doc__},
-    {"lun_eclipse_how", (PyCFunction) pyswe_lun_eclipse_how,
-        METH_VARARGS|METH_KEYWORDS, pyswe_lun_eclipse_how__doc__},
-    {"rise_trans", (PyCFunction) pyswe_rise_trans,
-        METH_VARARGS|METH_KEYWORDS, pyswe_rise_trans__doc__},
-    {"pheno", (PyCFunction) pyswe_pheno,
-        METH_VARARGS|METH_KEYWORDS, pyswe_pheno__doc__},
-    {"pheno_ut", (PyCFunction) pyswe_pheno_ut,
-        METH_VARARGS|METH_KEYWORDS, pyswe_pheno_ut__doc__},
-    {"refrac", (PyCFunction) pyswe_refrac,
-        METH_VARARGS|METH_KEYWORDS, pyswe_refrac__doc__},
-    {"refrac_extended", (PyCFunction) pyswe_refrac_extended,
-        METH_VARARGS|METH_KEYWORDS, pyswe_refrac_extended__doc__},
-    {"set_lapse_rate", (PyCFunction) pyswe_set_lapse_rate,
-        METH_VARARGS|METH_KEYWORDS, pyswe_set_lapse_rate__doc__},
     {"azalt", (PyCFunction) pyswe_azalt,
         METH_VARARGS|METH_KEYWORDS, pyswe_azalt__doc__},
     {"azalt_rev", (PyCFunction) pyswe_azalt_rev,
         METH_VARARGS|METH_KEYWORDS, pyswe_azalt_rev__doc__},
+    {"calc", (PyCFunction) pyswe_calc,
+        METH_VARARGS|METH_KEYWORDS, pyswe_calc__doc__},
+    {"calc_ut", (PyCFunction) pyswe_calc_ut,
+        METH_VARARGS|METH_KEYWORDS, pyswe_calc_ut__doc__},
+    {"close", (PyCFunction) pyswe_close,
+        METH_NOARGS, pyswe_close__doc__},
     {"cotrans", (PyCFunction) pyswe_cotrans,
         METH_VARARGS|METH_KEYWORDS, pyswe_cotrans__doc__},
     {"cotrans_sp", (PyCFunction) pyswe_cotrans_sp,
         METH_VARARGS|METH_KEYWORDS, pyswe_cotrans_sp__doc__},
-    {"degnorm", (PyCFunction) pyswe_degnorm,
-        METH_VARARGS|METH_KEYWORDS, pyswe_degnorm__doc__},
+    {"cs2degstr", (PyCFunction) pyswe_cs2degstr,
+        METH_VARARGS|METH_KEYWORDS, pyswe_cs2degstr__doc__},
+    {"cs2lonlatstr", (PyCFunction) pyswe_cs2lonlatstr,
+        METH_VARARGS|METH_KEYWORDS, pyswe_cs2lonlatstr__doc__},
+    {"cs2timestr", (PyCFunction) pyswe_cs2timestr,
+        METH_VARARGS|METH_KEYWORDS, pyswe_cs2timestr__doc__},
     {"csnorm", (PyCFunction) pyswe_csnorm,
         METH_VARARGS|METH_KEYWORDS, pyswe_csnorm__doc__},
-    {"radnorm", (PyCFunction) pyswe_radnorm,
-        METH_VARARGS|METH_KEYWORDS, pyswe_radnorm__doc__},
-    {"rad_midp", (PyCFunction) pyswe_rad_midp,
-        METH_VARARGS|METH_KEYWORDS, pyswe_rad_midp__doc__},
-    {"deg_midp", (PyCFunction) pyswe_deg_midp,
-        METH_VARARGS|METH_KEYWORDS, pyswe_deg_midp__doc__},
-    {"split_deg", (PyCFunction) pyswe_split_deg,
-        METH_VARARGS|METH_KEYWORDS, pyswe_split_deg__doc__},
-    {"difcsn", (PyCFunction) pyswe_difcsn,
-        METH_VARARGS|METH_KEYWORDS, pyswe_difcsn__doc__},
-    {"difdegn", (PyCFunction) pyswe_difdegn,
-        METH_VARARGS|METH_KEYWORDS, pyswe_difdegn__doc__},
-    {"difcs2n", (PyCFunction) pyswe_difcs2n,
-        METH_VARARGS|METH_KEYWORDS, pyswe_difcs2n__doc__},
-    {"difdeg2n", (PyCFunction) pyswe_difdeg2n,
-        METH_VARARGS|METH_KEYWORDS, pyswe_difdeg2n__doc__},
-    {"difrad2n", (PyCFunction) pyswe_difrad2n,
-        METH_VARARGS|METH_KEYWORDS, pyswe_difrad2n__doc__},
     {"csroundsec", (PyCFunction) pyswe_csroundsec,
         METH_VARARGS|METH_KEYWORDS, pyswe_csroundsec__doc__},
     {"d2l", (PyCFunction) pyswe_d2l,
         METH_VARARGS|METH_KEYWORDS, pyswe_d2l__doc__},
+    {"date_conversion", (PyCFunction) pyswe_date_conversion,
+        METH_VARARGS|METH_KEYWORDS, pyswe_date_conversion__doc__},
     {"day_of_week", (PyCFunction) pyswe_day_of_week,
         METH_VARARGS|METH_KEYWORDS, pyswe_day_of_week__doc__},
-    {"cs2timestr", (PyCFunction) pyswe_cs2timestr,
-        METH_VARARGS|METH_KEYWORDS, pyswe_cs2timestr__doc__},
-    {"cs2lonlatstr", (PyCFunction) pyswe_cs2lonlatstr,
-        METH_VARARGS|METH_KEYWORDS, pyswe_cs2lonlatstr__doc__},
-    {"cs2degstr", (PyCFunction) pyswe_cs2degstr,
-        METH_VARARGS|METH_KEYWORDS, pyswe_cs2degstr__doc__},
-    {"fixstar_mag", (PyCFunction) pyswe_fixstar_mag,
-        METH_VARARGS|METH_KEYWORDS, pyswe_fixstar_mag__doc__},
+    {"deg_midp", (PyCFunction) pyswe_deg_midp,
+        METH_VARARGS|METH_KEYWORDS, pyswe_deg_midp__doc__},
+    {"degnorm", (PyCFunction) pyswe_degnorm,
+        METH_VARARGS|METH_KEYWORDS, pyswe_degnorm__doc__},
+    {"deltat", (PyCFunction) pyswe_deltat,
+        METH_VARARGS|METH_KEYWORDS, pyswe_deltat__doc__},
+    {"difcs2n", (PyCFunction) pyswe_difcs2n,
+        METH_VARARGS|METH_KEYWORDS, pyswe_difcs2n__doc__},
+    {"difcsn", (PyCFunction) pyswe_difcsn,
+        METH_VARARGS|METH_KEYWORDS, pyswe_difcsn__doc__},
+    {"difdeg2n", (PyCFunction) pyswe_difdeg2n,
+        METH_VARARGS|METH_KEYWORDS, pyswe_difdeg2n__doc__},
+    {"difdegn", (PyCFunction) pyswe_difdegn,
+        METH_VARARGS|METH_KEYWORDS, pyswe_difdegn__doc__},
+    {"difrad2n", (PyCFunction) pyswe_difrad2n,
+        METH_VARARGS|METH_KEYWORDS, pyswe_difrad2n__doc__},
+    {"fixstar", (PyCFunction) pyswe_fixstar,
+        METH_VARARGS|METH_KEYWORDS, pyswe_fixstar__doc__},
+    {"fixstar2", (PyCFunction) pyswe_fixstar2,
+        METH_VARARGS|METH_KEYWORDS, pyswe_fixstar2__doc__},
     {"fixstar2_mag", (PyCFunction) pyswe_fixstar2_mag,
         METH_VARARGS|METH_KEYWORDS, pyswe_fixstar2_mag__doc__},
-    {"heliacal_ut", (PyCFunction) pyswe_heliacal_ut,
-        METH_VARARGS|METH_KEYWORDS, pyswe_heliacal_ut__doc__},
+    {"fixstar2_ut", (PyCFunction) pyswe_fixstar2_ut,
+        METH_VARARGS|METH_KEYWORDS, pyswe_fixstar2_ut__doc__},
+    {"fixstar_mag", (PyCFunction) pyswe_fixstar_mag,
+        METH_VARARGS|METH_KEYWORDS, pyswe_fixstar_mag__doc__},
+    {"fixstar_ut", (PyCFunction) pyswe_fixstar_ut,
+        METH_VARARGS|METH_KEYWORDS, pyswe_fixstar_ut__doc__},
+    {"gauquelin_sector", (PyCFunction) pyswe_gauquelin_sector,
+        METH_VARARGS|METH_KEYWORDS, pyswe_gauquelin_sector__doc__},
+    {"get_ayanamsa", (PyCFunction) pyswe_get_ayanamsa,
+        METH_VARARGS|METH_KEYWORDS, pyswe_get_ayanamsa__doc__},
+    {"get_ayanamsa_name", (PyCFunction) pyswe_get_ayanamsa_name,
+        METH_VARARGS|METH_KEYWORDS, pyswe_get_ayanamsa_name__doc__},
+    {"get_ayanamsa_ut", (PyCFunction) pyswe_get_ayanamsa_ut,
+        METH_VARARGS|METH_KEYWORDS, pyswe_get_ayanamsa_ut__doc__},
+    {"get_planet_name", (PyCFunction) pyswe_get_planet_name,
+        METH_VARARGS|METH_KEYWORDS, pyswe_get_planet_name__doc__},
+    {"get_tid_acc", (PyCFunction) pyswe_get_tid_acc,
+        METH_NOARGS, pyswe_get_tid_acc__doc__},
     {"heliacal_pheno_ut", (PyCFunction) pyswe_heliacal_pheno_ut,
         METH_VARARGS|METH_KEYWORDS, pyswe_heliacal_pheno_ut__doc__},
+    {"heliacal_ut", (PyCFunction) pyswe_heliacal_ut,
+        METH_VARARGS|METH_KEYWORDS, pyswe_heliacal_ut__doc__},
+    {"house_name", (PyCFunction) pyswe_house_name,
+        METH_VARARGS|METH_KEYWORDS, pyswe_house_name__doc__},
+    {"house_pos", (PyCFunction) pyswe_house_pos,
+        METH_VARARGS|METH_KEYWORDS, pyswe_house_pos__doc__},
+    {"houses", (PyCFunction) pyswe_houses,
+        METH_VARARGS|METH_KEYWORDS, pyswe_houses__doc__},
+    {"houses_armc", (PyCFunction) pyswe_houses_armc,
+        METH_VARARGS|METH_KEYWORDS, pyswe_houses_armc__doc__},
+    {"houses_ex", (PyCFunction) pyswe_houses_ex,
+        METH_VARARGS|METH_KEYWORDS, pyswe_houses_ex__doc__},
+    {"jdet_to_utc", (PyCFunction) pyswe_jdet_to_utc,
+        METH_VARARGS|METH_KEYWORDS, pyswe_jdet_to_utc__doc__},
+    {"jdut1_to_utc", (PyCFunction) pyswe_jdut1_to_utc,
+        METH_VARARGS|METH_KEYWORDS, pyswe_jdut1_to_utc__doc__},
+    {"julday", (PyCFunction) pyswe_julday,
+        METH_VARARGS|METH_KEYWORDS, pyswe_julday__doc__},
+    {"lat_to_lmt", (PyCFunction) pyswe_lat_to_lmt,
+        METH_VARARGS|METH_KEYWORDS, pyswe_lat_to_lmt__doc__},
+    {"lmt_to_lat", (PyCFunction) pyswe_lmt_to_lat,
+        METH_VARARGS|METH_KEYWORDS, pyswe_lmt_to_lat__doc__},
+    {"lun_eclipse_how", (PyCFunction) pyswe_lun_eclipse_how,
+        METH_VARARGS|METH_KEYWORDS, pyswe_lun_eclipse_how__doc__},
+    {"lun_eclipse_when", (PyCFunction) pyswe_lun_eclipse_when,
+        METH_VARARGS|METH_KEYWORDS, pyswe_lun_eclipse_when__doc__},
+    {"lun_eclipse_when_loc", (PyCFunction) pyswe_lun_eclipse_when_loc,
+        METH_VARARGS|METH_KEYWORDS, pyswe_lun_eclipse_when_loc__doc__},
+    {"lun_occult_when_glob", (PyCFunction) pyswe_lun_occult_when_glob,
+        METH_VARARGS|METH_KEYWORDS, pyswe_lun_occult_when_glob__doc__},
+    {"lun_occult_when_loc", (PyCFunction) pyswe_lun_occult_when_loc,
+        METH_VARARGS|METH_KEYWORDS, pyswe_lun_occult_when_loc__doc__},
+    {"lun_occult_where", (PyCFunction) pyswe_lun_occult_where,
+        METH_VARARGS|METH_KEYWORDS, pyswe_lun_occult_where__doc__},
+    {"nod_aps", (PyCFunction) pyswe_nod_aps,
+        METH_VARARGS|METH_KEYWORDS, pyswe_nod_aps__doc__},
+    {"nod_aps_ut", (PyCFunction) pyswe_nod_aps_ut,
+        METH_VARARGS|METH_KEYWORDS, pyswe_nod_aps_ut__doc__},
+    {"pheno", (PyCFunction) pyswe_pheno,
+        METH_VARARGS|METH_KEYWORDS, pyswe_pheno__doc__},
+    {"pheno_ut", (PyCFunction) pyswe_pheno_ut,
+        METH_VARARGS|METH_KEYWORDS, pyswe_pheno_ut__doc__},
+    {"rad_midp", (PyCFunction) pyswe_rad_midp,
+        METH_VARARGS|METH_KEYWORDS, pyswe_rad_midp__doc__},
+    {"radnorm", (PyCFunction) pyswe_radnorm,
+        METH_VARARGS|METH_KEYWORDS, pyswe_radnorm__doc__},
+    {"refrac", (PyCFunction) pyswe_refrac,
+        METH_VARARGS|METH_KEYWORDS, pyswe_refrac__doc__},
+    {"refrac_extended", (PyCFunction) pyswe_refrac_extended,
+        METH_VARARGS|METH_KEYWORDS, pyswe_refrac_extended__doc__},
+    {"revjul", (PyCFunction) pyswe_revjul,
+        METH_VARARGS|METH_KEYWORDS, pyswe_revjul__doc__},
+    {"rise_trans", (PyCFunction) pyswe_rise_trans,
+        METH_VARARGS|METH_KEYWORDS, pyswe_rise_trans__doc__},
+    {"set_ephe_path", (PyCFunction) pyswe_set_ephe_path,
+        METH_VARARGS|METH_KEYWORDS, pyswe_set_ephe_path__doc__},
+    {"set_jpl_file", (PyCFunction) pyswe_set_jpl_file,
+        METH_VARARGS|METH_KEYWORDS, pyswe_set_jpl_file__doc__},
+    {"set_lapse_rate", (PyCFunction) pyswe_set_lapse_rate,
+        METH_VARARGS|METH_KEYWORDS, pyswe_set_lapse_rate__doc__},
+    {"set_sid_mode", (PyCFunction) pyswe_set_sid_mode,
+        METH_VARARGS|METH_KEYWORDS, pyswe_set_sid_mode__doc__},
+    {"set_tid_acc", (PyCFunction) pyswe_set_tid_acc,
+        METH_VARARGS|METH_KEYWORDS, pyswe_set_tid_acc__doc__},
+    {"set_topo", (PyCFunction) pyswe_set_topo,
+        METH_VARARGS|METH_KEYWORDS, pyswe_set_topo__doc__},
+    {"sidtime", (PyCFunction) pyswe_sidtime,
+        METH_VARARGS|METH_KEYWORDS, pyswe_sidtime__doc__},
+    {"sidtime0", (PyCFunction) pyswe_sidtime0,
+        METH_VARARGS|METH_KEYWORDS, pyswe_sidtime0__doc__},
+    {"sol_eclipse_how", (PyCFunction) pyswe_sol_eclipse_how,
+        METH_VARARGS|METH_KEYWORDS, pyswe_sol_eclipse_how__doc__},
+    {"sol_eclipse_when_glob", (PyCFunction) pyswe_sol_eclipse_when_glob,
+        METH_VARARGS|METH_KEYWORDS, pyswe_sol_eclipse_when_glob__doc__},
+    {"sol_eclipse_when_loc", (PyCFunction) pyswe_sol_eclipse_when_loc,
+        METH_VARARGS|METH_KEYWORDS, pyswe_sol_eclipse_when_loc__doc__},
+    {"sol_eclipse_where", (PyCFunction) pyswe_sol_eclipse_where,
+        METH_VARARGS|METH_KEYWORDS, pyswe_sol_eclipse_where__doc__},
+    {"split_deg", (PyCFunction) pyswe_split_deg,
+        METH_VARARGS|METH_KEYWORDS, pyswe_split_deg__doc__},
+    {"time_equ", (PyCFunction) pyswe_time_equ,
+        METH_VARARGS|METH_KEYWORDS, pyswe_time_equ__doc__},
+    {"utc_time_zone", (PyCFunction) pyswe_utc_time_zone,
+        METH_VARARGS|METH_KEYWORDS, pyswe_utc_time_zone__doc__},
+    {"utc_to_jd", (PyCFunction) pyswe_utc_to_jd,
+        METH_VARARGS|METH_KEYWORDS, pyswe_utc_to_jd__doc__},
     {"vis_limit_mag", (PyCFunction) pyswe_vis_limit_mag,
         METH_VARARGS|METH_KEYWORDS, pyswe_vis_limit_mag__doc__},
 
 #if PYSWE_USE_SWEPHELP
     /* pyswisseph/swephelp functions. */
+    {"_degsplit", (PyCFunction) pyswe__degsplit,
+        METH_VARARGS|METH_KEYWORDS, pyswe__degsplit__doc__},
+    {"_geoc2d", (PyCFunction) pyswe__geoc2d,
+        METH_VARARGS|METH_KEYWORDS, pyswe__geoc2d__doc__},
+    {"_geolat2c", (PyCFunction) pyswe__geolat2c,
+        METH_VARARGS|METH_KEYWORDS, pyswe__geolat2c__doc__},
+    {"_geolon2c", (PyCFunction) pyswe__geolon2c,
+        METH_VARARGS|METH_KEYWORDS, pyswe__geolon2c__doc__},
+    {"_get_nakshatra_name", (PyCFunction) pyswe__get_nakshatra_name,
+        METH_VARARGS|METH_KEYWORDS, pyswe__get_nakshatra_name__doc__},
+    {"_go_past", (PyCFunction) pyswe__go_past,
+        METH_VARARGS|METH_KEYWORDS, pyswe__go_past__doc__},
+    {"_house_system_name", (PyCFunction) pyswe__house_system_name,
+        METH_VARARGS|METH_KEYWORDS, pyswe__house_system_name__doc__},
     {"_jdnow", (PyCFunction) pyswe__jdnow,
         METH_NOARGS, pyswe__jdnow__doc__},
     {"_julday", (PyCFunction) pyswe__julday,
         METH_VARARGS|METH_KEYWORDS, pyswe__julday__doc__},
-    {"_revjul", (PyCFunction) pyswe__revjul,
-        METH_VARARGS|METH_KEYWORDS, pyswe__revjul__doc__},
-    {"_degsplit", (PyCFunction) pyswe__degsplit,
-        METH_VARARGS|METH_KEYWORDS, pyswe__degsplit__doc__},
-    {"_signtostr", (PyCFunction) pyswe__signtostr,
-        METH_VARARGS|METH_KEYWORDS, pyswe__signtostr__doc__},
-    {"_house_system_name", (PyCFunction) pyswe__house_system_name,
-        METH_VARARGS|METH_KEYWORDS, pyswe__house_system_name__doc__},
-    {"_min_retro_time", (PyCFunction) pyswe__min_retro_time,
-        METH_VARARGS|METH_KEYWORDS, pyswe__min_retro_time__doc__},
-    {"_max_retro_time", (PyCFunction) pyswe__max_retro_time,
-        METH_VARARGS|METH_KEYWORDS, pyswe__max_retro_time__doc__},
-    {"_next_retro", (PyCFunction) pyswe__next_retro,
-        METH_VARARGS|METH_KEYWORDS, pyswe__next_retro__doc__},
-    {"_go_past", (PyCFunction) pyswe__go_past,
-        METH_VARARGS|METH_KEYWORDS, pyswe__go_past__doc__},
-    {"_next_aspect", (PyCFunction) pyswe__next_aspect,
-        METH_VARARGS|METH_KEYWORDS, pyswe__next_aspect__doc__},
-    {"_next_aspect2", (PyCFunction) pyswe__next_aspect2,
-        METH_VARARGS|METH_KEYWORDS, pyswe__next_aspect2__doc__},
-    {"_next_aspect_with", (PyCFunction) pyswe__next_aspect_with,
-        METH_VARARGS|METH_KEYWORDS, pyswe__next_aspect_with__doc__},
-    {"_next_aspect_with2", (PyCFunction) pyswe__next_aspect_with2,
-        METH_VARARGS|METH_KEYWORDS, pyswe__next_aspect_with2__doc__},
-    {"_next_aspect_cusp", (PyCFunction) pyswe__next_aspect_cusp,
-        METH_VARARGS|METH_KEYWORDS, pyswe__next_aspect_cusp__doc__},
-    {"_next_aspect_cusp2", (PyCFunction) pyswe__next_aspect_cusp2,
-        METH_VARARGS|METH_KEYWORDS, pyswe__next_aspect_cusp2__doc__},
+    {"_long2nakshatra", (PyCFunction) pyswe__long2nakshatra,
+        METH_VARARGS|METH_KEYWORDS, pyswe__long2nakshatra__doc__},
+    {"_long2navamsa", (PyCFunction) pyswe__long2navamsa,
+        METH_VARARGS|METH_KEYWORDS, pyswe__long2navamsa__doc__},
+    {"_long2rasi", (PyCFunction) pyswe__long2rasi,
+        METH_VARARGS|METH_KEYWORDS, pyswe__long2rasi__doc__},
+    {"_lord", (PyCFunction) pyswe__lord,
+        METH_VARARGS|METH_KEYWORDS, pyswe__lord__doc__},
     {"_match_aspect", (PyCFunction) pyswe__match_aspect,
         METH_VARARGS|METH_KEYWORDS, pyswe__match_aspect__doc__},
     {"_match_aspect2", (PyCFunction) pyswe__match_aspect2,
@@ -4377,49 +4369,56 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe__match_aspect3__doc__},
     {"_match_aspect4", (PyCFunction) pyswe__match_aspect4,
         METH_VARARGS|METH_KEYWORDS, pyswe__match_aspect4__doc__},
-    {"_years_diff", (PyCFunction) pyswe__years_diff,
-        METH_VARARGS|METH_KEYWORDS, pyswe__years_diff__doc__},
-    {"_geoc2d", (PyCFunction) pyswe__geoc2d,
-        METH_VARARGS|METH_KEYWORDS, pyswe__geoc2d__doc__},
-    {"_geolat2c", (PyCFunction) pyswe__geolat2c,
-        METH_VARARGS|METH_KEYWORDS, pyswe__geolat2c__doc__},
-    {"_geolon2c", (PyCFunction) pyswe__geolon2c,
-        METH_VARARGS|METH_KEYWORDS, pyswe__geolon2c__doc__},
+    {"_max_retro_time", (PyCFunction) pyswe__max_retro_time,
+        METH_VARARGS|METH_KEYWORDS, pyswe__max_retro_time__doc__},
+    {"_min_retro_time", (PyCFunction) pyswe__min_retro_time,
+        METH_VARARGS|METH_KEYWORDS, pyswe__min_retro_time__doc__},
+    {"_naisargika_relation", (PyCFunction) pyswe__naisargika_relation,
+        METH_VARARGS|METH_KEYWORDS, pyswe__naisargika_relation__doc__},
+    {"_next_aspect", (PyCFunction) pyswe__next_aspect,
+        METH_VARARGS|METH_KEYWORDS, pyswe__next_aspect__doc__},
+    {"_next_aspect2", (PyCFunction) pyswe__next_aspect2,
+        METH_VARARGS|METH_KEYWORDS, pyswe__next_aspect2__doc__},
+    {"_next_aspect_cusp", (PyCFunction) pyswe__next_aspect_cusp,
+        METH_VARARGS|METH_KEYWORDS, pyswe__next_aspect_cusp__doc__},
+    {"_next_aspect_cusp2", (PyCFunction) pyswe__next_aspect_cusp2,
+        METH_VARARGS|METH_KEYWORDS, pyswe__next_aspect_cusp2__doc__},
+    {"_next_aspect_with", (PyCFunction) pyswe__next_aspect_with,
+        METH_VARARGS|METH_KEYWORDS, pyswe__next_aspect_with__doc__},
+    {"_next_aspect_with2", (PyCFunction) pyswe__next_aspect_with2,
+        METH_VARARGS|METH_KEYWORDS, pyswe__next_aspect_with2__doc__},
+    {"_next_retro", (PyCFunction) pyswe__next_retro,
+        METH_VARARGS|METH_KEYWORDS, pyswe__next_retro__doc__},
+    {"_ochchabala", (PyCFunction) pyswe__ochchabala,
+        METH_VARARGS|METH_KEYWORDS, pyswe__ochchabala__doc__},
     {"_raman_houses", (PyCFunction) pyswe__raman_houses,
         METH_VARARGS|METH_KEYWORDS, pyswe__raman_houses__doc__},
-    {"_lord", (PyCFunction) pyswe__lord,
-        METH_VARARGS|METH_KEYWORDS, pyswe__lord__doc__},
-    {"_long2rasi", (PyCFunction) pyswe__long2rasi,
-        METH_VARARGS|METH_KEYWORDS, pyswe__long2rasi__doc__},
-    {"_long2navamsa", (PyCFunction) pyswe__long2navamsa,
-        METH_VARARGS|METH_KEYWORDS, pyswe__long2navamsa__doc__},
-    {"_long2nakshatra", (PyCFunction) pyswe__long2nakshatra,
-        METH_VARARGS|METH_KEYWORDS, pyswe__long2nakshatra__doc__},
-    {"_get_nakshatra_name", (PyCFunction) pyswe__get_nakshatra_name,
-        METH_VARARGS|METH_KEYWORDS, pyswe__get_nakshatra_name__doc__},
-    {"_rasinorm", (PyCFunction) pyswe__rasinorm,
-        METH_VARARGS|METH_KEYWORDS, pyswe__rasinorm__doc__},
     {"_rasi_dif", (PyCFunction) pyswe__rasi_dif,
         METH_VARARGS|METH_KEYWORDS, pyswe__rasi_dif__doc__},
     {"_rasi_dif2", (PyCFunction) pyswe__rasi_dif2,
         METH_VARARGS|METH_KEYWORDS, pyswe__rasi_dif2__doc__},
-    {"_tatkalika_relation", (PyCFunction) pyswe__tatkalika_relation,
-        METH_VARARGS|METH_KEYWORDS, pyswe__tatkalika_relation__doc__},
-    {"_naisargika_relation", (PyCFunction) pyswe__naisargika_relation,
-        METH_VARARGS|METH_KEYWORDS, pyswe__naisargika_relation__doc__},
+    {"_rasinorm", (PyCFunction) pyswe__rasinorm,
+        METH_VARARGS|METH_KEYWORDS, pyswe__rasinorm__doc__},
     {"_residential_strength", (PyCFunction) pyswe__residential_strength,
         METH_VARARGS|METH_KEYWORDS, pyswe__residential_strength__doc__},
-    {"_ochchabala", (PyCFunction) pyswe__ochchabala,
-        METH_VARARGS|METH_KEYWORDS, pyswe__ochchabala__doc__},
+    {"_revjul", (PyCFunction) pyswe__revjul,
+        METH_VARARGS|METH_KEYWORDS, pyswe__revjul__doc__},
     {"_saturn_4_stars", (PyCFunction) pyswe__saturn_4_stars,
         METH_VARARGS|METH_KEYWORDS, pyswe__saturn_4_stars__doc__},
+    {"_signtostr", (PyCFunction) pyswe__signtostr,
+        METH_VARARGS|METH_KEYWORDS, pyswe__signtostr__doc__},
+    {"_tatkalika_relation", (PyCFunction) pyswe__tatkalika_relation,
+        METH_VARARGS|METH_KEYWORDS, pyswe__tatkalika_relation__doc__},
+    {"_years_diff", (PyCFunction) pyswe__years_diff,
+        METH_VARARGS|METH_KEYWORDS, pyswe__years_diff__doc__},
+
 #if SWH_USE_THREADS
     {"_lock", (PyCFunction) pyswe__lock,
         METH_VARARGS|METH_KEYWORDS, pyswe__lock__doc__},
-    {"_unlock", (PyCFunction) pyswe__unlock,
-        METH_VARARGS|METH_KEYWORDS, pyswe__unlock__doc__},
     {"_trylock", (PyCFunction) pyswe__trylock,
         METH_VARARGS|METH_KEYWORDS, pyswe__trylock__doc__},
+    {"_unlock", (PyCFunction) pyswe__unlock,
+        METH_VARARGS|METH_KEYWORDS, pyswe__unlock__doc__},
 #endif /* SWH_USE_THREADS */
 #endif /* PYSWE_USE_SWEPHELP */
     {NULL, (PyCFunction) NULL, 0, NULL}
