@@ -22,7 +22,7 @@
 # and is used as Distutils long description:
 """Python extension to AstroDienst Swiss Ephemeris library.
 
-Swiss Ephemeris homepage: http://www.astro.com/swisseph/
+Fork me on Github: https://github.com/astrorigin/pyswisseph
 
 Compatible with Python 2.x and 3.x.
 
@@ -36,11 +36,9 @@ Usage example:
 >>> ecltime
 (2007, 3, 3, 23.347975596785545)
 >>> jd = swe.julday(2008,3,21)
->>> swe.calc_ut(jd, swe.AST_OFFSET+13681)[0] # asteroid Monty Python
+>>> swe.calc_ut(jd, swe.AST_OFFSET+13681)[0][0] # asteroid Monty Python
 0.098474291148756998
 >>> help(swe)
-
-Standard installation (unixes): ``# python setup.py install``
 
 """
 
@@ -216,7 +214,7 @@ setup(
     author = 'Stanislas Marquis',
     author_email = 'stan@astrorigin.com',
     url = 'https://astrorigin.com/pyswisseph',
-    download_url = 'http://pypi.python.org/pypi/pyswisseph',
+    download_url = 'https://pypi.org/project/pyswisseph',
     classifiers = [
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',

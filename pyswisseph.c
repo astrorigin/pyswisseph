@@ -29,10 +29,10 @@
  *  Swisseph homepage: http://www.astro.com/swisseph
  *
  *  Swisseph version: 2.08.00
- *  Last revision: 27.03.2020
+ *  Last revision: 31.03.2020
  */
 
-#define PYSWISSEPH_VERSION      20200327
+#define PYSWISSEPH_VERSION      20200331
 
 /* Set the default argument for set_ephe_path function */
 #ifndef PYSWE_DEFAULT_EPHE_PATH
