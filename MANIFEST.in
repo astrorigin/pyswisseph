@@ -1,7 +1,5 @@
-include COPYING.TXT
-include README.TXT
-include debian/*
-include epydoc/*
+include LICENSE.txt
+include README.rst
 include libswe/*
 include swephelp/*
 
