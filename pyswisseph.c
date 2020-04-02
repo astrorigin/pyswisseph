@@ -4452,7 +4452,9 @@ PyMODINIT_FUNC initswisseph(void)
 #endif
 {
     PyObject *m;
-    char buf[10];
+    char buf[256]; /* for swe_version */
+
+    memset(buf, 0, sizeof(char) * 256);
 
 #if PY_MAJOR_VERSION >= 3
     m = PyModule_Create(&pyswe_module);
