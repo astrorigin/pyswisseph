@@ -749,6 +749,19 @@ static PyObject * pyswe_get_ayanamsa_ut FUNCARGS_KEYWDS
     return Py_BuildValue("f", ret);
 }
 
+/* swisseph.get_library_path */
+static char pyswe_get_library_path__doc__[] =
+"Find the path of the swisseph library (dll) actually in use.\n\n"
+"Args: -\n"
+"Return: str";
+
+static PyObject * pyswe_get_library_path FUNCARGS_SELF
+{
+    char buf[256];
+    memset(buf, 0, sizeof(char) * 256);
+    return Py_BuildValue("s", swe_get_library_path(buf));
+}
+
 /* swisseph.get_planet_name */
 static char pyswe_get_planet_name__doc__[] =
 "Get planet name.\n\n"
@@ -4238,6 +4251,8 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe_get_ayanamsa_name__doc__},
     {"get_ayanamsa_ut", (PyCFunction) pyswe_get_ayanamsa_ut,
         METH_VARARGS|METH_KEYWORDS, pyswe_get_ayanamsa_ut__doc__},
+    {"get_library_path", (PyCFunction) pyswe_get_library_path,
+        METH_NOARGS, pyswe_get_library_path__doc__},
     {"get_planet_name", (PyCFunction) pyswe_get_planet_name,
         METH_VARARGS|METH_KEYWORDS, pyswe_get_planet_name__doc__},
     {"get_tid_acc", (PyCFunction) pyswe_get_tid_acc,
