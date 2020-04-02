@@ -26,7 +26,7 @@
  *  Homepage: https://astrorigin.com/pyswisseph
  *
  *  Swisseph authors: Alois Treindl, Dieter Koch (et al.)
- *  Swisseph homepage: http://www.astro.com/swisseph
+ *  Swisseph homepage: https://www.astro.com/swisseph
  *
  *  Swisseph version: 2.08.00
  *  Last revision: 31.03.2020
@@ -4430,10 +4430,11 @@ static char pyswe_module_documentation[] =
 "Import of this extension module does automagicaly set the ephemeris path"
 " to \"" PYSWE_DEFAULT_EPHE_PATH "\".\n\n"
 #endif
-"Extended documentation can be found on AstroDienst website.\n\n"
+"Extended documentation can be found at AstroDienst website.\n"
+"Please refer to: https://www.astro.com/swisseph/swephprg.htm\n\n"
 "    Pyswisseph homepage: https://astrorigin.com/pyswisseph/\n"
-"    AstroDienst: http://www.astro.com/swisseph/\n"
-"    PyPI: http://pypi.python.org/pypi/pyswisseph/";
+"    AstroDienst: https://www.astro.com/swisseph/\n"
+"    PyPI: https://pypi.org/project/pyswisseph/";
 
 #if PY_MAJOR_VERSION >= 3
 struct PyModuleDef pyswe_module =
