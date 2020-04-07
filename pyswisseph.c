@@ -2566,9 +2566,10 @@ static PyObject * pyswe_sol_eclipse_where FUNCARGS_KEYWDS
 
 /* swisseph.split_deg */
 static char pyswe_split_deg__doc__[] =
-"Split centiseconds in degrees, minutes, seconds, fraction of seconds, zodiac sign number.\n\n"
+"Provide sign or nakshatra, degree, minutes, seconds and fraction of second"
+" from decimal degree. Can also round to seconds, minutes, degrees.\n\n"
 "Args: float ddeg, int roundflag\n"
-"Return: tuple";
+"Return: tuple (deg, min, sec, secfr, sign)";
 
 static PyObject * pyswe_split_deg FUNCARGS_KEYWDS
 {
