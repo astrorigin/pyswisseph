@@ -779,6 +779,40 @@ static PyObject * pyswe_get_planet_name FUNCARGS_KEYWDS
     return Py_BuildValue("s", name);
 }
 
+/* swisseph.get_orbital_elements */
+static char pyswe_get_orbital_elements__doc__[] =
+"Calculate osculating elements (Kepler elements) and orbital periods for a"
+" planet, the Earth-Moon barycenter, or an asteroid.\n\n"
+"Args: float jdet, int pl, int flag\n"
+"Return: ";
+
+static PyObject * pyswe_get_orbital_elements FUNCARGS_KEYWDS
+{
+    int i, pl, flg;
+    double jd, dret[50];
+    char err[256];
+    static char *kwlist[] = {"jdet", "pl", "flag", NULL};
+    memset(dret, 0, sizeof(double) * 50);
+    if(!PyArg_ParseTupleAndKeywords(args, keywds, "dii", kwlist, &jd, &pl, &flg))
+        return NULL;
+    i = swe_get_orbital_elements(jd, pl, flg, dret, err);
+    if (i == 0)
+    {
+        return Py_BuildValue("dddddddddddddddddddddddddddddddddddddddddddddddddd",
+            dret[0],dret[1],dret[2],dret[3],dret[4],dret[5],dret[6],dret[7],dret[8],dret[9],
+            dret[10],dret[11],dret[12],dret[13],dret[14],dret[15],dret[16],dret[17],dret[18],dret[19],
+            dret[20],dret[21],dret[22],dret[23],dret[24],dret[25],dret[26],dret[27],dret[28],dret[29],
+            dret[30],dret[31],dret[32],dret[33],dret[34],dret[35],dret[36],dret[37],dret[38],dret[39],
+            dret[40],dret[41],dret[42],dret[43],dret[44],dret[45],dret[46],dret[47],dret[48],dret[49]);
+
+    }
+    else
+    {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+}
+
 /* swisseph.get_tid_acc */
 static char pyswe_get_tid_acc__doc__[] =
 "Get tidal acceleration.\n\n"
@@ -4254,6 +4288,8 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe_get_ayanamsa_ut__doc__},
     {"get_library_path", (PyCFunction) pyswe_get_library_path,
         METH_NOARGS, pyswe_get_library_path__doc__},
+    {"get_orbital_elements", (PyCFunction) pyswe_get_orbital_elements,
+        METH_VARARGS|METH_KEYWORDS, pyswe_get_orbital_elements__doc__},
     {"get_planet_name", (PyCFunction) pyswe_get_planet_name,
         METH_VARARGS|METH_KEYWORDS, pyswe_get_planet_name__doc__},
     {"get_tid_acc", (PyCFunction) pyswe_get_tid_acc,
