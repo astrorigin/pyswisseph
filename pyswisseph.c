@@ -4177,45 +4177,6 @@ static PyObject * pyswe__years_diff FUNCARGS_KEYWDS
     return Py_BuildValue("f", years);
 }
 
-#if SWH_USE_THREADS
-
-/* swisseph._lock */
-static char pyswe__lock__doc__[] =
-"Lock pyswisseph.\n\nArgs: -\nReturn: None";
-
-static PyObject * pyswe__lock FUNCARGS_SELF
-{
-    swh_lock();
-    Py_RETURN_NONE;
-}
-
-/* swisseph._trylock */
-static char pyswe__trylock__doc__[] =
-"Try to lock pyswisseph.\n\nArgs: -\nReturn: bool";
-
-static PyObject * pyswe__trylock FUNCARGS_SELF
-{
-    if (swh_trylock() == 0)
-    {
-        Py_RETURN_TRUE;
-    }
-    else
-    {
-        Py_RETURN_FALSE;
-    }
-}
-
-/* swisseph._unlock */
-static char pyswe__unlock__doc__[] =
-"Unlock pyswisseph.\n\nArgs: -\nReturn: None";
-
-static PyObject * pyswe__unlock FUNCARGS_SELF
-{
-    swh_unlock();
-    Py_RETURN_NONE;
-}
-
-#endif /* SWH_USE_THREADS */
 #endif /* PYSWE_USE_SWEPHELP */
 
 /* Methods */
@@ -4463,15 +4424,6 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe__tatkalika_relation__doc__},
     {"_years_diff", (PyCFunction) pyswe__years_diff,
         METH_VARARGS|METH_KEYWORDS, pyswe__years_diff__doc__},
-
-#if SWH_USE_THREADS
-    {"_lock", (PyCFunction) pyswe__lock,
-        METH_VARARGS|METH_KEYWORDS, pyswe__lock__doc__},
-    {"_trylock", (PyCFunction) pyswe__trylock,
-        METH_VARARGS|METH_KEYWORDS, pyswe__trylock__doc__},
-    {"_unlock", (PyCFunction) pyswe__unlock,
-        METH_VARARGS|METH_KEYWORDS, pyswe__unlock__doc__},
-#endif /* SWH_USE_THREADS */
 #endif /* PYSWE_USE_SWEPHELP */
     {NULL, (PyCFunction) NULL, 0, NULL}
 };
