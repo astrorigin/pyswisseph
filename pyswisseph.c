@@ -2170,6 +2170,30 @@ static PyObject * pyswe_nod_aps_ut FUNCARGS_KEYWDS
         xaph[2],xaph[3],xaph[4],xaph[5]);
 }
 
+/* swisseph.orbit_max_min_true_distance */
+static char pyswe_orbit_max_min_true_distance__doc__[] =
+"Calculate the maximum possible distance, the minimum possible distance, and\n"
+" the current true distance of planet, the EMB, or an asteroid.\n\n"
+"Args: float jdet, int pl, int flag\n"
+"Return: tuple (max, min, true)";
+
+static PyObject * pyswe_orbit_max_min_true_distance FUNCARGS_KEYWDS
+{
+    int pl, flg, i;
+    double jd, dmax, dmin, dtrue;
+    char err[256];
+    static char *kwlist[] = {"jdet", "pl", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dii", kwlist,
+        &jd, &pl, &flg))
+        return NULL;
+    i = swe_orbit_max_min_true_distance(jd, pl, flg, &dmax, &dmin, &dtrue, err);
+    if (i == 0) {
+        return Py_BuildValue("(ddd)", dmax, dmin, dtrue);
+    }
+    PyErr_SetString(pyswe_Error, err);
+    return NULL;
+}
+
 /* swisseph.pheno */
 static char pyswe_pheno__doc__[] =
 "Calculate planetary phenomena (ET).\n\n"
@@ -4295,6 +4319,8 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe_nod_aps__doc__},
     {"nod_aps_ut", (PyCFunction) pyswe_nod_aps_ut,
         METH_VARARGS|METH_KEYWORDS, pyswe_nod_aps_ut__doc__},
+    {"orbit_max_min_true_distance", (PyCFunction) pyswe_orbit_max_min_true_distance,
+        METH_VARARGS|METH_KEYWORDS, pyswe_orbit_max_min_true_distance__doc__},
     {"pheno", (PyCFunction) pyswe_pheno,
         METH_VARARGS|METH_KEYWORDS, pyswe_pheno__doc__},
     {"pheno_ut", (PyCFunction) pyswe_pheno_ut,
