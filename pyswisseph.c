@@ -2172,7 +2172,7 @@ static PyObject * pyswe_nod_aps_ut FUNCARGS_KEYWDS
 
 /* swisseph.orbit_max_min_true_distance */
 static char pyswe_orbit_max_min_true_distance__doc__[] =
-"Calculate the maximum possible distance, the minimum possible distance, and\n"
+"Calculate the maximum possible distance, the minimum possible distance, and"
 " the current true distance of planet, the EMB, or an asteroid.\n\n"
 "Args: float jdet, int pl, int flag\n"
 "Return: tuple (max, min, true)";
