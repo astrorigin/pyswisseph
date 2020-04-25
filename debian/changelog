@@ -1,0 +1,24 @@
+python3-swisseph (2.08.00.0-1) unstable; urgency=medium
+
+  * First Debian release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Stanislas Marquis <stan@astrorigin.com>  Fri, 24 Apr 2020 23:46:54 +0200
+
+python3-swisseph (2.00.00-0mx19+2) mx; urgency=medium
+
+  * Correct Copyright information
+
+ -- Timothy E. Harris <maintainer@mxrepo.com>  Thu, 02 Apr 2020 20:37:19 -0400
+
+python3-swisseph (2.00.00-0mx19+1) mx; urgency=medium
+
+  * Rebuild for MX-19
+
+ -- Timothy E. Harris <maintainer@mxrepo.com>  Mon, 26 Aug 2019 15:22:03 -0400
+
+python3-swisseph (2.00.00-0ubuntu1~bionic) bionic; urgency=low
+
+  * Initial release
+
+ -- Pelle van der Scheer <pellesimon@gmail.com>  Sat, 11 Mar 2017 20:28:32 +0100
+

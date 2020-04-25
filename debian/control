@@ -1,0 +1,18 @@
+Source: python3-swisseph
+Section: python
+Priority: optional
+Maintainer: Stanislas Marquis <stan@astrorigin.com>
+Build-Depends: debhelper-compat (= 12), dh-python, python3-all, python3-distutils
+Standards-Version: 4.4.1
+Homepage: https://pypi.org/project/pyswisseph
+Vcs-Browser: https://github.com/astrorigin/pyswisseph
+Vcs-Git: https://github.com/astrorigin/pyswisseph.git
+
+Package: python3-swisseph
+Architecture: any
+Depends: ${python3:Depends}, ${misc:Depends}, ${shlibs:Depends}
+Description: Python extension to the Swiss Ephemeris (Python 3)
+ The Swiss Ephemeris is the de-facto standard for astrological calculations.
+ .
+ This package installs the library for Python 3.
+
