@@ -16,6 +16,8 @@ License: GPL-2+
 Files: libswe/*
 Copyright: 1997-2020 Astrodienst AG, Switzerland.
 License: GPL-2+
+Comment: The Swiss Ephemeris is made available under a dual licensing system.
+ For more details refer to file libswe/LICENSE in the source package.
 
 License: GPL-2+
  These files are free software; you can redistribute them and/or modify
