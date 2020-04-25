@@ -1,6 +1,6 @@
 python3-swisseph (2.08.00.0-1) unstable; urgency=medium
 
-  * First Debian release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+  * First Debian release (Closes: #958755)
 
  -- Stanislas Marquis <stan@astrorigin.com>  Fri, 24 Apr 2020 23:46:54 +0200
 
