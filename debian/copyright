@@ -9,6 +9,8 @@ License: GPL-2+
 
 Files: debian/*
 Copyright: 2020 Stanislas Marquis <stan@astrorigin.com>
+ 2019, 2020 Timothy E. Harris <maintainer@mxrepo.com>
+ 2014 Pelle van der Scheer <pellesimon@gmail.com>
 License: GPL-2+
 
 Files: libswe/*
