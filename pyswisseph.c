@@ -29,10 +29,10 @@
  *  Swisseph homepage: https://www.astro.com/swisseph
  *
  *  Swisseph version: 2.08.00
- *  Last revision: 31.03.2020
+ *  Last revision: 27.04.2020
  */
 
-#define PYSWISSEPH_VERSION      20200331
+#define PYSWISSEPH_VERSION      20200427
 
 /* Set the default argument for set_ephe_path function */
 #ifndef PYSWE_DEFAULT_EPHE_PATH
@@ -4142,14 +4142,14 @@ static PyObject * pyswe__saturn_4_stars FUNCARGS_KEYWDS
 
 /* swisseph._signtostr */
 static char pyswe__signtostr__doc__[] =
-"Get a 3-letters string representing the sign number [0;11].\n\n"
+"Get a string representing the sign number given [0;11].\n\n"
 "Args: int sign\n"
 "Return: str";
 
 static PyObject * pyswe__signtostr FUNCARGS_KEYWDS
 {
     int res, sign;
-    char str[4];
+    char str[12];
     static char *kwlist[] = {"sign", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &sign))
         return NULL;
