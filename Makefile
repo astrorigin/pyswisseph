@@ -16,7 +16,7 @@ install:
 	$(PYTHON) setup.py install
 
 sdist:
-	$(PYTHON) setup.py sdist --formats=xztar
+	$(PYTHON) setup.py sdist --formats=xztar,zip
 
 void: ;
 
