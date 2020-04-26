@@ -2,7 +2,7 @@ Source: python3-swisseph
 Section: python
 Priority: optional
 Maintainer: Stanislas Marquis <stan@astrorigin.com>
-Build-Depends: debhelper-compat (= 12), dh-python, python3-all, python3-distutils
+Build-Depends: debhelper-compat (= 12), dh-python, python3-all-dev, python3-distutils
 Standards-Version: 4.4.1
 Homepage: https://pypi.org/project/pyswisseph
 Vcs-Browser: https://github.com/astrorigin/pyswisseph
