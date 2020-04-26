@@ -1,8 +1,8 @@
-python3-swisseph (2.08.00.0-1) unstable; urgency=medium
+python3-swisseph (2.08.00.1-ubuntu1~focal) focal; urgency=medium
 
-  * First Debian release (Closes: #958755)
+  * First Ubuntu/PPA release
 
- -- Stanislas Marquis <stan@astrorigin.com>  Fri, 24 Apr 2020 23:46:54 +0200
+ -- Stanislas Marquis <stan@astrorigin.com>  Mon, 27 Apr 2020 01:22:50 +0200
 
 python3-swisseph (2.00.00-0mx19+2) mx; urgency=medium
 
