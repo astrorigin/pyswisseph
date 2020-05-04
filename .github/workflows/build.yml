@@ -1,0 +1,37 @@
+name: Build
+
+on: [push]
+
+jobs:
+  build_wheels:
+    strategy:
+      matrix:
+        os: ['ubuntu-18.04', 'windows-latest', 'macos-latest']
+
+    name: Build wheel on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - uses: actions/setup-python@v2
+      name: Install Python 3.7
+      with:
+        python-version: 3.7
+
+    - name: Install cibuildwheel
+      run: |
+        python -m pip install cibuildwheel==1.4.0
+
+    - name: Build wheel
+      run: |
+        python -m cibuildwheel --output-dir wheelhouse
+      env:
+        CIBW_BUILD: cp3?-*
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: wheels
+        path: ./wheelhouse

@@ -43,7 +43,8 @@ Usage example:
 """
 
 import os.path, sys
-from distutils.core import setup, Extension
+from setuptools import setup
+from distutils.core import Extension
 
 # Pyswisseph version string
 # Our version string gets the version of the swisseph library (x.xx.xx)
@@ -63,7 +64,7 @@ use_swephelp = True
 
 # Compile flags
 cflags = []
-if sys.platform == 'windows': # Windows
+if sys.platform in ['win32', 'win_amd64']: # Windows
     cflags.append('-D_CRT_SECURE_NO_WARNINGS')
 elif sys.platform == 'darwin': # OSX
     cflags.append('-Wno-error=unused-command-line-argument-hard-error-in-future')
@@ -228,7 +229,8 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules'
         ],
     keywords = 'Astrology Ephemeris Swisseph',
-    ext_modules = [swemodule]
+    ext_modules = [swemodule],
+    setup_requires = ['wheel']
     )
 
 # vi: set fenc=utf-8 ff=unix et sw=4 ts=4 sts=4 :
