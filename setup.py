@@ -48,7 +48,7 @@ from distutils.core import setup, Extension
 # Pyswisseph version string
 # Our version string gets the version of the swisseph library (x.xx.xx)
 # and our increment as suffix (-x).
-VERSION = '2.08.00-1'
+VERSION = '2.08.00-2'
 
 # Corresponding swisseph version string
 swe_version = '2.08.00'

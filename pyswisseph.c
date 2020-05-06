@@ -29,10 +29,10 @@
  *  Swisseph homepage: https://www.astro.com/swisseph
  *
  *  Swisseph version: 2.08.00
- *  Last revision: 27.04.2020
+ *  Last revision: 2020-05-06
  */
 
-#define PYSWISSEPH_VERSION      20200427
+#define PYSWISSEPH_VERSION      20200506
 
 /* Set the default argument for set_ephe_path function */
 #ifndef PYSWE_DEFAULT_EPHE_PATH
@@ -3215,36 +3215,6 @@ static PyObject * pyswe__get_nakshatra_name FUNCARGS_KEYWDS
     return Py_BuildValue("s", ret);
 }
 
-/* swisseph._go_past */
-static char pyswe__go_past__doc__[] =
-"Get Julian day number and positions when a celestial object has gone past a"
-" fixed point expressed in longitude degrees.\n\n"
-"If daystep=0, use a predefined step.\n"
-"Same warning as in swe._next_retro.\n\n"
-"Args: int planet, float fixedpt, float jd_start, float daystep=0,"
-" bool backward=False, int flag=FLG_SWIEPH+FLG_SPEED+FLG_NOGDEFL\n"
-"Return: 2 tuples Julian day, positions";
-
-static PyObject * pyswe__go_past FUNCARGS_KEYWDS
-{
-    int plnt, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED+SEFLG_NOGDEFL;
-    double fix, jd, step=0, res, jdret, posret[6];
-    char err[256];
-    static char *kwlist[] = {"planet", "fixedpt", "jd_start", "daystep",
-        "backward", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "idd|dii", kwlist,
-        &plnt, &fix, &jd, &step, &backw, &flag))
-        return NULL;
-    res = swh_go_past(plnt, fix, jd, step, backw, flag, &jdret, posret, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("(f)(ffffff)", jdret, posret[0], posret[1], posret[2],
-        posret[3], posret[4], posret[5]);
-}
-
 /* swisseph._house_system_name */
 static char pyswe__house_system_name__doc__[] =
 "Get house system name.\n\n"
@@ -3477,50 +3447,6 @@ static PyObject * pyswe__match_aspect4 FUNCARGS_KEYWDS
         return Py_BuildValue("(fOf)", ret, Py_None, ftor);
 }
 
-/* swisseph._max_retro_time */
-static char pyswe__max_retro_time__doc__[] =
-"Get approximate maximum retrogradation time of a planet, in days.\n\n"
-"Args: int planet\n"
-"Return: int";
-
-static PyObject * pyswe__max_retro_time FUNCARGS_KEYWDS
-{
-    int plnt, res;
-    char err[64];
-    static char *kwlist[] = {"planet", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &plnt))
-        return NULL;
-    res = swh_max_retro_time(plnt, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("i", res);
-}
-
-/* swisseph._min_retro_time */
-static char pyswe__min_retro_time__doc__[] =
-"Get approximate minimum retrogradation time of a planet, in days.\n\n"
-"Args: int planet\n"
-"Return: int";
-
-static PyObject * pyswe__min_retro_time FUNCARGS_KEYWDS
-{
-    int plnt, res;
-    char err[64];
-    static char *kwlist[] = {"planet", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &plnt))
-        return NULL;
-    res = swh_min_retro_time(plnt, err);
-    if (res < 0)
-    {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("i", res);
-}
-
 /* swisseph._naisargika_relation */
 static char pyswe__naisargika_relation__doc__[] =
 "Get the naisargika relation between two planets.\n\n"
@@ -3546,78 +3472,67 @@ static PyObject * pyswe__naisargika_relation FUNCARGS_KEYWDS
 static char pyswe__next_aspect__doc__[] =
 "Get Julian day number and positions when celestial object makes longitudinal"
 " aspect to a fixed point expressed in longitude degrees.\n\n"
-"Aspect in the range [0;360[.\n"
-"If daystep=0, use a predefined step.\n"
-"If dayspan != 0, can return None if limit has been reached.\n\n"
-"Args: int planet, float aspect, float fixedpt, float jd_start, float daystep=0,"
-" bool backward=False, float dayspan=0, int flag=FLG_SWIEPH+FLG_SPEED+FLG_NOGDEFL\n"
-"Return: 2 tuples Julian day, positions (or None if limit has been reached)";
+"Aspect and fixed point in the range [0;360[.\n"
+"Can return None if time limit (variable stop, expressed in days) has been"
+" reached.\n\n"
+"Args: int planet, float aspect, float fixedpt, float jdstart,"
+" bool backw=False, float stop=0, int flags=FLG_SWIEPH+FLG_SPEED+FLG_NOGDEFL\n"
+"Return: Julian day, positions (or None if time limit has been reached)";
 
 static PyObject * pyswe__next_aspect FUNCARGS_KEYWDS
 {
-    int plnt, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED+SEFLG_NOGDEFL;
-    double asp, fix, jd, step=0, trange=0, res, jdret, posret[6];
+    int res, plnt, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED+SEFLG_NOGDEFL;
+    double asp, fix, jd, trange=0, jdret, posret[6];
     char err[256];
-    static char *kwlist[] = {"planet", "aspect", "fixedpt", "jd_start",
-        "daystep", "backward", "dayspan", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iddd|didi", kwlist,
-        &plnt, &asp, &fix, &jd, &step, &backw, &trange, &flag))
+    static char *kwlist[] = {"planet", "aspect", "fixedpt", "jdstart",
+        "backw", "stop", "flags", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iddd|idi", kwlist,
+        &plnt, &asp, &fix, &jd, &backw, &trange, &flag))
         return NULL;
-    res = swh_next_aspect(plnt, asp, fix, jd, step, backw, trange, flag,
+    res = swh_next_aspect(plnt, asp, fix, jd, backw, trange, flag,
         &jdret, posret, err);
-    if (res < 0)
-    {
+    switch (res) {
+    case 1:
         PyErr_SetString(pyswe_Error, err);
         return NULL;
-    }
-    else if (res > 0) /* time limit reached */
-    {
+    case 2: /* time limit reached */
         return Py_BuildValue("(O)(OOOOOO)", Py_None, Py_None, Py_None, Py_None,
-        Py_None, Py_None, Py_None);
-    }
-    else
-    {
+            Py_None, Py_None, Py_None);
+    default:
         return Py_BuildValue("(f)(ffffff)", jdret, posret[0], posret[1],
-        posret[2], posret[3], posret[4], posret[5]);
+            posret[2], posret[3], posret[4], posret[5]);
     }
 }
 
 /* swisseph._next_aspect2 */
 static char pyswe__next_aspect2__doc__[] =
 "Same as _next_aspect, but with aspect in range [0;180].\n\n"
-"If aspect is not 0 or 180, it will try the two aspects in [0;360[, and return"
-" the nearest from jd_start. It may then be faster to use _next_aspect several"
-" times, especially when scanning long periods of time.\n\n"
-"Args: int planet, float aspect, float fixedpt, float jd_start, float daystep=0,"
-" bool backward=False, float dayspan=0, int flag=FLG_SWIEPH+FLG_SPEED+FLG_NOGDEFL\n"
-"Return: 2 tuples Julian day, positions (or None if limit has been reached)";
+"Args: int planet, float aspect, float fixedpt, float jdstart,"
+" bool backw=False, float stop=0, int flags=FLG_SWIEPH+FLG_SPEED+FLG_NOGDEFL\n"
+"Return: Julian day, positions (or None if time limit has been reached)";
 
 static PyObject * pyswe__next_aspect2 FUNCARGS_KEYWDS
 {
-    int plnt, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED+SEFLG_NOGDEFL;
-    double asp, fix, jd, step=0, trange=0, res, jdret, posret[6];
+    int res, plnt, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED+SEFLG_NOGDEFL;
+    double asp, fix, jd, trange=0, jdret, posret[6];
     char err[256];
-    static char *kwlist[] = {"planet", "aspect", "fixedpt", "jd_start",
-        "daystep", "backward", "dayspan", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iddd|didi", kwlist,
-        &plnt, &asp, &fix, &jd, &step, &backw, &trange, &flag))
+    static char *kwlist[] = {"planet", "aspect", "fixedpt", "jdstart",
+        "backw", "stop", "flags", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iddd|idi", kwlist,
+        &plnt, &asp, &fix, &jd, &backw, &trange, &flag))
         return NULL;
-    res = swh_next_aspect2(plnt, asp, fix, jd, step, backw, trange, flag,
+    res = swh_next_aspect2(plnt, asp, fix, jd, backw, trange, flag,
         &jdret, posret, err);
-    if (res < 0)
-    {
+    switch (res) {
+    case 1:
         PyErr_SetString(pyswe_Error, err);
         return NULL;
-    }
-    else if (res > 0) /* time limit reached */
-    {
+    case 2: /* time limit reached */
         return Py_BuildValue("(O)(OOOOOO)", Py_None, Py_None, Py_None, Py_None,
-        Py_None, Py_None, Py_None);
-    }
-    else
-    {
+            Py_None, Py_None, Py_None);
+    default:
         return Py_BuildValue("(f)(ffffff)", jdret, posret[0], posret[1],
-        posret[2], posret[3], posret[4], posret[5]);
+            posret[2], posret[3], posret[4], posret[5]);
     }
 }
 
@@ -3625,22 +3540,22 @@ static PyObject * pyswe__next_aspect2 FUNCARGS_KEYWDS
 static char pyswe__next_aspect_cusp__doc__[] =
 "Get Julian day number and positions, and houses cusps and ascmc, when celestial"
 " object makes longitudinal aspect to a house cusp.\n\n"
-"House cusp expressed as an integer in [1;12] or [1;36] for Gauquelin.\n"
+"House cusp expressed as an integer in range [1;12] or [1;36] for Gauquelin.\n"
 "Aspect in the range [0;360[.\n"
 "Body can be a fixed star.\n"
 "For risings, settings, meridian transits, see rise_trans.\n\n"
-"Args: int or str body, float aspect, int cusp, double jd_start, double lat,"
-" double lon, char hsys='P', bool backward=False, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: 4 tuples Julian day, body positions, cusps, ascmc";
+"Args: int or str body, float aspect, int cusp, float jdstart, float lat,"
+" float lon, char hsys='P', bool backw=False, int flags=FLG_SWIEPH+FLG_SPEED\n"
+"Return: Julian day, body positions, cusps, ascmc";
 
 static PyObject * pyswe__next_aspect_cusp FUNCARGS_KEYWDS
 {
     int res, plnt, cusp, hsys='P', backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
-    double asp, jd, lat, lon, step=0.2, jdret, posret[6], cusps[37], ascmc[10];
+    double asp, jd, lat, lon, jdret, posret[6], cusps[37], ascmc[10];
     char err[256], *star="";
     PyObject *body;
-    static char *kwlist[] = {"body", "aspect", "cusp", "jd_start", "lat", "lon",
-        "hsys", "backward", "flag", NULL};
+    static char *kwlist[] = {"body", "aspect", "cusp", "jdstart", "lat", "lon",
+        "hsys", "backw", "flags", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "Odiddd|cii", kwlist,
         &body, &asp, &cusp, &jd, &lat, &lon, &hsys, &backw, &flag))
         return NULL;
@@ -3671,13 +3586,14 @@ static PyObject * pyswe__next_aspect_cusp FUNCARGS_KEYWDS
             "swisseph._next_aspect_cusp: Invalid body type");
         return NULL;
     }
-    res = swh_next_aspect_cusp(plnt, star, asp, cusp, jd, lat, lon, hsys, step,
+    res = swh_next_aspect_cusp(plnt, star, asp, cusp - 1, jd, lat, lon, hsys,
         backw, flag, &jdret, posret, cusps, ascmc, err);
-    if (res < 0)
+    if (res == 1)
     {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
+    assert(!res);
     if (hsys == 71) /* Gauquelin sectors */
     {
         return Py_BuildValue("(f)(ffffff)(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
@@ -3706,21 +3622,18 @@ static PyObject * pyswe__next_aspect_cusp FUNCARGS_KEYWDS
 /* swisseph._next_aspect_cusp2 */
 static char pyswe__next_aspect_cusp2__doc__[] =
 "Same as _next_aspect_cusp, but aspect in range[0;180].\n\n"
-"If aspect is not 0 or 180, it will try the two aspects in [0;360[, and return"
-" the nearest from jd_start. It may then be faster to use _next_aspect_cusp"
-" several times, especially when scanning long periods of time.\n\n"
-"Args: int or str body, float aspect, int cusp, double jd_start, double lat,"
-" double lon, char hsys='P', bool backward=False, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: 4 tuples Julian day, body positions, cusps, ascmc";
+"Args: int or str body, float aspect, int cusp, float jdstart, float lat,"
+" float lon, char hsys='P', bool backw=False, int flags=FLG_SWIEPH+FLG_SPEED\n"
+"Return: Julian day, body positions, cusps, ascmc";
 
 static PyObject * pyswe__next_aspect_cusp2 FUNCARGS_KEYWDS
 {
     int res, plnt, cusp, hsys='P', backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
-    double asp, jd, lat, lon, step=0.2, jdret, posret[6], cusps[37], ascmc[10];
+    double asp, jd, lat, lon, jdret, posret[6], cusps[37], ascmc[10];
     char err[256], *star="";
     PyObject *body;
-    static char *kwlist[] = {"body", "aspect", "cusp", "jd_start", "lat", "lon",
-        "hsys", "backward", "flag", NULL};
+    static char *kwlist[] = {"body", "aspect", "cusp", "jdstart", "lat", "lon",
+        "hsys", "backw", "flags", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "Odiddd|cii", kwlist,
         &body, &asp, &cusp, &jd, &lat, &lon, &hsys, &backw, &flag))
         return NULL;
@@ -3751,13 +3664,14 @@ static PyObject * pyswe__next_aspect_cusp2 FUNCARGS_KEYWDS
             "swisseph._next_aspect_cusp2: Invalid body type");
         return NULL;
     }
-    res = swh_next_aspect_cusp2(plnt, star, asp, cusp, jd, lat, lon, hsys, step,
+    res = swh_next_aspect_cusp2(plnt, star, asp, cusp - 1, jd, lat, lon, hsys,
         backw, flag, &jdret, posret, cusps, ascmc, err);
-    if (res < 0)
+    if (res == 1)
     {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
+    assert(!res);
     if (hsys == 71) /* Gauquelin sectors */
     {
         return Py_BuildValue("(f)(ffffff)(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
@@ -3788,22 +3702,21 @@ static char pyswe__next_aspect_with__doc__[] =
 "Get Julian day number and positions when celestial object makes longitudinal"
 " aspect to another moving object.\n\n"
 "Aspect in the range [0;360[.\n"
-"Other object can be a fixed star.\n"
-"If dayspan != 0, can return None if limit has been reached.\n\n"
-"Args: int planet, float aspect, int or str other, float jd_start,"
-" float daystep=10, bool backward=False, float dayspan=0, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: 3 tuples Julian day, planet positions, other positions (or None if limit has been reached)";
+"Other object can be a fixed star.\n\n"
+"Args: int planet, float aspect, int or str other, float jdstart,"
+" bool backw=False, float stop=0, int flags=FLG_SWIEPH+FLG_SPEED\n"
+"Return: Julian day, planet positions, other positions (or None if limit has been reached)";
 
 static PyObject * pyswe__next_aspect_with FUNCARGS_KEYWDS
 {
     int res, plnt, other, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
-    double asp, jd, step=10, trange=0, jdret, posret0[6], posret1[6];
+    double asp, jd, trange=0, jdret, posret0[6], posret1[6];
     char err[256], *star="";
     PyObject *body;
-    static char *kwlist[] = {"planet", "aspect", "other", "jd_start",
-        "daystep", "backward", "dayspan", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "idOd|didi", kwlist,
-        &plnt, &asp, &body, &jd, &step, &backw, &trange, &flag))
+    static char *kwlist[] = {"planet", "aspect", "other", "jdstart",
+        "backw", "stop", "flags", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "idOd|idi", kwlist,
+        &plnt, &asp, &body, &jd, &backw, &trange, &flag))
         return NULL;
     if (PyLong_CheckExact(body)) /* long -> planet */
     {
@@ -3832,21 +3745,17 @@ static PyObject * pyswe__next_aspect_with FUNCARGS_KEYWDS
             "swisseph._next_aspect_with: Invalid body type");
         return NULL;
     }
-    res = swh_next_aspect_with(plnt, asp, other, star, jd, step, backw, trange,
+    res = swh_next_aspect_with(plnt, asp, other, star, jd, backw, trange,
         flag, &jdret, posret0, posret1, err);
-    if (res < 0)
-    {
+    switch (res) {
+    case 1:
         PyErr_SetString(pyswe_Error, err);
         return NULL;
-    }
-    else if (res > 0) /* time limit reached */
-    {
+    case 2: /* time limit reached */
         return Py_BuildValue("(O)(OOOOOO)(OOOOOO)", Py_None, Py_None, Py_None,
         Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None,
         Py_None, Py_None);
-    }
-    else
-    {
+    default:
         return Py_BuildValue("(f)(ffffff)(ffffff)", jdret, posret0[0],
         posret0[1], posret0[2], posret0[3], posret0[4], posret0[5], posret1[0],
         posret1[1], posret1[2], posret1[3], posret1[4], posret1[5]);
@@ -3856,23 +3765,20 @@ static PyObject * pyswe__next_aspect_with FUNCARGS_KEYWDS
 /* swisseph._next_aspect_with2 */
 static char pyswe__next_aspect_with2__doc__[] =
 "Same as _next_aspect_with, but aspect in range [0;180].\n\n"
-"If aspect is not 0 or 180, it will try the two aspects in [0;360[, and return"
-" the nearest from jd_start. It may then be faster to use _next_aspect_with"
-" several times, especially when scanning long periods of time.\n\n"
-"Args: int planet, float aspect, int or str other, float jd_start,"
-" float daystep=10, bool backward=False, float dayspan=0, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: 3 tuples Julian day, planet positions, other positions (or None if limit has been reached)";
+"Args: int planet, float aspect, int or str other, float jdstart,"
+" bool backw=False, float stop=0, int flags=FLG_SWIEPH+FLG_SPEED\n"
+"Return: Julian day, planet positions, other positions (or None if limit has been reached)";
 
 static PyObject * pyswe__next_aspect_with2 FUNCARGS_KEYWDS
 {
     int res, plnt, other, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
-    double asp, jd, step=10, trange=0, jdret, posret0[6], posret1[6];
+    double asp, jd, trange=0, jdret, posret0[6], posret1[6];
     char err[256], *star="";
     PyObject *body;
-    static char *kwlist[] = {"planet", "aspect", "other", "jd_start",
-        "daystep", "backward", "dayspan", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "idOd|didi", kwlist,
-        &plnt, &asp, &body, &jd, &step, &backw, &trange, &flag))
+    static char *kwlist[] = {"planet", "aspect", "other", "jdstart",
+        "backw", "stop", "flags", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "idOd|idi", kwlist,
+        &plnt, &asp, &body, &jd, &backw, &trange, &flag))
         return NULL;
     if (PyLong_CheckExact(body)) /* long -> planet */
     {
@@ -3901,21 +3807,17 @@ static PyObject * pyswe__next_aspect_with2 FUNCARGS_KEYWDS
             "swisseph._next_aspect_with2: Invalid body type");
         return NULL;
     }
-    res = swh_next_aspect_with2(plnt, asp, other, star, jd, step, backw, trange,
+    res = swh_next_aspect_with2(plnt, asp, other, star, jd, backw, trange,
         flag, &jdret, posret0, posret1, err);
-    if (res < 0)
-    {
+    switch (res) {
+    case 1:
         PyErr_SetString(pyswe_Error, err);
         return NULL;
-    }
-    else if (res > 0) /* time limit reached */
-    {
+    case 2: /* time limit reached */
         return Py_BuildValue("(O)(OOOOOO)(OOOOOO)", Py_None, Py_None, Py_None,
         Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None,
         Py_None, Py_None);
-    }
-    else
-    {
+    default:
         return Py_BuildValue("(f)(ffffff)(ffffff)", jdret, posret0[0],
         posret0[1], posret0[2], posret0[3], posret0[4], posret0[5], posret1[0],
         posret1[1], posret1[2], posret1[3], posret1[4], posret1[5]);
@@ -3925,40 +3827,35 @@ static PyObject * pyswe__next_aspect_with2 FUNCARGS_KEYWDS
 /* swisseph._next_retro */
 static char pyswe__next_retro__doc__[] =
 "Find next direction changing of object.\n\n"
-"If daystep=0, use predefined step.\n"
 "Flag should include FLG_SPEED, and FLG_NOGDEFL to avoid bad surprises;"
 " alternatively use true positions.\n"
-"If dayspan != 0, can return None if limit has been reached.\n\n"
-"Args: int planet, float jd_start, float daystep=0, bool backward=False,"
-" float dayspan=0, int flag=FLG_SWIEPH+FLG_SPEED+FLG_NOGDEFL\n"
-"Return: 2 tuples Julian day, positions (or None if time limit has been reached)";
+"If argument stop != 0, can return None if time limit has been reached.\n\n"
+"Args: int planet, float jdstart, bool backw=False,"
+" float stop=0, int flags=FLG_SWIEPH+FLG_SPEED+FLG_NOGDEFL\n"
+"Return: Julian day, positions (or None if time limit has been reached)";
 
 static PyObject * pyswe__next_retro FUNCARGS_KEYWDS
 {
     int res, plnt, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED+SEFLG_NOGDEFL;
-    double jd, step=0.0, trange=0, jdret, posret[6];
+    double jd, trange=0, jdret, posret[6];
     char err[256];
-    static char *kwlist[] = {"planet", "jd_start", "daystep", "backward",
-        "dayspan", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "id|didi", kwlist,
-        &plnt, &jd, &step, &backw, &trange, &flag))
+    static char *kwlist[] = {"planet", "jdstart", "backw",
+        "stop", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "id|idi", kwlist,
+        &plnt, &jd, &backw, &trange, &flag))
         return NULL;
-    res = swh_next_retro(plnt, jd, step, backw, trange, flag,
+    res = swh_next_retro(plnt, jd, backw, trange, flag,
         &jdret, posret, err);
-    if (res < 0)
-    {
+    switch (res) {
+    case 1:
         PyErr_SetString(pyswe_Error, err);
         return NULL;
-    }
-    else if (res > 0) /* time limit reached */
-    {
+    case 2: /* time limit reached */
         return Py_BuildValue("(O)(OOOOOO)", Py_None, Py_None, Py_None, Py_None,
-        Py_None, Py_None, Py_None);
-    }
-    else
-    {
+            Py_None, Py_None, Py_None);
+    default:
         return Py_BuildValue("(f)(ffffff)", jdret, posret[0], posret[1],
-        posret[2], posret[3], posret[4], posret[5]);
+            posret[2], posret[3], posret[4], posret[5]);
     }
 }
 
@@ -4384,8 +4281,6 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe__geolon2c__doc__},
     {"_get_nakshatra_name", (PyCFunction) pyswe__get_nakshatra_name,
         METH_VARARGS|METH_KEYWORDS, pyswe__get_nakshatra_name__doc__},
-    {"_go_past", (PyCFunction) pyswe__go_past,
-        METH_VARARGS|METH_KEYWORDS, pyswe__go_past__doc__},
     {"_house_system_name", (PyCFunction) pyswe__house_system_name,
         METH_VARARGS|METH_KEYWORDS, pyswe__house_system_name__doc__},
     {"_jdnow", (PyCFunction) pyswe__jdnow,
@@ -4408,10 +4303,6 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe__match_aspect3__doc__},
     {"_match_aspect4", (PyCFunction) pyswe__match_aspect4,
         METH_VARARGS|METH_KEYWORDS, pyswe__match_aspect4__doc__},
-    {"_max_retro_time", (PyCFunction) pyswe__max_retro_time,
-        METH_VARARGS|METH_KEYWORDS, pyswe__max_retro_time__doc__},
-    {"_min_retro_time", (PyCFunction) pyswe__min_retro_time,
-        METH_VARARGS|METH_KEYWORDS, pyswe__min_retro_time__doc__},
     {"_naisargika_relation", (PyCFunction) pyswe__naisargika_relation,
         METH_VARARGS|METH_KEYWORDS, pyswe__naisargika_relation__doc__},
     {"_next_aspect", (PyCFunction) pyswe__next_aspect,
