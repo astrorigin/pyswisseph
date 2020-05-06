@@ -3552,7 +3552,7 @@ static PyObject * pyswe__next_aspect_cusp FUNCARGS_KEYWDS
 {
     int res, plnt, cusp, hsys='P', backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
     double asp, jd, lat, lon, jdret, posret[6], cusps[37], ascmc[10];
-    char err[256], *star="";
+    char err[256], *star=NULL;
     PyObject *body;
     static char *kwlist[] = {"body", "aspect", "cusp", "jdstart", "lat", "lon",
         "hsys", "backw", "flags", NULL};
@@ -3630,7 +3630,7 @@ static PyObject * pyswe__next_aspect_cusp2 FUNCARGS_KEYWDS
 {
     int res, plnt, cusp, hsys='P', backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
     double asp, jd, lat, lon, jdret, posret[6], cusps[37], ascmc[10];
-    char err[256], *star="";
+    char err[256], *star=NULL;
     PyObject *body;
     static char *kwlist[] = {"body", "aspect", "cusp", "jdstart", "lat", "lon",
         "hsys", "backw", "flags", NULL};
@@ -3711,7 +3711,7 @@ static PyObject * pyswe__next_aspect_with FUNCARGS_KEYWDS
 {
     int res, plnt, other, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
     double asp, jd, trange=0, jdret, posret0[6], posret1[6];
-    char err[256], *star="";
+    char err[256], *star=NULL;
     PyObject *body;
     static char *kwlist[] = {"planet", "aspect", "other", "jdstart",
         "backw", "stop", "flags", NULL};
@@ -3773,7 +3773,7 @@ static PyObject * pyswe__next_aspect_with2 FUNCARGS_KEYWDS
 {
     int res, plnt, other, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
     double asp, jd, trange=0, jdret, posret0[6], posret1[6];
-    char err[256], *star="";
+    char err[256], *star=NULL;
     PyObject *body;
     static char *kwlist[] = {"planet", "aspect", "other", "jdstart",
         "backw", "stop", "flags", NULL};
