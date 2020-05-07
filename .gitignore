@@ -11,7 +11,7 @@
 *.zip
 
 MANIFEST
-build/
+build*/
 dist/
 doc
 epydoc/*
