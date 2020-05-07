@@ -3586,7 +3586,7 @@ static PyObject * pyswe__next_aspect_cusp FUNCARGS_KEYWDS
             "swisseph._next_aspect_cusp: Invalid body type");
         return NULL;
     }
-    res = swh_next_aspect_cusp(plnt, star, asp, cusp - 1, jd, lat, lon, hsys,
+    res = swh_next_aspect_cusp(plnt, star, asp, cusp, jd, lat, lon, hsys,
         backw, flag, &jdret, posret, cusps, ascmc, err);
     if (res == 1)
     {
@@ -3664,7 +3664,7 @@ static PyObject * pyswe__next_aspect_cusp2 FUNCARGS_KEYWDS
             "swisseph._next_aspect_cusp2: Invalid body type");
         return NULL;
     }
-    res = swh_next_aspect_cusp2(plnt, star, asp, cusp - 1, jd, lat, lon, hsys,
+    res = swh_next_aspect_cusp2(plnt, star, asp, cusp, jd, lat, lon, hsys,
         backw, flag, &jdret, posret, cusps, ascmc, err);
     if (res == 1)
     {
