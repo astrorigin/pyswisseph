@@ -654,7 +654,7 @@ static char pyswe_gauquelin_sector__doc__[] =
 static PyObject * pyswe_gauquelin_sector FUNCARGS_KEYWDS
 {
     double jd, geopos[3], res, ret, press = 0.0, temp = 0.0;
-    int plt, flag = SEFLG_SWIEPH, method = 0;
+    int plt = 0, flag = SEFLG_SWIEPH, method = 0;
     char *star = "", err[256];
     PyObject *body;
     static char *kwlist[] = {"julday", "body", "lon", "lat", "alt", "press",
@@ -670,8 +670,11 @@ static PyObject * pyswe_gauquelin_sector FUNCARGS_KEYWDS
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
     {
-        plt = 0;
-        star = (char*) PyUnicode_AS_DATA(body);
+        if (PyUnicode_READY(body)) {
+            PyErr_SetString(pyswe_Error, "swisseph.gauquelin_sector: nomem");
+            return NULL;
+        }
+        star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
     else if (PyInt_CheckExact(body)) /* int -> planet */
@@ -680,7 +683,6 @@ static PyObject * pyswe_gauquelin_sector FUNCARGS_KEYWDS
     }
     else if (PyString_CheckExact(body)) /* str -> fixed star */
     {
-        plt = 0;
         star = PyString_AsString(body);
     }
 #endif
@@ -1965,7 +1967,7 @@ static char pyswe_lun_occult_when_glob__doc__[] =
 static PyObject * pyswe_lun_occult_when_glob FUNCARGS_KEYWDS
 {
     double jd, tret[10];
-    int res, plt, ecltype = 0, backward = 0, flag = SEFLG_SWIEPH;
+    int res, plt = 0, ecltype = 0, backward = 0, flag = SEFLG_SWIEPH;
     char *star = "", err[256];
     PyObject *body;
     static char *kwlist[] = {"jd_start", "body", "ecl_type", "backward", "flag", NULL};
@@ -1979,8 +1981,11 @@ static PyObject * pyswe_lun_occult_when_glob FUNCARGS_KEYWDS
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
     {
-        plt = 0;
-        star = (char*) PyUnicode_AS_DATA(body);
+        if (PyUnicode_READY(body)) {
+            PyErr_SetString(pyswe_Error, "swisseph.lun_occult_when_glob: nomem");
+            return NULL;
+        }
+        star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
     else if (PyInt_CheckExact(body)) /* int -> planet */
@@ -1989,7 +1994,6 @@ static PyObject * pyswe_lun_occult_when_glob FUNCARGS_KEYWDS
     }
     else if (PyString_CheckExact(body)) /* str -> fixed star */
     {
-        plt = 0;
         star = PyString_AsString(body);
     }
 #endif
@@ -2018,7 +2022,7 @@ static char pyswe_lun_occult_when_loc__doc__[] =
 static PyObject * pyswe_lun_occult_when_loc FUNCARGS_KEYWDS
 {
     double jd, tret[10], attr[20], geopos[3] = {0.0, 0.0, 0.0};
-    int res, plt, backward = 0, flag = SEFLG_SWIEPH;
+    int res, plt = 0, backward = 0, flag = SEFLG_SWIEPH;
     char *star = "", err[256];
     PyObject *body;
     static char *kwlist[] = {"julday", "body", "lon", "lat", "alt", "backward", "flag", NULL};
@@ -2032,8 +2036,11 @@ static PyObject * pyswe_lun_occult_when_loc FUNCARGS_KEYWDS
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
     {
-        plt = 0;
-        star = (char*) PyUnicode_AS_DATA(body);
+        if (PyUnicode_READY(body)) {
+            PyErr_SetString(pyswe_Error, "swisseph.lun_occult_when_loc: nomem");
+            return NULL;
+        }
+        star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
     else if (PyInt_CheckExact(body)) /* int -> planet */
@@ -2042,7 +2049,6 @@ static PyObject * pyswe_lun_occult_when_loc FUNCARGS_KEYWDS
     }
     else if (PyString_CheckExact(body)) /* str -> fixed star */
     {
-        plt = 0;
         star = PyString_AsString(body);
     }
 #endif
@@ -2072,7 +2078,7 @@ static PyObject * pyswe_lun_occult_where FUNCARGS_KEYWDS
 {
     double jd, geopos[10] = {0,0,0,0,0,0,0,0,0,0};
     double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    int res, plt, flag = SEFLG_SWIEPH;
+    int res, plt = 0, flag = SEFLG_SWIEPH;
     char *star = "", err[256];
     PyObject *body;
     static char *kwlist[] = {"julday", "body", "flag", NULL};
@@ -2086,8 +2092,11 @@ static PyObject * pyswe_lun_occult_where FUNCARGS_KEYWDS
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
     {
-        plt = 0;
-        star = (char*) PyUnicode_AS_DATA(body);
+        if (PyUnicode_READY(body)) {
+            PyErr_SetString(pyswe_Error, "swisseph._lun_occult_where: nomem");
+            return NULL;
+        }
+        star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
     else if (PyInt_CheckExact(body)) /* int -> planet */
@@ -2096,7 +2105,6 @@ static PyObject * pyswe_lun_occult_where FUNCARGS_KEYWDS
     }
     else if (PyString_CheckExact(body)) /* str -> fixed star */
     {
-        plt = 0;
         star = PyString_AsString(body);
     }
 #endif
@@ -2339,7 +2347,7 @@ static char pyswe_rise_trans__doc__[] =
 static PyObject * pyswe_rise_trans FUNCARGS_KEYWDS
 {
     double jd, tret[10], press = 0.0, temp = 0.0, geopos[3] = {0.0, 0.0, 0.0};
-    int res, plt, rsmi = 0, flag = SEFLG_SWIEPH;
+    int res, plt = 0, rsmi = 0, flag = SEFLG_SWIEPH;
     char *star = "", err[256];
     PyObject *body;
     static char *kwlist[] = {"jd_start", "body", "lon", "lat", "alt", "press",
@@ -2354,8 +2362,11 @@ static PyObject * pyswe_rise_trans FUNCARGS_KEYWDS
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
     {
-        plt = 0;
-        star = (char*) PyUnicode_AS_DATA(body);
+        if (PyUnicode_READY(body)) {
+            PyErr_SetString(pyswe_Error, "swisseph.rise_trans: nomem");
+            return NULL;
+        }
+        star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
     else if (PyInt_CheckExact(body)) /* int -> planet */
@@ -2364,7 +2375,6 @@ static PyObject * pyswe_rise_trans FUNCARGS_KEYWDS
     }
     else if (PyString_CheckExact(body)) /* str -> fixed star */
     {
-        plt = 0;
         star = PyString_AsString(body);
     }
 #endif
@@ -3550,7 +3560,7 @@ static char pyswe__next_aspect_cusp__doc__[] =
 
 static PyObject * pyswe__next_aspect_cusp FUNCARGS_KEYWDS
 {
-    int res, plnt, cusp, hsys='P', backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
+    int res, plnt = 0, cusp, hsys='P', backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
     double asp, jd, lat, lon, jdret, posret[6], cusps[37], ascmc[10];
     char err[256], *star=NULL;
     PyObject *body;
@@ -3566,8 +3576,11 @@ static PyObject * pyswe__next_aspect_cusp FUNCARGS_KEYWDS
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
     {
-        plnt = 0;
-        star = (char*) PyUnicode_AS_DATA(body);
+        if (PyUnicode_READY(body)) {
+            PyErr_SetString(pyswe_Error, "swisseph._next_aspect_cusp: nomem");
+            return NULL;
+        }
+        star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
     else if (PyInt_CheckExact(body)) /* int -> planet */
@@ -3576,7 +3589,6 @@ static PyObject * pyswe__next_aspect_cusp FUNCARGS_KEYWDS
     }
     else if (PyString_CheckExact(body)) /* str -> fixed star */
     {
-        plnt = 0;
         star = PyString_AsString(body);
     }
 #endif
@@ -3628,7 +3640,7 @@ static char pyswe__next_aspect_cusp2__doc__[] =
 
 static PyObject * pyswe__next_aspect_cusp2 FUNCARGS_KEYWDS
 {
-    int res, plnt, cusp, hsys='P', backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
+    int res, plnt=0, cusp, hsys='P', backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
     double asp, jd, lat, lon, jdret, posret[6], cusps[37], ascmc[10];
     char err[256], *star=NULL;
     PyObject *body;
@@ -3644,8 +3656,11 @@ static PyObject * pyswe__next_aspect_cusp2 FUNCARGS_KEYWDS
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
     {
-        plnt = 0;
-        star = (char*) PyUnicode_AS_DATA(body);
+        if (PyUnicode_READY(body)) {
+            PyErr_SetString(pyswe_Error, "swisseph._next_aspect_cusp2: nomem");
+            return NULL;
+        }
+        star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
     else if (PyInt_CheckExact(body)) /* int -> planet */
@@ -3654,7 +3669,6 @@ static PyObject * pyswe__next_aspect_cusp2 FUNCARGS_KEYWDS
     }
     else if (PyString_CheckExact(body)) /* str -> fixed star */
     {
-        plnt = 0;
         star = PyString_AsString(body);
     }
 #endif
@@ -3709,7 +3723,7 @@ static char pyswe__next_aspect_with__doc__[] =
 
 static PyObject * pyswe__next_aspect_with FUNCARGS_KEYWDS
 {
-    int res, plnt, other, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
+    int res, plnt, other=0, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
     double asp, jd, trange=0, jdret, posret0[6], posret1[6];
     char err[256], *star=NULL;
     PyObject *body;
@@ -3725,8 +3739,11 @@ static PyObject * pyswe__next_aspect_with FUNCARGS_KEYWDS
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
     {
-        other = 0;
-        star = (char*) PyUnicode_AS_DATA(body);
+        if (PyUnicode_READY(body)) {
+            PyErr_SetString(pyswe_Error, "swisseph._next_aspect_with: nomem");
+            return NULL;
+        }
+        star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
     else if (PyInt_CheckExact(body)) /* int -> planet */
@@ -3735,7 +3752,6 @@ static PyObject * pyswe__next_aspect_with FUNCARGS_KEYWDS
     }
     else if (PyString_CheckExact(body)) /* str -> fixed star */
     {
-        other = 0;
         star = PyString_AsString(body);
     }
 #endif
@@ -3771,7 +3787,7 @@ static char pyswe__next_aspect_with2__doc__[] =
 
 static PyObject * pyswe__next_aspect_with2 FUNCARGS_KEYWDS
 {
-    int res, plnt, other, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
+    int res, plnt, other=0, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
     double asp, jd, trange=0, jdret, posret0[6], posret1[6];
     char err[256], *star=NULL;
     PyObject *body;
@@ -3787,8 +3803,11 @@ static PyObject * pyswe__next_aspect_with2 FUNCARGS_KEYWDS
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
     {
-        other = 0;
-        star = (char*) PyUnicode_AS_DATA(body);
+        if (PyUnicode_READY(body)) {
+            PyErr_SetString(pyswe_Error, "swisseph._next_aspect_with2: nomem");
+            return NULL;
+        }
+        star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
     else if (PyInt_CheckExact(body)) /* int -> planet */
@@ -3797,7 +3816,6 @@ static PyObject * pyswe__next_aspect_with2 FUNCARGS_KEYWDS
     }
     else if (PyString_CheckExact(body)) /* str -> fixed star */
     {
-        other = 0;
         star = PyString_AsString(body);
     }
 #endif
