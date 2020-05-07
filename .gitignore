@@ -11,8 +11,8 @@
 *.zip
 
 MANIFEST
-build*
-dist*
+build*/
+dist/
 doc
 epydoc/*
 make.py
@@ -24,3 +24,5 @@ swe_unix_src*
 swisseph.*.so
 swisseph.so
 
+venv/
+.idea/
