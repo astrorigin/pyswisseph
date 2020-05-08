@@ -25,4 +25,5 @@ swisseph.*.so
 swisseph.so
 
 venv/
+.eggs/
 .idea/
