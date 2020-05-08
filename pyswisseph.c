@@ -3175,19 +3175,20 @@ static PyObject * pyswe__calc_ut FUNCARGS_KEYWDS
 
 /* swisseph._degsplit */
 static char pyswe__degsplit__doc__[] =
-"Get degrees, sign number [0;11], minutes, seconds, from a longitude position in [0;360[.\n\n"
-"Args: double pos\n"
-"Return: tuple of 4 int (deg, sign, min, sec)";
+"Get degrees [0;29], sign number [0;11], minutes [0;59], seconds [0;59],"
+" from a longitude position [0;360[.\n\n"
+"Args: float deg\n"
+"Return: 4 int (degree, sign, minutes, seconds)";
 
 static PyObject * pyswe__degsplit FUNCARGS_KEYWDS
 {
     int ret[6];
     double pos;
-    static char *kwlist[] = {"pos", NULL};
+    static char *kwlist[] = {"deg", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &pos))
         return NULL;
     swh_degsplit(pos, ret);
-    return Py_BuildValue("(iiii)", ret[0], ret[1], ret[2], ret[3]);
+    return Py_BuildValue("iiii", ret[0], ret[1], ret[2], ret[3]);
 }
 
 /* swisseph._geoc2d */
