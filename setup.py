@@ -172,8 +172,7 @@ if use_swephelp:
         'swephelp/swhgeo.c',
         'swephelp/swhmisc.c',
         'swephelp/swhraman.c',
-        'swephelp/swhsearch.c',
-        'swephelp/swhutil.c'
+        'swephelp/swhsearch.c'
         ]
     #
 
@@ -185,7 +184,6 @@ if use_swephelp:
         'swephelp/swhdef.h',
         'swephelp/swhgeo.h',
         'swephelp/swhraman.h',
-        'swephelp/swhutil.h',
         'swephelp/swhdatetime.h',
         'swephelp/swhformat.h',
         'swephelp/swhmisc.h',

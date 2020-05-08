@@ -3117,6 +3117,62 @@ There is no guarantee that these functions are accurate. Use at your own risks.
 
 */
 
+/* swisseph._calc_ut */
+static char pyswe__calc_ut__doc__[] =
+"Calculate positions of either a planet (using function calc_ut)"
+" or a fixed star (using function fixstar2_ut).\n\n"
+"Args: float tjdut, int or str obj, flags=FLG_SWIEPH+FLG_SPEED\n"
+"Return: 2 tuples: positions of object (on success), returned flags and object name\n\n"
+"Usage examples:\n\n"
+"\tres, xtra = swisseph._calc_ut(swisseph._jdnow(), swisseph.SUN)\n"
+"\tres, xtra = swisseph._calc_ut(swisseph._jdnow(), \"Regulus\")";
+
+static PyObject * pyswe__calc_ut FUNCARGS_KEYWDS
+{
+    int x, pl = 0, flags = SEFLG_SWIEPH+SEFLG_SPEED;
+    double t, res[6] = {0,0,0,0,0,0};
+    char err[256], nam[256] = {'\0'}, st[(SE_MAX_STNAME*2)+1] = {'\0'};
+    char* star = NULL;
+    PyObject* p;
+    static char* kwlist[] = {"tjdut", "obj", "flags", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dO|i", kwlist,
+        &t, &p, &flags))
+        return NULL;
+    if (PyLong_CheckExact(p)) { /* long -> planet */
+        pl = (int) PyLong_AsLong(p);
+    }
+#if PY_MAJOR_VERSION >= 3
+    else if (PyUnicode_CheckExact(p)) { /* unicode -> fixed star */
+        if (PyUnicode_READY(p)) {
+            PyErr_SetString(pyswe_Error, "swisseph._calc_ut: nomem");
+            return NULL;
+        }
+        star = (char*) PyUnicode_1BYTE_DATA(p);
+    }
+#elif PY_MAJOR_VERSION < 3
+    else if (PyInt_CheckExact(p)) { /* int -> planet */
+        pl = (int) PyInt_AsLong(p);
+    }
+    else if (PyString_CheckExact(p)) { /* str -> fixed star */
+        star = PyString_AsString(p);
+    }
+#endif
+    else {
+        PyErr_SetString(pyswe_Error, "swisseph._calc_ut: invalid body type");
+        return NULL;
+    }
+    x = swh_calc_ut(t, pl, star, flags, res, st, err);
+    if (x < 0) {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return star ?
+        Py_BuildValue("(ffffff)(is)",res[0],res[1],res[2],res[3],res[4],res[5],
+                x, st)
+        : Py_BuildValue("(ffffff)(is)",res[0],res[1],res[2],res[3],res[4],res[5],
+                x, swe_get_planet_name(pl, nam));
+}
+
 /* swisseph._degsplit */
 static char pyswe__degsplit__doc__[] =
 "Get degrees, sign number [0;11], minutes, seconds, from a longitude position in [0;360[.\n\n"
@@ -4289,6 +4345,8 @@ static struct PyMethodDef pyswe_methods[] = {
 
 #if PYSWE_USE_SWEPHELP
     /* pyswisseph/swephelp functions. */
+    {"_calc_ut", (PyCFunction) pyswe__calc_ut,
+        METH_VARARGS|METH_KEYWORDS, pyswe__calc_ut__doc__},
     {"_degsplit", (PyCFunction) pyswe__degsplit,
         METH_VARARGS|METH_KEYWORDS, pyswe__degsplit__doc__},
     {"_geoc2d", (PyCFunction) pyswe__geoc2d,
