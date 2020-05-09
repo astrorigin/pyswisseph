@@ -3284,21 +3284,22 @@ static PyObject * pyswe__get_nakshatra_name FUNCARGS_KEYWDS
 
 /* swisseph._house_system_name */
 static char pyswe__house_system_name__doc__[] =
-"Get house system name.\n\n"
-"Args: char hsys\n"
+"Get house system name from given char identifier.\n\n"
+"Will check for identifier validity instead of just returning 'Placidus' when"
+" given char is unknown/invalid.\n\n"
+"Args: str hsys\n"
 "Return: str";
 
 static PyObject * pyswe__house_system_name FUNCARGS_KEYWDS
 {
-    int res;
-    char hsys, str[25];
+    char* hsys, str[50];
     static char *kwlist[] = {"hsys", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "c", kwlist, &hsys))
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &hsys))
         return NULL;
-    res = swh_house_system_name(hsys, str);
-    if (res < 0)
+    if (strlen(hsys) != 1 || swh_house_system_name(*hsys, str))
     {
-        PyErr_SetString(pyswe_Error, "swisseph._house_system_name: invalid house system");
+        PyErr_SetString(pyswe_Error,
+            "swisseph._house_system_name: invalid house system identifier");
         return NULL;
     }
     return Py_BuildValue("s", str);
