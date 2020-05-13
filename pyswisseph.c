@@ -29,10 +29,10 @@
  *  Swisseph homepage: https://www.astro.com/swisseph
  *
  *  Swisseph version: 2.08.00
- *  Last revision: 2020-05-06
+ *  Last revision: 2020-05-14
  */
 
-#define PYSWISSEPH_VERSION      20200506
+#define PYSWISSEPH_VERSION      20200514
 
 /* Set the default argument for set_ephe_path function */
 #ifndef PYSWE_DEFAULT_EPHE_PATH
@@ -3549,7 +3549,7 @@ static char pyswe__next_aspect__doc__[] =
 
 static PyObject * pyswe__next_aspect FUNCARGS_KEYWDS
 {
-    int res, plnt, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED+SEFLG_NOGDEFL;
+    int res, plnt, backw=0, flag=SEFLG_SWIEPH|SEFLG_SPEED|SEFLG_NOGDEFL;
     double asp, fix, jd, trange=0, jdret, posret[6];
     char err[256];
     static char *kwlist[] = {"planet", "aspect", "fixedpt", "jdstart",
@@ -3560,14 +3560,14 @@ static PyObject * pyswe__next_aspect FUNCARGS_KEYWDS
     res = swh_next_aspect(plnt, asp, fix, jd, backw, trange, flag,
         &jdret, posret, err);
     switch (res) {
-    case 1:
+    case 1: /* internal error */
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     case 2: /* time limit reached */
-        return Py_BuildValue("(O)(OOOOOO)", Py_None, Py_None, Py_None, Py_None,
+        return Py_BuildValue("O(OOOOOO)", Py_None, Py_None, Py_None, Py_None,
             Py_None, Py_None, Py_None);
     default:
-        return Py_BuildValue("(f)(ffffff)", jdret, posret[0], posret[1],
+        return Py_BuildValue("f(ffffff)", jdret, posret[0], posret[1],
             posret[2], posret[3], posret[4], posret[5]);
     }
 }
@@ -3581,7 +3581,7 @@ static char pyswe__next_aspect2__doc__[] =
 
 static PyObject * pyswe__next_aspect2 FUNCARGS_KEYWDS
 {
-    int res, plnt, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED+SEFLG_NOGDEFL;
+    int res, plnt, backw=0, flag=SEFLG_SWIEPH|SEFLG_SPEED|SEFLG_NOGDEFL;
     double asp, fix, jd, trange=0, jdret, posret[6];
     char err[256];
     static char *kwlist[] = {"planet", "aspect", "fixedpt", "jdstart",
@@ -3592,14 +3592,14 @@ static PyObject * pyswe__next_aspect2 FUNCARGS_KEYWDS
     res = swh_next_aspect2(plnt, asp, fix, jd, backw, trange, flag,
         &jdret, posret, err);
     switch (res) {
-    case 1:
+    case 1: /* internal error */
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     case 2: /* time limit reached */
-        return Py_BuildValue("(O)(OOOOOO)", Py_None, Py_None, Py_None, Py_None,
+        return Py_BuildValue("O(OOOOOO)", Py_None, Py_None, Py_None, Py_None,
             Py_None, Py_None, Py_None);
     default:
-        return Py_BuildValue("(f)(ffffff)", jdret, posret[0], posret[1],
+        return Py_BuildValue("f(ffffff)", jdret, posret[0], posret[1],
             posret[2], posret[3], posret[4], posret[5]);
     }
 }
@@ -3618,7 +3618,7 @@ static char pyswe__next_aspect_cusp__doc__[] =
 
 static PyObject * pyswe__next_aspect_cusp FUNCARGS_KEYWDS
 {
-    int res, plnt = 0, cusp, hsys='P', backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
+    int res, plnt = 0, cusp, hsys='P', backw=0, flag=SEFLG_SWIEPH|SEFLG_SPEED;
     double asp, jd, lat, lon, jdret, posret[6], cusps[37], ascmc[10];
     char err[256], *star=NULL;
     PyObject *body;
@@ -3628,12 +3628,9 @@ static PyObject * pyswe__next_aspect_cusp FUNCARGS_KEYWDS
         &body, &asp, &cusp, &jd, &lat, &lon, &hsys, &backw, &flag))
         return NULL;
     if (PyLong_CheckExact(body)) /* long -> planet */
-    {
         plnt = (int) PyLong_AsLong(body);
-    }
 #if PY_MAJOR_VERSION >= 3
-    else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
-    {
+    else if (PyUnicode_CheckExact(body)) { /* unicode -> fixed star */
         if (PyUnicode_READY(body)) {
             PyErr_SetString(pyswe_Error, "swisseph._next_aspect_cusp: nomem");
             return NULL;
@@ -3642,31 +3639,24 @@ static PyObject * pyswe__next_aspect_cusp FUNCARGS_KEYWDS
     }
 #elif PY_MAJOR_VERSION < 3
     else if (PyInt_CheckExact(body)) /* int -> planet */
-    {
         plnt = (int) PyInt_AsLong(body);
-    }
     else if (PyString_CheckExact(body)) /* str -> fixed star */
-    {
         star = PyString_AsString(body);
-    }
 #endif
-    else
-    {
+    else {
         PyErr_SetString(pyswe_Error,
             "swisseph._next_aspect_cusp: Invalid body type");
         return NULL;
     }
     res = swh_next_aspect_cusp(plnt, star, asp, cusp, jd, lat, lon, hsys,
         backw, flag, &jdret, posret, cusps, ascmc, err);
-    if (res == 1)
-    {
+    if (res == 1) {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
     assert(!res);
     if (hsys == 71) /* Gauquelin sectors */
-    {
-        return Py_BuildValue("(f)(ffffff)(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
+        return Py_BuildValue("f(ffffff)(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
         jdret,
         posret[0], posret[1], posret[2], posret[3], posret[4], posret[5],
         cusps[1], cusps[2], cusps[3], cusps[4], cusps[5], cusps[6], cusps[7],
@@ -3677,16 +3667,12 @@ static PyObject * pyswe__next_aspect_cusp FUNCARGS_KEYWDS
         cusps[32], cusps[33], cusps[34], cusps[35], cusps[36],
         ascmc[0], ascmc[1], ascmc[2], ascmc[3], ascmc[4], ascmc[5], ascmc[6],
         ascmc[7]);
-    }
-    else
-    {
-        return Py_BuildValue("(f)(ffffff)(ffffffffffff)(ffffffff)", jdret,
-        posret[0], posret[1], posret[2], posret[3], posret[4], posret[5],
-        cusps[1], cusps[2], cusps[3], cusps[4], cusps[5], cusps[6], cusps[7],
-        cusps[8], cusps[9], cusps[10], cusps[11], cusps[12],
-        ascmc[0], ascmc[1], ascmc[2], ascmc[3], ascmc[4], ascmc[5], ascmc[6],
-        ascmc[7]);
-    }
+    return Py_BuildValue("f(ffffff)(ffffffffffff)(ffffffff)", jdret,
+    posret[0], posret[1], posret[2], posret[3], posret[4], posret[5],
+    cusps[1], cusps[2], cusps[3], cusps[4], cusps[5], cusps[6], cusps[7],
+    cusps[8], cusps[9], cusps[10], cusps[11], cusps[12],
+    ascmc[0], ascmc[1], ascmc[2], ascmc[3], ascmc[4], ascmc[5], ascmc[6],
+    ascmc[7]);
 }
 
 /* swisseph._next_aspect_cusp2 */
@@ -3698,7 +3684,7 @@ static char pyswe__next_aspect_cusp2__doc__[] =
 
 static PyObject * pyswe__next_aspect_cusp2 FUNCARGS_KEYWDS
 {
-    int res, plnt=0, cusp, hsys='P', backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
+    int res, plnt=0, cusp, hsys='P', backw=0, flag=SEFLG_SWIEPH|SEFLG_SPEED;
     double asp, jd, lat, lon, jdret, posret[6], cusps[37], ascmc[10];
     char err[256], *star=NULL;
     PyObject *body;
@@ -3708,12 +3694,9 @@ static PyObject * pyswe__next_aspect_cusp2 FUNCARGS_KEYWDS
         &body, &asp, &cusp, &jd, &lat, &lon, &hsys, &backw, &flag))
         return NULL;
     if (PyLong_CheckExact(body)) /* long -> planet */
-    {
         plnt = (int) PyLong_AsLong(body);
-    }
 #if PY_MAJOR_VERSION >= 3
-    else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
-    {
+    else if (PyUnicode_CheckExact(body)) { /* unicode -> fixed star */
         if (PyUnicode_READY(body)) {
             PyErr_SetString(pyswe_Error, "swisseph._next_aspect_cusp2: nomem");
             return NULL;
@@ -3722,31 +3705,24 @@ static PyObject * pyswe__next_aspect_cusp2 FUNCARGS_KEYWDS
     }
 #elif PY_MAJOR_VERSION < 3
     else if (PyInt_CheckExact(body)) /* int -> planet */
-    {
         plnt = (int) PyInt_AsLong(body);
-    }
     else if (PyString_CheckExact(body)) /* str -> fixed star */
-    {
         star = PyString_AsString(body);
-    }
 #endif
-    else
-    {
+    else {
         PyErr_SetString(pyswe_Error,
             "swisseph._next_aspect_cusp2: Invalid body type");
         return NULL;
     }
     res = swh_next_aspect_cusp2(plnt, star, asp, cusp, jd, lat, lon, hsys,
         backw, flag, &jdret, posret, cusps, ascmc, err);
-    if (res == 1)
-    {
+    if (res == 1) {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
     assert(!res);
     if (hsys == 71) /* Gauquelin sectors */
-    {
-        return Py_BuildValue("(f)(ffffff)(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
+        return Py_BuildValue("f(ffffff)(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
         jdret,
         posret[0], posret[1], posret[2], posret[3], posret[4], posret[5],
         cusps[1], cusps[2], cusps[3], cusps[4], cusps[5], cusps[6], cusps[7],
@@ -3757,16 +3733,12 @@ static PyObject * pyswe__next_aspect_cusp2 FUNCARGS_KEYWDS
         cusps[32], cusps[33], cusps[34], cusps[35], cusps[36],
         ascmc[0], ascmc[1], ascmc[2], ascmc[3], ascmc[4], ascmc[5], ascmc[6],
         ascmc[7]);
-    }
-    else
-    {
-        return Py_BuildValue("(f)(ffffff)(ffffffffffff)(ffffffff)", jdret,
-        posret[0], posret[1], posret[2], posret[3], posret[4], posret[5],
-        cusps[1], cusps[2], cusps[3], cusps[4], cusps[5], cusps[6], cusps[7],
-        cusps[8], cusps[9], cusps[10], cusps[11], cusps[12],
-        ascmc[0], ascmc[1], ascmc[2], ascmc[3], ascmc[4], ascmc[5], ascmc[6],
-        ascmc[7]);
-    }
+    return Py_BuildValue("f(ffffff)(ffffffffffff)(ffffffff)", jdret,
+    posret[0], posret[1], posret[2], posret[3], posret[4], posret[5],
+    cusps[1], cusps[2], cusps[3], cusps[4], cusps[5], cusps[6], cusps[7],
+    cusps[8], cusps[9], cusps[10], cusps[11], cusps[12],
+    ascmc[0], ascmc[1], ascmc[2], ascmc[3], ascmc[4], ascmc[5], ascmc[6],
+    ascmc[7]);
 }
 
 /* swisseph._next_aspect_with */
@@ -3781,7 +3753,7 @@ static char pyswe__next_aspect_with__doc__[] =
 
 static PyObject * pyswe__next_aspect_with FUNCARGS_KEYWDS
 {
-    int res, plnt, other=0, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
+    int res, plnt, other=0, backw=0, flag=SEFLG_SWIEPH|SEFLG_SPEED;
     double asp, jd, trange=0, jdret, posret0[6], posret1[6];
     char err[256], *star=NULL;
     PyObject *body;
@@ -3791,12 +3763,9 @@ static PyObject * pyswe__next_aspect_with FUNCARGS_KEYWDS
         &plnt, &asp, &body, &jd, &backw, &trange, &flag))
         return NULL;
     if (PyLong_CheckExact(body)) /* long -> planet */
-    {
         other = (int) PyLong_AsLong(body);
-    }
 #if PY_MAJOR_VERSION >= 3
-    else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
-    {
+    else if (PyUnicode_CheckExact(body)) { /* unicode -> fixed star */
         if (PyUnicode_READY(body)) {
             PyErr_SetString(pyswe_Error, "swisseph._next_aspect_with: nomem");
             return NULL;
@@ -3805,32 +3774,27 @@ static PyObject * pyswe__next_aspect_with FUNCARGS_KEYWDS
     }
 #elif PY_MAJOR_VERSION < 3
     else if (PyInt_CheckExact(body)) /* int -> planet */
-    {
         other = (int) PyInt_AsLong(body);
-    }
     else if (PyString_CheckExact(body)) /* str -> fixed star */
-    {
         star = PyString_AsString(body);
-    }
 #endif
-    else
-    {
+    else {
         PyErr_SetString(pyswe_Error,
-            "swisseph._next_aspect_with: Invalid body type");
+            "swisseph._next_aspect_with: invalid body type");
         return NULL;
     }
     res = swh_next_aspect_with(plnt, asp, other, star, jd, backw, trange,
         flag, &jdret, posret0, posret1, err);
     switch (res) {
-    case 1:
+    case 1: /* internal error */
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     case 2: /* time limit reached */
-        return Py_BuildValue("(O)(OOOOOO)(OOOOOO)", Py_None, Py_None, Py_None,
+        return Py_BuildValue("O(OOOOOO)(OOOOOO)", Py_None, Py_None, Py_None,
         Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None,
         Py_None, Py_None);
     default:
-        return Py_BuildValue("(f)(ffffff)(ffffff)", jdret, posret0[0],
+        return Py_BuildValue("f(ffffff)(ffffff)", jdret, posret0[0],
         posret0[1], posret0[2], posret0[3], posret0[4], posret0[5], posret1[0],
         posret1[1], posret1[2], posret1[3], posret1[4], posret1[5]);
     }
@@ -3845,7 +3809,7 @@ static char pyswe__next_aspect_with2__doc__[] =
 
 static PyObject * pyswe__next_aspect_with2 FUNCARGS_KEYWDS
 {
-    int res, plnt, other=0, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED;
+    int res, plnt, other=0, backw=0, flag=SEFLG_SWIEPH|SEFLG_SPEED;
     double asp, jd, trange=0, jdret, posret0[6], posret1[6];
     char err[256], *star=NULL;
     PyObject *body;
@@ -3855,12 +3819,9 @@ static PyObject * pyswe__next_aspect_with2 FUNCARGS_KEYWDS
         &plnt, &asp, &body, &jd, &backw, &trange, &flag))
         return NULL;
     if (PyLong_CheckExact(body)) /* long -> planet */
-    {
         other = (int) PyLong_AsLong(body);
-    }
 #if PY_MAJOR_VERSION >= 3
-    else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
-    {
+    else if (PyUnicode_CheckExact(body)) { /* unicode -> fixed star */
         if (PyUnicode_READY(body)) {
             PyErr_SetString(pyswe_Error, "swisseph._next_aspect_with2: nomem");
             return NULL;
@@ -3869,32 +3830,27 @@ static PyObject * pyswe__next_aspect_with2 FUNCARGS_KEYWDS
     }
 #elif PY_MAJOR_VERSION < 3
     else if (PyInt_CheckExact(body)) /* int -> planet */
-    {
         other = (int) PyInt_AsLong(body);
-    }
     else if (PyString_CheckExact(body)) /* str -> fixed star */
-    {
         star = PyString_AsString(body);
-    }
 #endif
-    else
-    {
+    else {
         PyErr_SetString(pyswe_Error,
-            "swisseph._next_aspect_with2: Invalid body type");
+            "swisseph._next_aspect_with2: invalid body type");
         return NULL;
     }
     res = swh_next_aspect_with2(plnt, asp, other, star, jd, backw, trange,
         flag, &jdret, posret0, posret1, err);
     switch (res) {
-    case 1:
+    case 1: /* internal error */
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     case 2: /* time limit reached */
-        return Py_BuildValue("(O)(OOOOOO)(OOOOOO)", Py_None, Py_None, Py_None,
+        return Py_BuildValue("O(OOOOOO)(OOOOOO)", Py_None, Py_None, Py_None,
         Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None,
         Py_None, Py_None);
     default:
-        return Py_BuildValue("(f)(ffffff)(ffffff)", jdret, posret0[0],
+        return Py_BuildValue("f(ffffff)(ffffff)", jdret, posret0[0],
         posret0[1], posret0[2], posret0[3], posret0[4], posret0[5], posret1[0],
         posret1[1], posret1[2], posret1[3], posret1[4], posret1[5]);
     }
@@ -3912,25 +3868,24 @@ static char pyswe__next_retro__doc__[] =
 
 static PyObject * pyswe__next_retro FUNCARGS_KEYWDS
 {
-    int res, plnt, backw=0, flag=SEFLG_SWIEPH+SEFLG_SPEED+SEFLG_NOGDEFL;
+    int res, plnt, backw=0, flag=SEFLG_SWIEPH|SEFLG_SPEED|SEFLG_NOGDEFL;
     double jd, trange=0, jdret, posret[6];
     char err[256];
-    static char *kwlist[] = {"planet", "jdstart", "backw",
-        "stop", "flag", NULL};
+    static char *kwlist[] = {"planet", "jdstart", "backw", "stop", "flag", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "id|idi", kwlist,
         &plnt, &jd, &backw, &trange, &flag))
         return NULL;
-    res = swh_next_retro(plnt, jd, backw, trange, flag,
-        &jdret, posret, err);
+    res = swh_next_retro(plnt, jd, backw, trange, flag, &jdret, posret, err);
     switch (res) {
-    case 1:
+    case 1: /* internal error */
+    case 3: /* bad argument */
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     case 2: /* time limit reached */
-        return Py_BuildValue("(O)(OOOOOO)", Py_None, Py_None, Py_None, Py_None,
+        return Py_BuildValue("O(OOOOOO)", Py_None, Py_None, Py_None, Py_None,
             Py_None, Py_None, Py_None);
     default:
-        return Py_BuildValue("(f)(ffffff)", jdret, posret[0], posret[1],
+        return Py_BuildValue("f(ffffff)", jdret, posret[0], posret[1],
             posret[2], posret[3], posret[4], posret[5]);
     }
 }
