@@ -11,7 +11,6 @@ calculations.
   - Fork me on GitHub:      https://github.com/astrorigin/pyswisseph
   - Launchpad PPA:          https://launchpad.net/~astrorigin/+archive/ubuntu/python-swisseph
   - Python Package Index:   https://pypi.org/project/pyswisseph
-  - Experimental packages:  https://test.pypi.org/project/pyswisseph/#files
   - AstroDienst:            https://www.astro.com/swisseph
 
 Licensing
@@ -28,6 +27,7 @@ Credits
 =======
 
 Author: Stanislas Marquis <stan(at)astrorigin.com>
+
 PyPI maintainer (branch pypi): Jonathan de Jong <jonathan(at)automatia.nl>
 
 ..
