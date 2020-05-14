@@ -3207,9 +3207,8 @@ static PyObject * pyswe__geoc2d FUNCARGS_KEYWDS
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &coord))
         return NULL;
     res = swh_geoc2d(coord, &ret);
-    if (res == -1)
-    {
-        PyErr_SetString(pyswe_Error, "swisseph._geoc2d: Invalid coord string");
+    if (res) {
+        PyErr_SetString(pyswe_Error, "swisseph._geoc2d: invalid coord string");
         return NULL;
     }
     return Py_BuildValue("f", ret);
