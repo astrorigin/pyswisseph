@@ -79,12 +79,12 @@
 static PyObject * pyswe_Error;
 
 /* swisseph.azalt */
-static char pyswe_azalt__doc__[] =
+PyDoc_STRVAR(pyswe_azalt__doc__,
 "Calculate horizontal coordinates (azimuth and altitude) of a planet or a star"
 " from either ecliptical or equatorial coordinates (UTC).\n\n"
 "Args: float julday, float lon, float lat, float hei, float x, float y,"
 " float z=0.0, float press=0.0, float temp=0.0, int flag=ECL2HOR\n"
-"Return: tuple of 3 float (azimuth, true altitude, apparent altitude)";
+"Return: tuple of 3 float (azimuth, true altitude, apparent altitude)");
 
 static PyObject * pyswe_azalt FUNCARGS_KEYWDS
 {
@@ -102,12 +102,12 @@ static PyObject * pyswe_azalt FUNCARGS_KEYWDS
 }
 
 /* swisseph.azalt_rev */
-static char pyswe_azalt_rev__doc__[] =
+PyDoc_STRVAR(pyswe_azalt_rev__doc__,
 "Calculate either ecliptical or equatorial coordinates from azimuth and true"
 " altitude.\n\n"
 "Args: float julday, float lon, float lat, float hei, double azim, double alt,"
 " int flag=HOR2ECL\n"
-"Return: tuple of 2 float";
+"Return: tuple of 2 float");
 
 static PyObject * pyswe_azalt_rev FUNCARGS_KEYWDS
 {
@@ -123,12 +123,12 @@ static PyObject * pyswe_azalt_rev FUNCARGS_KEYWDS
 }
 
 /* swisseph.calc */
-static char pyswe_calc__doc__[] =
+PyDoc_STRVAR(pyswe_calc__doc__,
 "Calculate body positions (ET).\n\n"
 "Args: float julday, int planet, int flag=FLG_SWIEPH+FLG_SPEED\n"
 "Return: tuple of 6 float, and returned flags\n\n"
 "Usage example:\n\n"
-"\tres, flg = swisseph.calc(jd, pl)";
+"\tres, flg = swisseph.calc(jd, pl)");
 
 static PyObject * pyswe_calc FUNCARGS_KEYWDS
 {
@@ -149,12 +149,12 @@ static PyObject * pyswe_calc FUNCARGS_KEYWDS
 }
 
 /* swisseph.calc_ut */
-static char pyswe_calc_ut__doc__[] =
+PyDoc_STRVAR(pyswe_calc_ut__doc__,
 "Calculate body positions (UT).\n\n"
 "Args: float julday, int planet, int flag=FLG_SWIEPH+FLG_SPEED\n"
 "Return: tuple of 6 float, and returned flags\n\n"
 "Usage example:\n\n"
-"\tres, flg = swisseph.calc_ut(jd, pl)";
+"\tres, flg = swisseph.calc_ut(jd, pl)");
 
 static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
 {
@@ -175,10 +175,10 @@ static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
 }
 
 /* swisseph.close */
-static char pyswe_close__doc__[] =
+PyDoc_STRVAR(pyswe_close__doc__,
 "Close swiss ephemeris.\n\n"
 "Args: -\n"
-"Return: None";
+"Return: None");
 
 static PyObject * pyswe_close FUNCARGS_SELF
 {
@@ -187,10 +187,10 @@ static PyObject * pyswe_close FUNCARGS_SELF
 }
 
 /* swisseph.cotrans */
-static char pyswe_cotrans__doc__[] =
+PyDoc_STRVAR(pyswe_cotrans__doc__,
 "Coordinate transformation from ecliptic to equator or vice-versa.\n\n"
 "Args: float lon, float lat, float dist, float obliquity\n"
-"Return: tuple of 3 float (longitude, latitude, distance)";
+"Return: tuple of 3 float (longitude, latitude, distance)");
 
 static PyObject * pyswe_cotrans FUNCARGS_KEYWDS
 {
@@ -204,12 +204,12 @@ static PyObject * pyswe_cotrans FUNCARGS_KEYWDS
 }
 
 /* swisseph.cotrans_sp */
-static char pyswe_cotrans_sp__doc__[] =
+PyDoc_STRVAR(pyswe_cotrans_sp__doc__,
 "Coordinate transformation of position and speed, from ecliptic to equator"
 " or vice-versa.\n\n"
 "Args: float lon, float lat, float dist, float lonspeed, float latspeed,"
 " float distspeed, float obliquity\n"
-"Return: tuple of 6 float";
+"Return: tuple of 6 float");
 
 static PyObject * pyswe_cotrans_sp FUNCARGS_KEYWDS
 {
@@ -225,10 +225,10 @@ static PyObject * pyswe_cotrans_sp FUNCARGS_KEYWDS
 }
 
 /* swisseph.cs2degstr */
-static char pyswe_cs2degstr__doc__[] =
+PyDoc_STRVAR(pyswe_cs2degstr__doc__,
 "Get degrees string from centiseconds.\n\n"
 "Args: int cs\n"
-"Return: str";
+"Return: str");
 
 static PyObject * pyswe_cs2degstr FUNCARGS_KEYWDS
 {
@@ -242,10 +242,10 @@ static PyObject * pyswe_cs2degstr FUNCARGS_KEYWDS
 }
 
 /* swisseph.cs2lonlatstr */
-static char pyswe_cs2lonlatstr__doc__[] =
+PyDoc_STRVAR(pyswe_cs2lonlatstr__doc__,
 "Get longitude or latitude string from centiseconds.\n\n"
 "Args: int cs, char plus, char minus\n"
-"Return: str";
+"Return: str");
 
 static PyObject * pyswe_cs2lonlatstr FUNCARGS_KEYWDS
 {
@@ -260,10 +260,10 @@ static PyObject * pyswe_cs2lonlatstr FUNCARGS_KEYWDS
 }
 
 /* swisseph.cs2timestr */
-static char pyswe_cs2timestr__doc__[] =
+PyDoc_STRVAR(pyswe_cs2timestr__doc__,
 "Get time string from centiseconds.\n\n"
 "Args: int cs, char sep, bool suppresszero=True\n"
-"Return: str";
+"Return: str");
 
 static PyObject * pyswe_cs2timestr FUNCARGS_KEYWDS
 {
@@ -278,10 +278,10 @@ static PyObject * pyswe_cs2timestr FUNCARGS_KEYWDS
 }
 
 /* swisseph.csnorm */
-static char pyswe_csnorm__doc__[] =
+PyDoc_STRVAR(pyswe_csnorm__doc__,
 "Normalization of any centisecond number to the range [0;360].\n\n"
 "Args: int x\n"
-"Return: int";
+"Return: int");
 
 static PyObject * pyswe_csnorm FUNCARGS_KEYWDS
 {
@@ -293,10 +293,10 @@ static PyObject * pyswe_csnorm FUNCARGS_KEYWDS
 }
 
 /* swisseph.csroundsec */
-static char pyswe_csroundsec__doc__[] =
+PyDoc_STRVAR(pyswe_csroundsec__doc__,
 "Round centiseconds, but at 29.5959 always down.\n\n"
 "Args: int x\n"
-"Return: int";
+"Return: int");
 
 static PyObject * pyswe_csroundsec FUNCARGS_KEYWDS
 {
@@ -308,10 +308,10 @@ static PyObject * pyswe_csroundsec FUNCARGS_KEYWDS
 }
 
 /* swisseph.d2l */
-static char pyswe_d2l__doc__[] =
+PyDoc_STRVAR(pyswe_d2l__doc__,
 "Double to integer with rounding, no overflow check.\n\n"
 "Args: float x\n"
-"Return: int";
+"Return: int");
 
 static PyObject * pyswe_d2l FUNCARGS_KEYWDS
 {
@@ -323,10 +323,10 @@ static PyObject * pyswe_d2l FUNCARGS_KEYWDS
 }
 
 /* swisseph.date_conversion */
-static char pyswe_date_conversion__doc__[] =
+PyDoc_STRVAR(pyswe_date_conversion__doc__,
 "Calculate Julian day number with check wether date is correct.\n\n"
 "Args: int year, int month, int day, float hour=12.0, char cal='g'\n"
-"Return: tuple (int result, float jd)";
+"Return: tuple (int result, float jd)");
 
 static PyObject * pyswe_date_conversion FUNCARGS_KEYWDS
 {
@@ -348,10 +348,10 @@ static PyObject * pyswe_date_conversion FUNCARGS_KEYWDS
 }
 
 /* swisseph.day_of_week */
-static char pyswe_day_of_week__doc__[] =
+PyDoc_STRVAR(pyswe_day_of_week__doc__,
 "Calculate day of week number [0;6] from julian day number.\n\n"
 "Args: float julday\n"
-"Return: int";
+"Return: int");
 
 static PyObject * pyswe_day_of_week FUNCARGS_KEYWDS
 {
@@ -363,10 +363,10 @@ static PyObject * pyswe_day_of_week FUNCARGS_KEYWDS
 }
 
 /* swisseph.deg_midp */
-static char pyswe_deg_midp__doc__[] =
+PyDoc_STRVAR(pyswe_deg_midp__doc__,
 "Calculate midpoint (in degrees).\n\n"
 "Args: float x, float y\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_deg_midp FUNCARGS_KEYWDS
 {
@@ -378,10 +378,10 @@ static PyObject * pyswe_deg_midp FUNCARGS_KEYWDS
 }
 
 /* swisseph.degnorm */
-static char pyswe_degnorm__doc__[] =
+PyDoc_STRVAR(pyswe_degnorm__doc__,
 "Normalization of any degree number to the range [0;360].\n\n"
 "Args: float x\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_degnorm FUNCARGS_KEYWDS
 {
@@ -393,10 +393,10 @@ static PyObject * pyswe_degnorm FUNCARGS_KEYWDS
 }
 
 /* swisseph.deltat */
-static char pyswe_deltat__doc__[] =
+PyDoc_STRVAR(pyswe_deltat__doc__,
 "Calculate value of delta T.\n\n"
 "Args: float julday\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_deltat FUNCARGS_KEYWDS
 {
@@ -408,10 +408,10 @@ static PyObject * pyswe_deltat FUNCARGS_KEYWDS
 }
 
 /* swisseph.difcs2n */
-static char pyswe_difcs2n__doc__[] =
+PyDoc_STRVAR(pyswe_difcs2n__doc__,
 "Calculate distance in centisecs p1 - p2 normalized to [-180;180].\n\n"
 "Args: int p1, int p2\n"
-"Return: int";
+"Return: int");
 
 static PyObject * pyswe_difcs2n FUNCARGS_KEYWDS
 {
@@ -423,10 +423,10 @@ static PyObject * pyswe_difcs2n FUNCARGS_KEYWDS
 }
 
 /* swisseph.difcsn */
-static char pyswe_difcsn__doc__[] =
+PyDoc_STRVAR(pyswe_difcsn__doc__,
 "Calculate distance in centisecs p1 - p2.\n\n"
 "Args: int p1, int p2\n"
-"Return: int";
+"Return: int");
 
 static PyObject * pyswe_difcsn FUNCARGS_KEYWDS
 {
@@ -438,10 +438,10 @@ static PyObject * pyswe_difcsn FUNCARGS_KEYWDS
 }
 
 /* swisseph.difdeg2n */
-static char pyswe_difdeg2n__doc__[] =
+PyDoc_STRVAR(pyswe_difdeg2n__doc__,
 "Calculate distance in degrees p1 - p2 normalized to [-180;180].\n\n"
 "Args: float p1, float p2\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_difdeg2n FUNCARGS_KEYWDS
 {
@@ -453,10 +453,10 @@ static PyObject * pyswe_difdeg2n FUNCARGS_KEYWDS
 }
 
 /* swisseph.difdegn */
-static char pyswe_difdegn__doc__[] =
+PyDoc_STRVAR(pyswe_difdegn__doc__,
 "Calculate distance in degrees p1 - p2.\n\n"
 "Args: float p1, float p2\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_difdegn FUNCARGS_KEYWDS
 {
@@ -468,10 +468,10 @@ static PyObject * pyswe_difdegn FUNCARGS_KEYWDS
 }
 
 /* swisseph.difrad2n */
-static char pyswe_difrad2n__doc__[] =
+PyDoc_STRVAR(pyswe_difrad2n__doc__,
 "Calculate distance in radians p1 - p2 normalized to [-180;180].\n\n"
 "Args: float p1, float p2\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_difrad2n FUNCARGS_KEYWDS
 {
@@ -483,12 +483,12 @@ static PyObject * pyswe_difrad2n FUNCARGS_KEYWDS
 }
 
 /* swisseph.fixstar */
-static char pyswe_fixstar__doc__[] =
+PyDoc_STRVAR(pyswe_fixstar__doc__,
 "Calculate fixed star positions (ET).\n\n"
 "Args: str star, float julday, int flag=FLG_SWIEPH\n"
 "Return: tuple of 6 float, returned star name, and returned flags\n\n"
 "Usage example:\n\n"
-"\tres, stnam, flg = swisseph.fixstar(st, jd)";
+"\tres, stnam, flg = swisseph.fixstar(st, jd)");
 
 static PyObject * pyswe_fixstar FUNCARGS_KEYWDS
 {
@@ -511,12 +511,12 @@ static PyObject * pyswe_fixstar FUNCARGS_KEYWDS
 }
 
 /* swisseph.fixstar2 */
-static char pyswe_fixstar2__doc__[] =
+PyDoc_STRVAR(pyswe_fixstar2__doc__,
 "Calculate fixed star positions (fast) (ET).\n\n"
 "Args: str star, float julday, int flag=FLG_SWIEPH\n"
 "Return: tuple of 6 float, returned star name, and returned flags\n\n"
 "Usage example:\n\n"
-"\tres, stnam, flg = swisseph.fixstar2(st, jd)";
+"\tres, stnam, flg = swisseph.fixstar2(st, jd)");
 
 static PyObject * pyswe_fixstar2 FUNCARGS_KEYWDS
 {
@@ -539,10 +539,10 @@ static PyObject * pyswe_fixstar2 FUNCARGS_KEYWDS
 }
 
 /* swisseph.fixstar2_mag */
-static char pyswe_fixstar2_mag__doc__ [] =
+PyDoc_STRVAR(pyswe_fixstar2_mag__doc__,
 "Get fixed star magnitude (fast).\n\n"
 "Args: str star\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_fixstar2_mag FUNCARGS_KEYWDS
 {
@@ -564,12 +564,12 @@ static PyObject * pyswe_fixstar2_mag FUNCARGS_KEYWDS
 }
 
 /* swisseph.fixstar2_ut */
-static char pyswe_fixstar2_ut__doc__[] =
+PyDoc_STRVAR(pyswe_fixstar2_ut__doc__,
 "Calculate fixed star positions (fast) (UT).\n\n"
 "Args: str star, float julday, int flag=FLG_SWIEPH\n"
 "Return: tuple of 6 float, returned star name, and returned flags\n\n"
 "Usage example:\n\n"
-"\tres, stnam, flg = swisseph.fixstar2_ut(st, jd)";
+"\tres, stnam, flg = swisseph.fixstar2_ut(st, jd)");
 
 static PyObject * pyswe_fixstar2_ut FUNCARGS_KEYWDS
 {
@@ -592,10 +592,10 @@ static PyObject * pyswe_fixstar2_ut FUNCARGS_KEYWDS
 }
 
 /* swisseph.fixstar_mag */
-static char pyswe_fixstar_mag__doc__[] =
+PyDoc_STRVAR(pyswe_fixstar_mag__doc__,
 "Get fixed star magnitude.\n\n"
 "Args: str star\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_fixstar_mag FUNCARGS_KEYWDS
 {
@@ -617,12 +617,12 @@ static PyObject * pyswe_fixstar_mag FUNCARGS_KEYWDS
 }
 
 /* swisseph.fixstar_ut */
-static char pyswe_fixstar_ut__doc__[] =
+PyDoc_STRVAR(pyswe_fixstar_ut__doc__,
 "Calculate fixed star positions (UT).\n\n"
 "Args: str star, float julday, int flag=FLG_SWIEPH\n"
 "Return: tuple of 6 float, returned star name, and returned flags\n\n"
 "Usage example:\n\n"
-"\tres, stnam, flg = swisseph.fixstar_ut(st, jd)";
+"\tres, stnam, flg = swisseph.fixstar_ut(st, jd)");
 
 static PyObject * pyswe_fixstar_ut FUNCARGS_KEYWDS
 {
@@ -645,11 +645,11 @@ static PyObject * pyswe_fixstar_ut FUNCARGS_KEYWDS
 }
 
 /* swisseph.gauquelin_sector */
-static char pyswe_gauquelin_sector__doc__[] =
+PyDoc_STRVAR(pyswe_gauquelin_sector__doc__,
 "Calculate Gauquelin sector position of a body (UT).\n\n"
 "Args: float julday, int or str body, float lon, float lat, float alt,"
 " float press=0, float temp=0, int method=0, int flag=FLG_SWIEPH\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_gauquelin_sector FUNCARGS_KEYWDS
 {
@@ -703,10 +703,10 @@ static PyObject * pyswe_gauquelin_sector FUNCARGS_KEYWDS
 }
 
 /* swisseph.get_ayanamsa */
-static char pyswe_get_ayanamsa__doc__[] =
+PyDoc_STRVAR(pyswe_get_ayanamsa__doc__,
 "Calculate ayanamsa (ET).\n\n"
 "Args: float julday\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_get_ayanamsa FUNCARGS_KEYWDS
 {
@@ -719,10 +719,10 @@ static PyObject * pyswe_get_ayanamsa FUNCARGS_KEYWDS
 }
 
 /* swisseph.get_ayanamsa_name */
-static char pyswe_get_ayanamsa_name__doc__[] =
+PyDoc_STRVAR(pyswe_get_ayanamsa_name__doc__,
 "Get ayanamsa name from sidereal mode constant.\n\n"
 "Args: int sidmode\n"
-"Return: str";
+"Return: str");
 
 static PyObject * pyswe_get_ayanamsa_name FUNCARGS_KEYWDS
 {
@@ -736,10 +736,10 @@ static PyObject * pyswe_get_ayanamsa_name FUNCARGS_KEYWDS
 }
 
 /* swisseph.get_ayanamsa_ut */
-static char pyswe_get_ayanamsa_ut__doc__[] =
+PyDoc_STRVAR(pyswe_get_ayanamsa_ut__doc__,
 "Calculate ayanamsa (UT).\n\n"
 "Args: float julday\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_get_ayanamsa_ut FUNCARGS_KEYWDS
 {
@@ -752,10 +752,10 @@ static PyObject * pyswe_get_ayanamsa_ut FUNCARGS_KEYWDS
 }
 
 /* swisseph.get_library_path */
-static char pyswe_get_library_path__doc__[] =
+PyDoc_STRVAR(pyswe_get_library_path__doc__,
 "Find the path of the swisseph library (dll) actually in use.\n\n"
 "Args: -\n"
-"Return: str";
+"Return: str");
 
 static PyObject * pyswe_get_library_path FUNCARGS_SELF
 {
@@ -765,10 +765,10 @@ static PyObject * pyswe_get_library_path FUNCARGS_SELF
 }
 
 /* swisseph.get_planet_name */
-static char pyswe_get_planet_name__doc__[] =
+PyDoc_STRVAR(pyswe_get_planet_name__doc__,
 "Get planet name.\n\n"
 "Args: int planet\n"
-"Return: str";
+"Return: str");
 
 static PyObject * pyswe_get_planet_name FUNCARGS_KEYWDS
 {
@@ -782,11 +782,11 @@ static PyObject * pyswe_get_planet_name FUNCARGS_KEYWDS
 }
 
 /* swisseph.get_orbital_elements */
-static char pyswe_get_orbital_elements__doc__[] =
+PyDoc_STRVAR(pyswe_get_orbital_elements__doc__,
 "Calculate osculating elements (Kepler elements) and orbital periods for a"
 " planet, the Earth-Moon barycenter, or an asteroid.\n\n"
 "Args: float jdet, int pl, int flag\n"
-"Return: ";
+"Return: ");
 
 static PyObject * pyswe_get_orbital_elements FUNCARGS_KEYWDS
 {
@@ -816,10 +816,10 @@ static PyObject * pyswe_get_orbital_elements FUNCARGS_KEYWDS
 }
 
 /* swisseph.get_tid_acc */
-static char pyswe_get_tid_acc__doc__[] =
+PyDoc_STRVAR(pyswe_get_tid_acc__doc__,
 "Get tidal acceleration.\n\n"
 "Args: -\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_get_tid_acc FUNCARGS_SELF
 {
@@ -827,10 +827,10 @@ static PyObject * pyswe_get_tid_acc FUNCARGS_SELF
 }
 
 /* swisseph.heliacal_pheno_ut */
-static char pyswe_heliacal_pheno_ut__doc__ [] =
+PyDoc_STRVAR(pyswe_heliacal_pheno_ut__doc__,
 "Provides data that are relevant for the calculation of heliacal risings and settings.\n\n"
 "Args: float jd_start, seq geopos, seq atmo, seq observer, str object, int enventtype, int helflag\n"
-"Return: tuple of 50 float";
+"Return: tuple of 50 float");
 
 static PyObject * pyswe_heliacal_pheno_ut FUNCARGS_KEYWDS
 {
@@ -1225,12 +1225,12 @@ static PyObject * pyswe_heliacal_pheno_ut FUNCARGS_KEYWDS
 }
 
 /* swisseph.heliacal_ut */
-static char pyswe_heliacal_ut__doc__ [] =
+PyDoc_STRVAR(pyswe_heliacal_ut__doc__,
 "Find the Julian day of the next heliacal phenomenon after a given start date.\n"
 "It works between geographic latitudes 60s - 60n.\n\n"
 "Args: float jd_start, seq geopos, seq atmo, seq observer, str object,"
 " int enventtype, int helflag\n"
-"Return: tuple with 3 julian days";
+"Return: tuple with 3 julian days");
 
 static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
 {
@@ -1618,10 +1618,10 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
 }
 
 /* swisseph.house_name */
-static char pyswe_house_name__doc__[] =
+PyDoc_STRVAR(pyswe_house_name__doc__,
 "Get the name of the house method.\n\n"
 "Args: char hsys\n"
-"Return: house system name";
+"Return: house system name");
 
 static PyObject * pyswe_house_name FUNCARGS_KEYWDS
 {
@@ -1633,11 +1633,11 @@ static PyObject * pyswe_house_name FUNCARGS_KEYWDS
 }
 
 /* swisseph.house_pos */
-static char pyswe_house_pos__doc__[] =
+PyDoc_STRVAR(pyswe_house_pos__doc__,
 "Calculate house position of a body.\n\n"
 "Args: float armc, float geolat, float obliquity, float objlon,"
 " float objlat=0.0, char hsys='P'\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_house_pos FUNCARGS_KEYWDS
 {
@@ -1660,10 +1660,10 @@ static PyObject * pyswe_house_pos FUNCARGS_KEYWDS
 }
 
 /* swisseph.houses */
-static char pyswe_houses__doc__[] =
+PyDoc_STRVAR(pyswe_houses__doc__,
 "Calculate houses cusps (UT).\n\n"
 "Args: float julday, float lat, float lon, char hsys='P'\n"
-"Return: 2 tuples of 12 and 8 float (cusps, ascmc) (except Gauquelin)";
+"Return: 2 tuples of 12 and 8 float (cusps, ascmc) (except Gauquelin)");
 
 static PyObject * pyswe_houses FUNCARGS_KEYWDS
 {
@@ -1699,10 +1699,10 @@ static PyObject * pyswe_houses FUNCARGS_KEYWDS
 }
 
 /* swisseph.houses_armc */
-static char pyswe_houses_armc__doc__[] =
+PyDoc_STRVAR(pyswe_houses_armc__doc__,
 "Calculate houses cusps with ARMC.\n\n"
 "Args: float armc, float lat, float obliquity, char hsys='P'\n"
-"Return: 2 tuples of 12 and 8 float (cusps, ascmc) (except Gauquelin)";
+"Return: 2 tuples of 12 and 8 float (cusps, ascmc) (except Gauquelin)");
 
 static PyObject * pyswe_houses_armc FUNCARGS_KEYWDS
 {
@@ -1738,10 +1738,10 @@ static PyObject * pyswe_houses_armc FUNCARGS_KEYWDS
 }
 
 /* swisseph.houses_ex */
-static char pyswe_houses_ex__doc__[] =
+PyDoc_STRVAR(pyswe_houses_ex__doc__,
 "Calculate houses cusps (extended) (UT).\n\n"
 "Args: float julday, float lat, float lon, char hsys='P', int flag=0\n"
-"Return: 2 tuples of 12 and 8 float (cusps, ascmc) (except Gauquelin)";
+"Return: 2 tuples of 12 and 8 float (cusps, ascmc) (except Gauquelin)");
 
 static PyObject * pyswe_houses_ex FUNCARGS_KEYWDS
 {
@@ -1777,10 +1777,10 @@ static PyObject * pyswe_houses_ex FUNCARGS_KEYWDS
 }
 
 /* swisseph.jdet_to_utc */
-static char pyswe_jdet_to_utc__doc__ [] =
+PyDoc_STRVAR(pyswe_jdet_to_utc__doc__,
 "Convert ET julian day number to UTC.\n\n"
 "Args: float et, int flag\n"
-"Return: tuple (int year, int month, int day, int hour, int minutes, float seconds)";
+"Return: tuple (int year, int month, int day, int hour, int minutes, float seconds)");
 
 static PyObject * pyswe_jdet_to_utc FUNCARGS_KEYWDS
 {
@@ -1794,10 +1794,10 @@ static PyObject * pyswe_jdet_to_utc FUNCARGS_KEYWDS
 }
 
 /* swisseph.jdut1_to_utc */
-static char pyswe_jdut1_to_utc__doc__ [] =
+PyDoc_STRVAR(pyswe_jdut1_to_utc__doc__,
 "Convert UT julian day number to UTC.\n\n"
 "Args: float ut, int flag\n"
-"Return: tuple (int year, int month, int day, int hour, int minutes, float seconds)";
+"Return: tuple (int year, int month, int day, int hour, int minutes, float seconds)");
 
 static PyObject * pyswe_jdut1_to_utc FUNCARGS_KEYWDS
 {
@@ -1811,10 +1811,10 @@ static PyObject * pyswe_jdut1_to_utc FUNCARGS_KEYWDS
 }
 
 /* swisseph.julday */
-static char pyswe_julday__doc__[] =
+PyDoc_STRVAR(pyswe_julday__doc__,
 "Calculate Julian day number.\n\n"
 "Args: int year, int month, int day, float hour=12.0, int cal=GREG_CAL\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_julday FUNCARGS_KEYWDS
 {
@@ -1830,10 +1830,10 @@ static PyObject * pyswe_julday FUNCARGS_KEYWDS
 }
 
 /* swisseph.lat_to_lmt */
-static char pyswe_lat_to_lmt__doc__[] =
+PyDoc_STRVAR(pyswe_lat_to_lmt__doc__,
 "Translate local apparent time (LAT) to local mean time (LMT).\n\n"
 "Args: float julday, float geolon\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_lat_to_lmt FUNCARGS_KEYWDS
 {
@@ -1853,10 +1853,10 @@ static PyObject * pyswe_lat_to_lmt FUNCARGS_KEYWDS
 }
 
 /* swisseph.lmt_to_lat */
-static char pyswe_lmt_to_lat__doc__[] =
+PyDoc_STRVAR(pyswe_lmt_to_lat__doc__,
 "Translate local mean time (LMT) to local apparent time (LAT).\n\n"
 "Args: float julday, float geolon\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_lmt_to_lat FUNCARGS_KEYWDS
 {
@@ -1876,10 +1876,10 @@ static PyObject * pyswe_lmt_to_lat FUNCARGS_KEYWDS
 }
 
 /* swisseph.lun_eclipse_how */
-static char pyswe_lun_eclipse_how__doc__[] =
+PyDoc_STRVAR(pyswe_lun_eclipse_how__doc__,
 "Calculate attributes of a lunar eclipse (UTC).\n\n"
 "Args: float julday, float lon, float lat, float alt=0.0, int flag=FLG_SWIEPH\n"
-"Return: tuples (retflag)(attr)";
+"Return: tuples (retflag)(attr)");
 
 static PyObject * pyswe_lun_eclipse_how FUNCARGS_KEYWDS
 {
@@ -1902,10 +1902,10 @@ static PyObject * pyswe_lun_eclipse_how FUNCARGS_KEYWDS
 }
 
 /* swisseph.lun_eclipse_when */
-static char pyswe_lun_eclipse_when__doc__[] =
+PyDoc_STRVAR(pyswe_lun_eclipse_when__doc__,
 "Find the next lunar eclipse (UTC).\n\n"
 "Args: float jd_start, int ecl_type=0, bool backward=False, int flag=FLG_SWIEPH\n"
-"Return: tuples (retflag)(tret)";
+"Return: tuples (retflag)(tret)");
 
 static PyObject * pyswe_lun_eclipse_when FUNCARGS_KEYWDS
 {
@@ -1927,11 +1927,11 @@ static PyObject * pyswe_lun_eclipse_when FUNCARGS_KEYWDS
 }
 
 /* swisseph.lun_eclipse_when_loc */
-static char pyswe_lun_eclipse_when_loc__doc__[] =
+PyDoc_STRVAR(pyswe_lun_eclipse_when_loc__doc__,
 "Find the next lunar eclipse observable from a given geographic position.\n\n"
 "Args: float jd_start, float lon, float lat, float alt=0.0, bool backward=False,"
 " int flag=FLG_SWIEPH\n"
-"Return: 3 tuples (retflag, tret, attr)";
+"Return: 3 tuples (retflag, tret, attr)");
 
 static PyObject * pyswe_lun_eclipse_when_loc FUNCARGS_KEYWDS
 {
@@ -1958,11 +1958,11 @@ static PyObject * pyswe_lun_eclipse_when_loc FUNCARGS_KEYWDS
 }
 
 /* swisseph.lun_occult_when_glob */
-static char pyswe_lun_occult_when_glob__doc__[] =
+PyDoc_STRVAR(pyswe_lun_occult_when_glob__doc__,
 "Find the next occultation of a planet or star by the moon globally (UTC).\n\n"
 "Args: float jd_start, int or str body, int ecl_type=0, bool backward=False,"
 " int flag=FLG_SWIEPH\n"
-"Return: tuple of results";
+"Return: tuple of results");
 
 static PyObject * pyswe_lun_occult_when_glob FUNCARGS_KEYWDS
 {
@@ -2013,11 +2013,11 @@ static PyObject * pyswe_lun_occult_when_glob FUNCARGS_KEYWDS
 }
 
 /* swisseph.lun_occult_when_loc */
-static char pyswe_lun_occult_when_loc__doc__[] =
+PyDoc_STRVAR(pyswe_lun_occult_when_loc__doc__,
 "Find next occultation of a body by the moon for a given geographic position (UTC).\n\n"
 "Args: float julday, int or str body, float lon, float lat, float alt=0.0,"
 " bool backward=False, int flag=FLG_SWIEPH\n"
-"Return: tuple of results";
+"Return: tuple of results");
 
 static PyObject * pyswe_lun_occult_when_loc FUNCARGS_KEYWDS
 {
@@ -2069,10 +2069,10 @@ static PyObject * pyswe_lun_occult_when_loc FUNCARGS_KEYWDS
 }
 
 /* swisseph.lun_occult_where */
-static char pyswe_lun_occult_where__doc__[] =
+PyDoc_STRVAR(pyswe_lun_occult_where__doc__,
 "Find where a lunar occultation is central or maximal (UTC).\n\n"
 "Args: float julday, int or str body, int flag=FLG_SWIEPH\n"
-"Return: tuples (retval)(geopos)(attr)";
+"Return: tuples (retval)(geopos)(attr)");
 
 static PyObject * pyswe_lun_occult_where FUNCARGS_KEYWDS
 {
@@ -2125,10 +2125,10 @@ static PyObject * pyswe_lun_occult_where FUNCARGS_KEYWDS
 }
 
 /* swisseph.nod_aps */
-static char pyswe_nod_aps__doc__[] =
+PyDoc_STRVAR(pyswe_nod_aps__doc__,
 "Calculate planetary nodes and apsides (ET).\n\n"
 "Args: float julday, int planet, int method=NODBIT_MEAN, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: 4 tuples of 6 float (asc, des, per, aph)";
+"Return: 4 tuples of 6 float (asc, des, per, aph)");
 
 static PyObject * pyswe_nod_aps FUNCARGS_KEYWDS
 {
@@ -2152,10 +2152,10 @@ static PyObject * pyswe_nod_aps FUNCARGS_KEYWDS
 }
 
 /* swisseph.nod_aps_ut */
-static char pyswe_nod_aps_ut__doc__[] =
+PyDoc_STRVAR(pyswe_nod_aps_ut__doc__,
 "Calculate planetary nodes and apsides (UT).\n\n"
 "Args: float julday, int planet, int method=NODBIT_MEAN, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: 4 tuples of 6 float (asc, des, per, aph)";
+"Return: 4 tuples of 6 float (asc, des, per, aph)");
 
 static PyObject * pyswe_nod_aps_ut FUNCARGS_KEYWDS
 {
@@ -2179,11 +2179,11 @@ static PyObject * pyswe_nod_aps_ut FUNCARGS_KEYWDS
 }
 
 /* swisseph.orbit_max_min_true_distance */
-static char pyswe_orbit_max_min_true_distance__doc__[] =
+PyDoc_STRVAR(pyswe_orbit_max_min_true_distance__doc__,
 "Calculate the maximum possible distance, the minimum possible distance, and"
 " the current true distance of planet, the EMB, or an asteroid.\n\n"
 "Args: float jdet, int pl, int flag\n"
-"Return: tuple (max, min, true)";
+"Return: tuple (max, min, true)");
 
 static PyObject * pyswe_orbit_max_min_true_distance FUNCARGS_KEYWDS
 {
@@ -2203,10 +2203,10 @@ static PyObject * pyswe_orbit_max_min_true_distance FUNCARGS_KEYWDS
 }
 
 /* swisseph.pheno */
-static char pyswe_pheno__doc__[] =
+PyDoc_STRVAR(pyswe_pheno__doc__,
 "Calculate planetary phenomena (ET).\n\n"
 "Args: float julday, int planet, int flag=FLG_SWIEPH\n"
-"Return: tuple of results";
+"Return: tuple of results");
 
 static PyObject * pyswe_pheno FUNCARGS_KEYWDS
 {
@@ -2227,10 +2227,10 @@ static PyObject * pyswe_pheno FUNCARGS_KEYWDS
 }
 
 /* swisseph.pheno_ut */
-static char pyswe_pheno_ut__doc__[] =
+PyDoc_STRVAR(pyswe_pheno_ut__doc__,
 "Calculate planetary phenomena (UTC).\n\n"
 "Args: float julday, int planet, int flag=FLG_SWIEPH\n"
-"Return: tuple of results";
+"Return: tuple of results");
 
 static PyObject * pyswe_pheno_ut FUNCARGS_KEYWDS
 {
@@ -2251,10 +2251,10 @@ static PyObject * pyswe_pheno_ut FUNCARGS_KEYWDS
 }
 
 /* swisseph.rad_midp */
-static char pyswe_rad_midp__doc__[] =
+PyDoc_STRVAR(pyswe_rad_midp__doc__,
 "Calculate midpoint (in radians).\n\n"
 "Args: float x, float y\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_rad_midp FUNCARGS_KEYWDS
 {
@@ -2266,10 +2266,10 @@ static PyObject * pyswe_rad_midp FUNCARGS_KEYWDS
 }
 
 /* swisseph.radnorm */
-static char pyswe_radnorm__doc__[] =
+PyDoc_STRVAR(pyswe_radnorm__doc__,
 "Normalization of any radian number to the range [0;2*pi].\n\n"
 "Args: float x\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_radnorm FUNCARGS_KEYWDS
 {
@@ -2281,11 +2281,11 @@ static PyObject * pyswe_radnorm FUNCARGS_KEYWDS
 }
 
 /* swisseph.refrac */
-static char pyswe_refrac__doc__[] =
+PyDoc_STRVAR(pyswe_refrac__doc__,
 "Calculate either true altitude from apparent altitude, or apparent altitude"
 " from true altitude.\n\n"
 "Args: float alt, float press=0.0, float temp=0.0, int flag=TRUE_TO_APP\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_refrac FUNCARGS_KEYWDS
 {
@@ -2299,12 +2299,12 @@ static PyObject * pyswe_refrac FUNCARGS_KEYWDS
 }
 
 /* swisseph.refrac_extended */
-static char pyswe_refrac_extended__doc__[] =
+PyDoc_STRVAR(pyswe_refrac_extended__doc__,
 "Calculate either true altitude from apparent altitude, or apparent altitude"
 " from true altitude, for geographical altitudes above sea level.\n\n"
 "Args: float alt, float geoalt, float lrate, float press=0.0, float temp=0.0,"
 " int flag=TRUE_TO_APP\n"
-"Return: 2 tuples of 1 and 4 float";
+"Return: 2 tuples of 1 and 4 float");
 
 static PyObject * pyswe_refrac_extended FUNCARGS_KEYWDS
 {
@@ -2320,10 +2320,10 @@ static PyObject * pyswe_refrac_extended FUNCARGS_KEYWDS
 }
 
 /* swisseph.revjul */
-static char pyswe_revjul__doc__[] =
+PyDoc_STRVAR(pyswe_revjul__doc__,
 "Calculate year, month, day, hour from Julian day number.\n\n"
 "Args: float julday, int cal=GREG_CAL\n"
-"Return: tuple of 3 int and 1 float";
+"Return: tuple of 3 int and 1 float");
 
 static PyObject * pyswe_revjul FUNCARGS_KEYWDS
 {
@@ -2338,11 +2338,11 @@ static PyObject * pyswe_revjul FUNCARGS_KEYWDS
 }
 
 /* swisseph.rise_trans */
-static char pyswe_rise_trans__doc__[] =
+PyDoc_STRVAR(pyswe_rise_trans__doc__,
 "Calculate times of rising, setting and meridian transits.\n\n"
 "Args: float jd_start, int or str body, float lon, float lat, float alt=0.0,"
 " float press=0.0, float temp=0.0, int rsmi=0, int flag=FLG_SWIEPH\n"
-"Return: tuple of results";
+"Return: tuple of results");
 
 static PyObject * pyswe_rise_trans FUNCARGS_KEYWDS
 {
@@ -2394,10 +2394,10 @@ static PyObject * pyswe_rise_trans FUNCARGS_KEYWDS
 }
 
 /* swisseph.set_ephe_path */
-static char pyswe_set_ephe_path__doc__[] =
+PyDoc_STRVAR(pyswe_set_ephe_path__doc__,
 "Set ephemeris files path.\n\n"
 "Args: str path=\"" PYSWE_DEFAULT_EPHE_PATH "\"\n"
-"Return: None";
+"Return: None");
 
 static PyObject * pyswe_set_ephe_path FUNCARGS_KEYWDS
 {
@@ -2410,10 +2410,10 @@ static PyObject * pyswe_set_ephe_path FUNCARGS_KEYWDS
 }
 
 /* swisseph.set_jpl_file */
-static char pyswe_set_jpl_file__doc__[] =
+PyDoc_STRVAR(pyswe_set_jpl_file__doc__,
 "Set JPL file path.\n\n"
 "Args: str path\n"
-"Return: None";
+"Return: None");
 
 static PyObject * pyswe_set_jpl_file FUNCARGS_KEYWDS
 {
@@ -2426,8 +2426,8 @@ static PyObject * pyswe_set_jpl_file FUNCARGS_KEYWDS
 }
 
 /* swisseph.set_lapse_rate */
-static char pyswe_set_lapse_rate__doc__[] =
-"Set lapse rate.\n\nArgs: float lrate\nReturn: None";
+PyDoc_STRVAR(pyswe_set_lapse_rate__doc__,
+"Set lapse rate.\n\nArgs: float lrate\nReturn: None");
 
 static PyObject * pyswe_set_lapse_rate FUNCARGS_KEYWDS
 {
@@ -2441,10 +2441,10 @@ static PyObject * pyswe_set_lapse_rate FUNCARGS_KEYWDS
 }
 
 /* swisseph.set_sid_mode */
-static char pyswe_set_sid_mode__doc__[] =
+PyDoc_STRVAR(pyswe_set_sid_mode__doc__,
 "Set sidereal mode.\n\n"
 "Args: int mode, float t0=0.0, float ayan_t0=0.0\n"
-"Return: None";
+"Return: None");
 
 static PyObject * pyswe_set_sid_mode FUNCARGS_KEYWDS
 {
@@ -2459,10 +2459,10 @@ static PyObject * pyswe_set_sid_mode FUNCARGS_KEYWDS
 }
 
 /* swisseph.set_tid_acc */
-static char pyswe_set_tid_acc__doc__[] =
+PyDoc_STRVAR(pyswe_set_tid_acc__doc__,
 "Set tidal acceleration.\n\n"
 "Args: float acc\n"
-"Return: None";
+"Return: None");
 
 static PyObject * pyswe_set_tid_acc FUNCARGS_KEYWDS
 {
@@ -2475,10 +2475,10 @@ static PyObject * pyswe_set_tid_acc FUNCARGS_KEYWDS
 }
 
 /* swisseph.set_topo */
-static char pyswe_set_topo__doc__[] =
+PyDoc_STRVAR(pyswe_set_topo__doc__,
 "Set topocentric parameters.\n\n"
 "Args: float lon, float lat, float alt=0.0\n"
-"Return: None";
+"Return: None");
 
 static PyObject * pyswe_set_topo FUNCARGS_KEYWDS
 {
@@ -2492,10 +2492,10 @@ static PyObject * pyswe_set_topo FUNCARGS_KEYWDS
 }
 
 /* swisseph.sidtime */
-static char pyswe_sidtime__doc__[] =
+PyDoc_STRVAR(pyswe_sidtime__doc__,
 "Calculate sidereal time (UT).\n\n"
 "Args: float julday\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_sidtime FUNCARGS_KEYWDS
 {
@@ -2508,10 +2508,10 @@ static PyObject * pyswe_sidtime FUNCARGS_KEYWDS
 }
 
 /* swisseph.sidtime0 */
-static char pyswe_sidtime0__doc__[] =
+PyDoc_STRVAR(pyswe_sidtime0__doc__,
 "Calculate sidereal time, given obliquity and nutation (UT).\n\n"
 "Args: float julday, float obliquity, float nutation\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_sidtime0 FUNCARGS_KEYWDS
 {
@@ -2525,10 +2525,10 @@ static PyObject * pyswe_sidtime0 FUNCARGS_KEYWDS
 }
 
 /* swisseph.sol_eclipse_how */
-static char pyswe_sol_eclipse_how__doc__[] =
+PyDoc_STRVAR(pyswe_sol_eclipse_how__doc__,
 "Calculate attributes of a solar eclipse.\n\n"
 "Args: float julday, float lon, float lat, float alt=0.0, int flag=FLG_SWIEPH\n"
-"Return: tuples (retflag)(attr)";
+"Return: tuples (retflag)(attr)");
 
 static PyObject * pyswe_sol_eclipse_how FUNCARGS_KEYWDS
 {
@@ -2551,10 +2551,10 @@ static PyObject * pyswe_sol_eclipse_how FUNCARGS_KEYWDS
 }
 
 /* swisseph.sol_eclipse_when_glob */
-static char pyswe_sol_eclipse_when_glob__doc__[] =
+PyDoc_STRVAR(pyswe_sol_eclipse_when_glob__doc__,
 "Find the next solar eclipse globally (UTC).\n\n"
 "Args: float jd_start, ecl_type=0, bool backward=False, int flag=FLG_SWIEPH\n"
-"Return: tuples (retflag)(tret)";
+"Return: tuples (retflag)(tret)");
 
 static PyObject * pyswe_sol_eclipse_when_glob FUNCARGS_KEYWDS
 {
@@ -2576,11 +2576,11 @@ static PyObject * pyswe_sol_eclipse_when_glob FUNCARGS_KEYWDS
 }
 
 /* swisseph.sol_eclipse_when_loc */
-static char pyswe_sol_eclipse_when_loc__doc__[] =
+PyDoc_STRVAR(pyswe_sol_eclipse_when_loc__doc__,
 "Find the next solar eclipse for a given geographic position (UTC).\n\n"
 "Args: float julday, float lon, float lat, float alt=0.0, bool backward=False,"
 " int flag=FLG_SWIEPH\n"
-"Return: tuples (retflag)(tret)(attr)";
+"Return: tuples (retflag)(tret)(attr)");
 
 static PyObject * pyswe_sol_eclipse_when_loc FUNCARGS_KEYWDS
 {
@@ -2606,10 +2606,10 @@ static PyObject * pyswe_sol_eclipse_when_loc FUNCARGS_KEYWDS
 }
 
 /* swisseph.sol_eclipse_where */
-static char pyswe_sol_eclipse_where__doc__[] =
+PyDoc_STRVAR(pyswe_sol_eclipse_where__doc__,
 "Find where a solar eclipse is central or maximal (UTC).\n\n"
 "Args: float julday, int flag=FLG_SWIEPH\n"
-"Return: tuples (retval)(geopos)(attr)";
+"Return: tuples (retval)(geopos)(attr)");
 
 static PyObject * pyswe_sol_eclipse_where FUNCARGS_KEYWDS
 {
@@ -2633,11 +2633,11 @@ static PyObject * pyswe_sol_eclipse_where FUNCARGS_KEYWDS
 }
 
 /* swisseph.split_deg */
-static char pyswe_split_deg__doc__[] =
+PyDoc_STRVAR(pyswe_split_deg__doc__,
 "Provide sign or nakshatra, degree, minutes, seconds and fraction of second"
 " from decimal degree. Can also round to seconds, minutes, degrees.\n\n"
 "Args: float ddeg, int roundflag\n"
-"Return: tuple (deg, min, sec, secfr, sign)";
+"Return: tuple (deg, min, sec, secfr, sign)");
 
 static PyObject * pyswe_split_deg FUNCARGS_KEYWDS
 {
@@ -2651,10 +2651,10 @@ static PyObject * pyswe_split_deg FUNCARGS_KEYWDS
 }
 
 /* swisseph.time_equ */
-static char pyswe_time_equ__doc__[] =
+PyDoc_STRVAR(pyswe_time_equ__doc__,
 "Calculate equation of time (UT).\n\n"
 "Args: float julday\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe_time_equ FUNCARGS_KEYWDS
 {
@@ -2674,10 +2674,10 @@ static PyObject * pyswe_time_equ FUNCARGS_KEYWDS
 }
 
 /* swisseph.utc_time_zone */
-static char pyswe_utc_time_zone__doc__[] =
+PyDoc_STRVAR(pyswe_utc_time_zone__doc__,
 "Transform local time to UTC or UTC to local time.\n\n"
 "Args: int year, int month, int day, int hour, int minutes, int seconds, float offset\n"
-"Return: tuple (year, month, day, hour, minutes, seconds)";
+"Return: tuple (year, month, day, hour, minutes, seconds)");
 
 static PyObject * pyswe_utc_time_zone FUNCARGS_KEYWDS
 {
@@ -2693,10 +2693,10 @@ static PyObject * pyswe_utc_time_zone FUNCARGS_KEYWDS
 }
 
 /* swisseph.utc_to_jd */
-static char pyswe_utc_to_jd__doc__ [] =
+PyDoc_STRVAR(pyswe_utc_to_jd__doc__,
 "Convert UTC to julian day.\n\n"
 "Args: int year, int month, int day, int hour, int minutes, float seconds, int flag\n"
-"Return: tuple (float et, float ut)";
+"Return: tuple (float et, float ut)");
 
 static PyObject * pyswe_utc_to_jd FUNCARGS_KEYWDS
 {
@@ -2718,10 +2718,10 @@ static PyObject * pyswe_utc_to_jd FUNCARGS_KEYWDS
 }
 
 /* swisseph.vis_limit_mag */
-static char pyswe_vis_limit_mag__doc__ [] =
+PyDoc_STRVAR(pyswe_vis_limit_mag__doc__,
 "Find the limiting visual magnitude in dark skies.\n\n"
 "Args: float jd, seq geopos, seq atmo, seq observer, str object, int helflag\n"
-"Return: tuple (float res, float magnitude)";
+"Return: tuple (float res, float magnitude)");
 
 static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
 {
@@ -3118,14 +3118,14 @@ There is no guarantee that these functions are accurate. Use at your own risks.
 */
 
 /* swisseph._calc_ut */
-static char pyswe__calc_ut__doc__[] =
+PyDoc_STRVAR(pyswe__calc_ut__doc__,
 "Calculate positions of either a planet (using function calc_ut)"
 " or a fixed star (using function fixstar2_ut).\n\n"
 "Args: float tjdut, int or str obj, flags=FLG_SWIEPH+FLG_SPEED\n"
 "Return: 2 tuples: positions of object (on success), returned flags and object name\n\n"
 "Usage examples:\n\n"
 "\tres, xtra = swisseph._calc_ut(swisseph._jdnow(), swisseph.SUN)\n"
-"\tres, xtra = swisseph._calc_ut(swisseph._jdnow(), \"Regulus\")";
+"\tres, xtra = swisseph._calc_ut(swisseph._jdnow(), \"Regulus\")");
 
 static PyObject * pyswe__calc_ut FUNCARGS_KEYWDS
 {
@@ -3174,11 +3174,11 @@ static PyObject * pyswe__calc_ut FUNCARGS_KEYWDS
 }
 
 /* swisseph._degsplit */
-static char pyswe__degsplit__doc__[] =
+PyDoc_STRVAR(pyswe__degsplit__doc__,
 "Get degrees [0;29], sign number [0;11], minutes [0;59], seconds [0;59],"
 " from a longitude position [0;360[.\n\n"
 "Args: float deg\n"
-"Return: 4 int (degree, sign, minutes, seconds)";
+"Return: 4 int (degree, sign, minutes, seconds)");
 
 static PyObject * pyswe__degsplit FUNCARGS_KEYWDS
 {
@@ -3192,11 +3192,11 @@ static PyObject * pyswe__degsplit FUNCARGS_KEYWDS
 }
 
 /* swisseph._geoc2d */
-static char pyswe__geoc2d__doc__[] =
+PyDoc_STRVAR(pyswe__geoc2d__doc__,
 "Get float from given string meant as a geographical coordinates, examples:"
 " \"022:W:25\", \"46:N:02:0\", \"6:E:55:00\".\n\n"
 "Args: str coord\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe__geoc2d FUNCARGS_KEYWDS
 {
@@ -3216,10 +3216,10 @@ static PyObject * pyswe__geoc2d FUNCARGS_KEYWDS
 }
 
 /* swisseph._geolat2c */
-static char pyswe__geolat2c__doc__[] =
+PyDoc_STRVAR(pyswe__geolat2c__doc__,
 "Get formated string of given geographical latitude.\n\n"
 "Args: float lat\n"
-"Return: str";
+"Return: str");
 
 static PyObject * pyswe__geolat2c FUNCARGS_KEYWDS
 {
@@ -3239,10 +3239,10 @@ static PyObject * pyswe__geolat2c FUNCARGS_KEYWDS
 }
 
 /* swisseph._geolon2c */
-static char pyswe__geolon2c__doc__[] =
+PyDoc_STRVAR(pyswe__geolon2c__doc__,
 "Get formated string of given geographical longitude.\n\n"
 "Args: float lon\n"
-"Return: str";
+"Return: str");
 
 static PyObject * pyswe__geolon2c FUNCARGS_KEYWDS
 {
@@ -3262,10 +3262,10 @@ static PyObject * pyswe__geolon2c FUNCARGS_KEYWDS
 }
 
 /* swisseph._get_nakshatra_name */
-static char pyswe__get_nakshatra_name__doc__[] =
+PyDoc_STRVAR(pyswe__get_nakshatra_name__doc__,
 "Get nakshatra name from nakshatra number [0:26].\n\n"
 "Args: int nakshatra\n"
-"Return: str";
+"Return: str");
 
 static PyObject * pyswe__get_nakshatra_name FUNCARGS_KEYWDS
 {
@@ -3283,12 +3283,12 @@ static PyObject * pyswe__get_nakshatra_name FUNCARGS_KEYWDS
 }
 
 /* swisseph._house_system_name */
-static char pyswe__house_system_name__doc__[] =
+PyDoc_STRVAR(pyswe__house_system_name__doc__,
 "Get house system name from given char identifier.\n\n"
 "Will check for identifier validity instead of just returning 'Placidus' when"
 " given char is unknown/invalid.\n\n"
 "Args: str hsys\n"
-"Return: str";
+"Return: str");
 
 static PyObject * pyswe__house_system_name FUNCARGS_KEYWDS
 {
@@ -3306,10 +3306,10 @@ static PyObject * pyswe__house_system_name FUNCARGS_KEYWDS
 }
 
 /* swisseph._jdnow */
-static char pyswe__jdnow__doc__[] =
+PyDoc_STRVAR(pyswe__jdnow__doc__,
 "Get current Julian day number (Gregorian calendar, UTC).\n\n"
 "Args: -\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe__jdnow FUNCARGS_SELF
 {
@@ -3317,11 +3317,11 @@ static PyObject * pyswe__jdnow FUNCARGS_SELF
 }
 
 /* swisseph._julday */
-static char pyswe__julday__doc__[] =
+PyDoc_STRVAR(pyswe__julday__doc__,
 "Get Julian day number (UTC), without having to calculate hour in decimal.\n\n"
 "Args: int year, int month, int day, int hour=12, int minutes=0, int seconds=0,"
 " int flag=GREG_FLAG\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe__julday FUNCARGS_KEYWDS
 {
@@ -3336,10 +3336,10 @@ static PyObject * pyswe__julday FUNCARGS_KEYWDS
 }
 
 /* swisseph._long2nakshatra */
-static char pyswe__long2nakshatra__doc__[] =
+PyDoc_STRVAR(pyswe__long2nakshatra__doc__,
 "Get nakshatra and pada from ecliptical longitude.\n\n"
 "Args: float lon\n"
-"Return: 2 int";
+"Return: 2 int");
 
 static PyObject * pyswe__long2nakshatra FUNCARGS_KEYWDS
 {
@@ -3353,10 +3353,10 @@ static PyObject * pyswe__long2nakshatra FUNCARGS_KEYWDS
 }
 
 /* swisseph._long2navamsa */
-static char pyswe__long2navamsa__doc__[] =
+PyDoc_STRVAR(pyswe__long2navamsa__doc__,
 "Get navamsa from ecliptical longitude.\n\n"
 "Args: float lon\n"
-"Return: int";
+"Return: int");
 
 static PyObject * pyswe__long2navamsa FUNCARGS_KEYWDS
 {
@@ -3368,10 +3368,10 @@ static PyObject * pyswe__long2navamsa FUNCARGS_KEYWDS
 }
 
 /* swisseph._long2rasi */
-static char pyswe__long2rasi__doc__[] =
+PyDoc_STRVAR(pyswe__long2rasi__doc__,
 "Get rasi number from ecliptical longitude.\n\n"
 "Args: float lon\n"
-"Return: int";
+"Return: int");
 
 static PyObject * pyswe__long2rasi FUNCARGS_KEYWDS
 {
@@ -3383,10 +3383,10 @@ static PyObject * pyswe__long2rasi FUNCARGS_KEYWDS
 }
 
 /* swisseph._lord */
-static char pyswe__lord__doc__[] =
+PyDoc_STRVAR(pyswe__lord__doc__,
 "Get sign lord.\n\n"
 "Args: int sign [0:11]\n"
-"Return: int planet number";
+"Return: int planet number");
 
 static PyObject * pyswe__lord FUNCARGS_KEYWDS
 {
@@ -3404,14 +3404,14 @@ static PyObject * pyswe__lord FUNCARGS_KEYWDS
 }
 
 /* swisseph._match_aspect */
-static char pyswe__match_aspect__doc__[] =
+PyDoc_STRVAR(pyswe__match_aspect__doc__,
 "Check if the two given positions match the aspect within the given orb.\n\n"
 "If so return a tuple with difference, a value for application (True),"
 " separation (False) or equal speeds (None), and an aspect strength factor;"
 " else return three None.\n"
 "Aspect in range [0;360[.\n\n"
 "Args: float pos1, float speed1, float pos2, float speed2, float aspect,"
-" float orb\nReturn: tuple (difference, application, factor)";
+" float orb\nReturn: tuple (difference, application, factor)");
 
 static PyObject * pyswe__match_aspect FUNCARGS_KEYWDS
 {
@@ -3434,10 +3434,10 @@ static PyObject * pyswe__match_aspect FUNCARGS_KEYWDS
 }
 
 /* swisseph._match_aspect2 */
-static char pyswe__match_aspect2__doc__[] =
+PyDoc_STRVAR(pyswe__match_aspect2__doc__,
 "Same as _match_aspect, but with aspect in range [0;180].\n\n"
 "Args: float pos1, float speed1, float pos2, float speed2, float aspect, float orb\n"
-"Return: tuple (difference, application, factor)";
+"Return: tuple (difference, application, factor)");
 
 static PyObject * pyswe__match_aspect2 FUNCARGS_KEYWDS
 {
@@ -3460,11 +3460,11 @@ static PyObject * pyswe__match_aspect2 FUNCARGS_KEYWDS
 }
 
 /* swisseph._match_aspect3 */
-static char pyswe__match_aspect3__doc__[] =
+PyDoc_STRVAR(pyswe__match_aspect3__doc__,
 "Same as _match_aspect, but with specific orbs for applying/separating/stable aspects.\n\n"
 "Args: float pos1, float speed1, float pos2, float speed2, float aspect, "
 "float app_orb, float sep_orb, float sta_orb\n"
-"Return: tuple (delta, applying, factor)";
+"Return: tuple (delta, applying, factor)");
 
 static PyObject * pyswe__match_aspect3 FUNCARGS_KEYWDS
 {
@@ -3488,11 +3488,11 @@ static PyObject * pyswe__match_aspect3 FUNCARGS_KEYWDS
 }
 
 /* swisseph._match_aspect4 */
-static char pyswe__match_aspect4__doc__[] =
+PyDoc_STRVAR(pyswe__match_aspect4__doc__,
 "Same as _match_aspect2, but with specific orbs for applying/separating/stable aspects.\n\n"
 "Args: float pos1, float speed1, float pos2, float speed2, float aspect, "
 "float app_orb, float sep_orb, float sta_orb\n"
-"Return: tuple (delta, applying, factor)";
+"Return: tuple (delta, applying, factor)");
 
 static PyObject * pyswe__match_aspect4 FUNCARGS_KEYWDS
 {
@@ -3516,10 +3516,10 @@ static PyObject * pyswe__match_aspect4 FUNCARGS_KEYWDS
 }
 
 /* swisseph._naisargika_relation */
-static char pyswe__naisargika_relation__doc__[] =
+PyDoc_STRVAR(pyswe__naisargika_relation__doc__,
 "Get the naisargika relation between two planets.\n\n"
 "Args: int gr1, int gr2\n"
-"Return: int 1 (Mitra) 0 (Sama) or -1 (Satru)";
+"Return: int 1 (Mitra) 0 (Sama) or -1 (Satru)");
 
 static PyObject * pyswe__naisargika_relation FUNCARGS_KEYWDS
 {
@@ -3537,7 +3537,7 @@ static PyObject * pyswe__naisargika_relation FUNCARGS_KEYWDS
 }
 
 /* swisseph._next_aspect */
-static char pyswe__next_aspect__doc__[] =
+PyDoc_STRVAR(pyswe__next_aspect__doc__,
 "Get Julian day number and positions when celestial object makes longitudinal"
 " aspect to a fixed point expressed in longitude degrees.\n\n"
 "Aspect and fixed point in the range [0;360[.\n"
@@ -3545,7 +3545,7 @@ static char pyswe__next_aspect__doc__[] =
 " reached.\n\n"
 "Args: int planet, float aspect, float fixedpt, float jdstart,"
 " bool backw=False, float stop=0, int flags=FLG_SWIEPH+FLG_SPEED+FLG_NOGDEFL\n"
-"Return: Julian day, positions (or None if time limit has been reached)";
+"Return: Julian day, positions (or None if time limit has been reached)");
 
 static PyObject * pyswe__next_aspect FUNCARGS_KEYWDS
 {
@@ -3573,11 +3573,11 @@ static PyObject * pyswe__next_aspect FUNCARGS_KEYWDS
 }
 
 /* swisseph._next_aspect2 */
-static char pyswe__next_aspect2__doc__[] =
+PyDoc_STRVAR(pyswe__next_aspect2__doc__,
 "Same as _next_aspect, but with aspect in range [0;180].\n\n"
 "Args: int planet, float aspect, float fixedpt, float jdstart,"
 " bool backw=False, float stop=0, int flags=FLG_SWIEPH+FLG_SPEED+FLG_NOGDEFL\n"
-"Return: Julian day, positions (or None if time limit has been reached)";
+"Return: Julian day, positions (or None if time limit has been reached)");
 
 static PyObject * pyswe__next_aspect2 FUNCARGS_KEYWDS
 {
@@ -3605,7 +3605,7 @@ static PyObject * pyswe__next_aspect2 FUNCARGS_KEYWDS
 }
 
 /* swisseph._next_aspect_cusp */
-static char pyswe__next_aspect_cusp__doc__[] =
+PyDoc_STRVAR(pyswe__next_aspect_cusp__doc__,
 "Get Julian day number and positions, and houses cusps and ascmc, when celestial"
 " object makes longitudinal aspect to a house cusp.\n\n"
 "House cusp expressed as an integer in range [1;12] or [1;36] for Gauquelin.\n"
@@ -3614,7 +3614,7 @@ static char pyswe__next_aspect_cusp__doc__[] =
 "For risings, settings, meridian transits, see rise_trans.\n\n"
 "Args: int or str body, float aspect, int cusp, float jdstart, float lat,"
 " float lon, char hsys='P', bool backw=False, int flags=FLG_SWIEPH+FLG_SPEED\n"
-"Return: Julian day, body positions, cusps, ascmc";
+"Return: Julian day, body positions, cusps, ascmc");
 
 static PyObject * pyswe__next_aspect_cusp FUNCARGS_KEYWDS
 {
@@ -3676,11 +3676,11 @@ static PyObject * pyswe__next_aspect_cusp FUNCARGS_KEYWDS
 }
 
 /* swisseph._next_aspect_cusp2 */
-static char pyswe__next_aspect_cusp2__doc__[] =
+PyDoc_STRVAR(pyswe__next_aspect_cusp2__doc__,
 "Same as _next_aspect_cusp, but aspect in range[0;180].\n\n"
 "Args: int or str body, float aspect, int cusp, float jdstart, float lat,"
 " float lon, char hsys='P', bool backw=False, int flags=FLG_SWIEPH+FLG_SPEED\n"
-"Return: Julian day, body positions, cusps, ascmc";
+"Return: Julian day, body positions, cusps, ascmc");
 
 static PyObject * pyswe__next_aspect_cusp2 FUNCARGS_KEYWDS
 {
@@ -3742,14 +3742,14 @@ static PyObject * pyswe__next_aspect_cusp2 FUNCARGS_KEYWDS
 }
 
 /* swisseph._next_aspect_with */
-static char pyswe__next_aspect_with__doc__[] =
+PyDoc_STRVAR(pyswe__next_aspect_with__doc__,
 "Get Julian day number and positions when celestial object makes longitudinal"
 " aspect to another moving object.\n\n"
 "Aspect in the range [0;360[.\n"
 "Other object can be a fixed star.\n\n"
 "Args: int planet, float aspect, int or str other, float jdstart,"
 " bool backw=False, float stop=0, int flags=FLG_SWIEPH+FLG_SPEED\n"
-"Return: Julian day, planet positions, other positions (or None if limit has been reached)";
+"Return: Julian day, planet positions, other positions (or None if limit has been reached)");
 
 static PyObject * pyswe__next_aspect_with FUNCARGS_KEYWDS
 {
@@ -3801,11 +3801,11 @@ static PyObject * pyswe__next_aspect_with FUNCARGS_KEYWDS
 }
 
 /* swisseph._next_aspect_with2 */
-static char pyswe__next_aspect_with2__doc__[] =
+PyDoc_STRVAR(pyswe__next_aspect_with2__doc__,
 "Same as _next_aspect_with, but aspect in range [0;180].\n\n"
 "Args: int planet, float aspect, int or str other, float jdstart,"
 " bool backw=False, float stop=0, int flags=FLG_SWIEPH+FLG_SPEED\n"
-"Return: Julian day, planet positions, other positions (or None if limit has been reached)";
+"Return: Julian day, planet positions, other positions (or None if limit has been reached)");
 
 static PyObject * pyswe__next_aspect_with2 FUNCARGS_KEYWDS
 {
@@ -3857,14 +3857,14 @@ static PyObject * pyswe__next_aspect_with2 FUNCARGS_KEYWDS
 }
 
 /* swisseph._next_retro */
-static char pyswe__next_retro__doc__[] =
+PyDoc_STRVAR(pyswe__next_retro__doc__,
 "Find next direction changing of object.\n\n"
 "Flag should include FLG_SPEED, and FLG_NOGDEFL to avoid bad surprises;"
 " alternatively use true positions.\n"
 "If argument stop != 0, can return None if time limit has been reached.\n\n"
 "Args: int planet, float jdstart, bool backw=False,"
 " float stop=0, int flags=FLG_SWIEPH+FLG_SPEED+FLG_NOGDEFL\n"
-"Return: Julian day, positions (or None if time limit has been reached)";
+"Return: Julian day, positions (or None if time limit has been reached)");
 
 static PyObject * pyswe__next_retro FUNCARGS_KEYWDS
 {
@@ -3891,10 +3891,10 @@ static PyObject * pyswe__next_retro FUNCARGS_KEYWDS
 }
 
 /* swisseph._ochchabala */
-static char pyswe__ochchabala__doc__[] =
+PyDoc_STRVAR(pyswe__ochchabala__doc__,
 "Get the ochchabala for a planet.\n\n"
 "Args: int pl, float longitude\n"
-"Return: float shashtiamsa";
+"Return: float shashtiamsa");
 
 static PyObject * pyswe__ochchabala FUNCARGS_KEYWDS
 {
@@ -3913,10 +3913,10 @@ static PyObject * pyswe__ochchabala FUNCARGS_KEYWDS
 }
 
 /* swisseph._raman_houses */
-static char pyswe__raman_houses__doc__[] =
+PyDoc_STRVAR(pyswe__raman_houses__doc__,
 "Get Raman houses cusps (bhavamadhya the default, or arambhasandhi).\n\n"
 "Args: float asc, float mc, bool sandhi=False\n"
-"Return: tuple of 12 float";
+"Return: tuple of 12 float");
 
 static PyObject * pyswe__raman_houses FUNCARGS_KEYWDS
 {
@@ -3931,10 +3931,10 @@ static PyObject * pyswe__raman_houses FUNCARGS_KEYWDS
 }
 
 /* swisseph._rasi_dif */
-static char pyswe__rasi_dif__doc__[] =
+PyDoc_STRVAR(pyswe__rasi_dif__doc__,
 "Get number of rasi between two rasis, from 0 to 11.\n\n"
 "Args: int r1, int r2\n"
-"Return: int";
+"Return: int");
 
 static PyObject * pyswe__rasi_dif FUNCARGS_KEYWDS
 {
@@ -3946,10 +3946,10 @@ static PyObject * pyswe__rasi_dif FUNCARGS_KEYWDS
 }
 
 /* swisseph._rasi_dif2 */
-static char pyswe__rasi_dif2__doc__[] =
+PyDoc_STRVAR(pyswe__rasi_dif2__doc__,
 "Get number of rasi between two rasis, from -5 to 6.\n\n"
 "Args: int r1, int r2\n"
-"Return: int";
+"Return: int");
 
 static PyObject * pyswe__rasi_dif2 FUNCARGS_KEYWDS
 {
@@ -3961,10 +3961,10 @@ static PyObject * pyswe__rasi_dif2 FUNCARGS_KEYWDS
 }
 
 /* swisseph._rasinorm */
-static char pyswe__rasinorm__doc__[] =
+PyDoc_STRVAR(pyswe__rasinorm__doc__,
 "Get a normalized rasi number between 0 and 11.\n\n"
 "Args: int rasi\n"
-"Return: int";
+"Return: int");
 
 static PyObject * pyswe__rasinorm FUNCARGS_KEYWDS
 {
@@ -3976,11 +3976,11 @@ static PyObject * pyswe__rasinorm FUNCARGS_KEYWDS
 }
 
 /* swisseph._residential_strength */
-static char pyswe__residential_strength__doc__[] =
+PyDoc_STRVAR(pyswe__residential_strength__doc__,
 "Get the residential strength for a planet, given its longitude and bhavamadhya"
 " longitudes in a 12 items sequence.\n\n"
 "Args: int plon, seq bhavas\n"
-"Return: float strength";
+"Return: float strength");
 
 static PyObject * pyswe__residential_strength FUNCARGS_KEYWDS
 {
@@ -4028,10 +4028,10 @@ static PyObject * pyswe__residential_strength FUNCARGS_KEYWDS
 }
 
 /* swisseph._revjul */
-static char pyswe__revjul__doc__[] =
+PyDoc_STRVAR(pyswe__revjul__doc__,
 "Reverse Julian day to date & time (UTC).\n\n"
 "Args: double julday, int flag=GREG_CAL\n"
-"Return: tuple of 6 int";
+"Return: tuple of 6 int");
 
 static PyObject * pyswe__revjul FUNCARGS_KEYWDS
 {
@@ -4046,10 +4046,10 @@ static PyObject * pyswe__revjul FUNCARGS_KEYWDS
 }
 
 /* swisseph._saturn_4_stars */
-static char pyswe__saturn_4_stars__doc__[] =
+PyDoc_STRVAR(pyswe__saturn_4_stars__doc__,
 "Compute Halbronn's 'Saturn 4 Stars' index.\n\n"
 "Args: float jd, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: tuple of 6 float (Sat, Ald, Reg, Ant, Fom, and index value)";
+"Return: tuple of 6 float (Sat, Ald, Reg, Ant, Fom, and index value)");
 
 static PyObject * pyswe__saturn_4_stars FUNCARGS_KEYWDS
 {
@@ -4069,10 +4069,10 @@ static PyObject * pyswe__saturn_4_stars FUNCARGS_KEYWDS
 }
 
 /* swisseph._signtostr */
-static char pyswe__signtostr__doc__[] =
+PyDoc_STRVAR(pyswe__signtostr__doc__,
 "Get a string representing the sign number given [0;11].\n\n"
 "Args: int sign\n"
-"Return: str";
+"Return: str");
 
 static PyObject * pyswe__signtostr FUNCARGS_KEYWDS
 {
@@ -4091,10 +4091,10 @@ static PyObject * pyswe__signtostr FUNCARGS_KEYWDS
 }
 
 /* swisseph._tatkalika_relation */
-static char pyswe__tatkalika_relation__doc__[] =
+PyDoc_STRVAR(pyswe__tatkalika_relation__doc__,
 "Get the tatkalika relation between two planets, given their rasi numbers.\n\n"
 "Args: int r1, int r2\n"
-"Return: int 1 (Mitra) or -1 (Satru)";
+"Return: int 1 (Mitra) or -1 (Satru)");
 
 static PyObject * pyswe__tatkalika_relation FUNCARGS_KEYWDS
 {
@@ -4106,10 +4106,10 @@ static PyObject * pyswe__tatkalika_relation FUNCARGS_KEYWDS
 }
 
 /* swisseph._years_diff */
-static char pyswe__years_diff__doc__[] =
+PyDoc_STRVAR(pyswe__years_diff__doc__,
 "Get number of 'astrological' years between two Julian days.\n\n"
 "Args: float jd1, float jd2, int flag=FLG_SWIEPH\n"
-"Return: float";
+"Return: float");
 
 static PyObject * pyswe__years_diff FUNCARGS_KEYWDS
 {
@@ -4378,7 +4378,7 @@ static struct PyMethodDef pyswe_methods[] = {
     {NULL, (PyCFunction) NULL, 0, NULL}
 };
 
-static char pyswe_module_documentation[] =
+PyDoc_STRVAR(pyswe_module_documentation,
 "Python extension to AstroDienst Swiss Ephemeris library.\n\n"
 #if PYSWE_AUTO_SET_EPHE_PATH
 "Import of this extension module does automagicaly set the ephemeris path"
@@ -4388,7 +4388,7 @@ static char pyswe_module_documentation[] =
 "Please refer to: https://www.astro.com/swisseph/swephprg.htm\n\n"
 "    Pyswisseph homepage: https://astrorigin.com/pyswisseph/\n"
 "    AstroDienst: https://www.astro.com/swisseph/\n"
-"    PyPI: https://pypi.org/project/pyswisseph/";
+"    PyPI: https://pypi.org/project/pyswisseph/");
 
 #if PY_MAJOR_VERSION >= 3
 struct PyModuleDef pyswe_module =
