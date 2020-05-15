@@ -3191,6 +3191,28 @@ static PyObject * pyswe__degsplit FUNCARGS_KEYWDS
     return Py_BuildValue("iiii", ret[0], ret[1], ret[2], ret[3]);
 }
 
+/* swisseph._dt2i */
+PyDoc_STRVAR(pyswe__dt2i__doc__,
+"Split a standardized datetime string 'YYYY-mm-dd HH:MM:SS' into integers.\n\n"
+"Args: str dt\n"
+"Return: 6 int (year, month, day, hour, minutes, seconds)");
+
+static PyObject * pyswe__dt2i FUNCARGS_KEYWDS
+{
+    int x;
+    char* dt;
+    int ret[6];
+    static char* kwlist[] = {"dt", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &dt))
+        return NULL;
+    x = swh_dt2i(dt, ret);
+    if (x) {
+        PyErr_SetString(pyswe_Error, "swisseph._dt2i: invalid string");
+        return NULL;
+    }
+    return Py_BuildValue("iiiiii",ret[0],ret[1],ret[2],ret[3],ret[4],ret[5]);
+}
+
 /* swisseph._geoc2d */
 PyDoc_STRVAR(pyswe__geoc2d__doc__,
 "Get float from given string meant as a geographical coordinates, examples:"
@@ -4304,6 +4326,8 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe__calc_ut__doc__},
     {"_degsplit", (PyCFunction) pyswe__degsplit,
         METH_VARARGS|METH_KEYWORDS, pyswe__degsplit__doc__},
+    {"_dt2i", (PyCFunction) pyswe__dt2i,
+        METH_VARARGS|METH_KEYWORDS, pyswe__dt2i__doc__},
     {"_geoc2d", (PyCFunction) pyswe__geoc2d,
         METH_VARARGS|METH_KEYWORDS, pyswe__geoc2d__doc__},
     {"_geolat2c", (PyCFunction) pyswe__geolat2c,
