@@ -4107,21 +4107,20 @@ static PyObject * pyswe__tatkalika_relation FUNCARGS_KEYWDS
 /* swisseph._years_diff */
 PyDoc_STRVAR(pyswe__years_diff__doc__,
 "Get number of 'astrological' years between two Julian days.\n\n"
-"Args: float jd1, float jd2, int flag=FLG_SWIEPH\n"
+"Args: float jd1, float jd2, int flags=FLG_SWIEPH|FLG_SPEED|FLG_NOGDEFL\n"
 "Return: float");
 
 static PyObject * pyswe__years_diff FUNCARGS_KEYWDS
 {
-    double jd1, jd2, years;
-    int flag = SEFLG_SWIEPH, res;
+    double jd1, jd2, years = 0;
+    int flags = SEFLG_SWIEPH|SEFLG_SPEED|SEFLG_NOGDEFL, res;
     char err[256];
-    static char *kwlist[] = {"jd1", "jd2", "flag", NULL};
+    static char *kwlist[] = {"jd1", "jd2", "flags", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|i", kwlist,
-        &jd1, &jd2, &flag))
+        &jd1, &jd2, &flags))
         return NULL;
-    res = swh_years_diff(jd1, jd2, flag, &years, err);
-    if (res < 0)
-    {
+    res = swh_years_diff(jd1, jd2, flags, &years, err);
+    if (res) {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
