@@ -56,7 +56,7 @@ swe_version = '2.08.00'
 # libswe-dev detection
 # Set to True to find libswe in system.
 # Set to False to use internal libswe.
-swe_detection = True
+swe_detection = False
 
 # Additional functions and constants
 use_swephelp = True
