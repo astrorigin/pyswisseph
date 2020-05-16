@@ -3215,8 +3215,22 @@ static PyObject * pyswe__dt2i FUNCARGS_KEYWDS
 
 /* swisseph._geoc2d */
 PyDoc_STRVAR(pyswe__geoc2d__doc__,
-"Get float from given string meant as a geographical coordinates, examples:"
-" \"022:W:25\", \"46:N:02:0\", \"6:E:55:00\".\n\n"
+"Get float from given string meant as a geographical coordinates.\n\n"
+"Possible string formats:\n"
+" - DMSx\n"
+" - DxMS\n"
+" - DMx\n"
+" - DxM\n"
+" - DMS\n"
+" - Dx\n"
+" - DM\n"
+" - D\n"
+"Where D is degrees, M is minutes, S is seconds, x is a char in \"NSEW\""
+" (direction).\n"
+"The last number given can be a floating point number.\n"
+"If no direction is given, a negative degree value is accepted down to -180.\n"
+"Decorations chars (like °\"':/,) can serve as separators and are accepted"
+" anywhere (ignored), as well as spaces.\n\n"
 "Args: str coord\n"
 "Return: float");
 
