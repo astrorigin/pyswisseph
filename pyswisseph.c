@@ -4132,6 +4132,33 @@ static PyObject * pyswe__signtostr FUNCARGS_KEYWDS
     return Py_BuildValue("s", str);
 }
 
+/* swisseph._t2i */
+PyDoc_STRVAR(pyswe__t2i__doc__,
+"Split a standardized time string 'HH:MM:SS' into integers.\n\n"
+"Similar to function _dt2i, but just for time.\n"
+"All non-digits in the given string are ignored and any of them can be"
+" used as separator, including spaces.\n"
+"Optionaly, minutes and seconds can be omitted, in that case will"
+" return zeros.\n\n"
+"Args: str t\n"
+"Return: 3 int (hour, minutes, seconds)");
+
+static PyObject * pyswe__t2i FUNCARGS_KEYWDS
+{
+    int x;
+    char* t;
+    int ret[3];
+    static char* kwlist[] = {"t", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &t))
+        return NULL;
+    x = swh_t2i(t, ret);
+    if (x) {
+        PyErr_SetString(pyswe_Error, "swisseph._t2i: invalid string");
+        return NULL;
+    }
+    return Py_BuildValue("iii",ret[0],ret[1],ret[2]);
+}
+
 /* swisseph._tatkalika_relation */
 PyDoc_STRVAR(pyswe__tatkalika_relation__doc__,
 "Get the tatkalika relation between two planets, given their rasi numbers.\n\n"
@@ -4413,6 +4440,8 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe__saturn_4_stars__doc__},
     {"_signtostr", (PyCFunction) pyswe__signtostr,
         METH_VARARGS|METH_KEYWORDS, pyswe__signtostr__doc__},
+    {"_t2i", (PyCFunction) pyswe__t2i,
+        METH_VARARGS|METH_KEYWORDS, pyswe__t2i__doc__},
     {"_tatkalika_relation", (PyCFunction) pyswe__tatkalika_relation,
         METH_VARARGS|METH_KEYWORDS, pyswe__tatkalika_relation__doc__},
     {"_years_diff", (PyCFunction) pyswe__years_diff,
