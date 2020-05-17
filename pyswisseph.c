@@ -3194,6 +3194,13 @@ static PyObject * pyswe__degsplit FUNCARGS_KEYWDS
 /* swisseph._dt2i */
 PyDoc_STRVAR(pyswe__dt2i__doc__,
 "Split a standardized datetime string 'YYYY-mm-dd HH:MM:SS' into integers.\n\n"
+"Datetimes are expected to roughly follow the ISO 8601 standard,"
+" 'Year-Month-Day Hour:Minutes:Seconds'.\n"
+"All non-digits in the given string are ignored and any of them can be"
+" used as separator, including spaces. A minus is evaluated only in"
+" front of the year, as first char of the string.\n"
+"Optionaly, the time part (hour etc) can be omitted, in that case will"
+" return zeros.\n\n"
 "Args: str dt\n"
 "Return: 6 int (year, month, day, hour, minutes, seconds)");
 
