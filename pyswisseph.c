@@ -3447,114 +3447,92 @@ static PyObject * pyswe__lord FUNCARGS_KEYWDS
 
 /* swisseph._match_aspect */
 PyDoc_STRVAR(pyswe__match_aspect__doc__,
-"Check if the two given positions match the aspect within the given orb.\n\n"
-"If so return a tuple with difference, a value for application (True),"
-" separation (False) or equal speeds (None), and an aspect strength factor;"
-" else return three None.\n"
-"Aspect in range [0;360[.\n\n"
+"Aspect matching - aspect in range [0;360[\n\n"
+"Check if the two given positions match the aspect within the given orb.\n"
+"This also calculates the difference between targeted aspect and objects"
+" distance (so that pos1 + asp + delta = pos2), and its speed (so that"
+" a negative speed indicates an applying aspect). Returned factor simply"
+" is that difference expressed in orb units (so that orb * factor = delta).\n\n"
+"If you are not interested in that mumbo-jumbo, just set objects speeds to"
+" zero, and consider only the boolean returned by the function.\n\n"
 "Args: float pos1, float speed1, float pos2, float speed2, float aspect,"
-" float orb\nReturn: tuple (difference, application, factor)");
+" float orb\n"
+"Return: True if match, else False, and tuple (delta, deltaspeed, factor)");
 
 static PyObject * pyswe__match_aspect FUNCARGS_KEYWDS
 {
-    int applic;
-    double res, pos0, pos1, sp0, sp1, asp, orb, ret, ftor;
+    double x, pos0, pos1, sp0, sp1, asp, orb, diff, applic, ftor;
     static char *kwlist[] = {"pos1", "speed1", "pos2", "speed2", "aspect",
         "orb", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddd", kwlist,
         &pos0, &sp0, &pos1, &sp1, &asp, &orb))
         return NULL;
-    res = swh_match_aspect(pos0, sp0, pos1, sp1, asp, orb, &ret, &applic, &ftor);
-    if (res < 0)
-        return Py_BuildValue("(OOO)", Py_None, Py_None, Py_None);
-    else if (applic == 1)
-        return Py_BuildValue("(fOf)", ret, Py_False, ftor);
-    else if (applic == -1)
-        return Py_BuildValue("(fOf)", ret, Py_True, ftor);
-    else
-        return Py_BuildValue("(fOf)", ret, Py_None, ftor);
+    x = swh_match_aspect(pos0, sp0, pos1, sp1, asp, orb, &diff, &applic, &ftor);
+    return Py_BuildValue("O(ddd)", x ? Py_False : Py_True, diff, applic, ftor);
 }
 
 /* swisseph._match_aspect2 */
 PyDoc_STRVAR(pyswe__match_aspect2__doc__,
+"Aspect matching - aspect in range [0;180]\n\n"
 "Same as _match_aspect, but with aspect in range [0;180].\n\n"
-"Args: float pos1, float speed1, float pos2, float speed2, float aspect, float orb\n"
-"Return: tuple (difference, application, factor)");
+"Args: float pos1, float speed1, float pos2, float speed2, float aspect,"
+" float orb\n"
+"Return: True if match, else False, and tuple (delta, deltaspeed, factor)");
 
 static PyObject * pyswe__match_aspect2 FUNCARGS_KEYWDS
 {
-    int applic;
-    double res, pos0, pos1, sp0, sp1, asp, orb, ret, ftor;
+    double x, pos0, pos1, sp0, sp1, asp, orb, diff, applic, ftor;
     static char *kwlist[] = {"pos1", "speed1", "pos2", "speed2", "aspect",
         "orb", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddd", kwlist,
         &pos0, &sp0, &pos1, &sp1, &asp, &orb))
         return NULL;
-    res = swh_match_aspect2(pos0, sp0, pos1, sp1, asp, orb, &ret, &applic, &ftor);
-    if (res < 0)
-        return Py_BuildValue("(OOO)", Py_None, Py_None, Py_None);
-    else if (applic == 1)
-        return Py_BuildValue("(fOf)", ret, Py_False, ftor);
-    else if (applic == -1)
-        return Py_BuildValue("(fOf)", ret, Py_True, ftor);
-    else
-        return Py_BuildValue("(fOf)", ret, Py_None, ftor);
+    x = swh_match_aspect2(pos0, sp0, pos1, sp1, asp, orb, &diff, &applic, &ftor);
+    return Py_BuildValue("O(ddd)", x ? Py_False : Py_True, diff, applic, ftor);
 }
 
 /* swisseph._match_aspect3 */
 PyDoc_STRVAR(pyswe__match_aspect3__doc__,
-"Same as _match_aspect, but with specific orbs for applying/separating/stable aspects.\n\n"
-"Args: float pos1, float speed1, float pos2, float speed2, float aspect, "
-"float app_orb, float sep_orb, float sta_orb\n"
-"Return: tuple (delta, applying, factor)");
+"Aspect matching - aspect in range [0;360[ and complex orb\n\n"
+"Same as _match_aspect, but with specific orbs for applying/separating/stable"
+" aspects.\n\n"
+"Args: float pos1, float speed1, float pos2, float speed2, float aspect,"
+" float app_orb, float sep_orb, float sta_orb\n"
+"Return: True if match, else False, and tuple (delta, deltaspeed, factor)");
 
 static PyObject * pyswe__match_aspect3 FUNCARGS_KEYWDS
 {
-    int applic;
-    double res, pos0, pos1, sp0, sp1, asp, app_orb, sep_orb, sta_orb, ret, ftor;
+    double x, pos0, pos1, sp0, sp1, asp, app_orb, sep_orb, sta_orb, diff, applic, ftor;
     static char *kwlist[] = {"pos1", "speed1", "pos2", "speed2", "aspect",
         "app_orb", "sep_orb", "sta_orb", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddddd", kwlist,
         &pos0, &sp0, &pos1, &sp1, &asp, &app_orb, &sep_orb, &sta_orb))
         return NULL;
-    res = swh_match_aspect3(pos0, sp0, pos1, sp1, asp, app_orb, sep_orb, sta_orb,
-        &ret, &applic, &ftor);
-    if (res < 0)
-        return Py_BuildValue("(OOO)", Py_None, Py_None, Py_None);
-    else if (applic == 1)
-        return Py_BuildValue("(fOf)", ret, Py_False, ftor);
-    else if (applic == -1)
-        return Py_BuildValue("(fOf)", ret, Py_True, ftor);
-    else
-        return Py_BuildValue("(fOf)", ret, Py_None, ftor);
+    x = swh_match_aspect3(pos0, sp0, pos1, sp1, asp, app_orb, sep_orb, sta_orb,
+        &diff, &applic, &ftor);
+    return Py_BuildValue("O(ddd)", x ? Py_False : Py_True, diff, applic, ftor);
 }
 
 /* swisseph._match_aspect4 */
 PyDoc_STRVAR(pyswe__match_aspect4__doc__,
-"Same as _match_aspect2, but with specific orbs for applying/separating/stable aspects.\n\n"
-"Args: float pos1, float speed1, float pos2, float speed2, float aspect, "
-"float app_orb, float sep_orb, float sta_orb\n"
-"Return: tuple (delta, applying, factor)");
+"Aspect matching - aspect in range [0;180] and complex orb\n\n"
+"Same as _match_aspect2, but with specific orbs for applying/separating/stable"
+" aspects.\n\n"
+"Args: float pos1, float speed1, float pos2, float speed2, float aspect,"
+" float app_orb, float sep_orb, float sta_orb\n"
+"Return: True if match, else False, and tuple (delta, deltaspeed, factor)");
 
 static PyObject * pyswe__match_aspect4 FUNCARGS_KEYWDS
 {
-    int applic;
-    double res, pos0, pos1, sp0, sp1, asp, app_orb, sep_orb, sta_orb, ret, ftor;
+    double x, pos0, pos1, sp0, sp1, asp, app_orb, sep_orb, sta_orb, diff, applic, ftor;
     static char *kwlist[] = {"pos1", "speed1", "pos2", "speed2", "aspect",
         "app_orb", "sep_orb", "sta_orb", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddddd", kwlist,
         &pos0, &sp0, &pos1, &sp1, &asp, &app_orb, &sep_orb, &sta_orb))
         return NULL;
-    res = swh_match_aspect4(pos0, sp0, pos1, sp1, asp, app_orb, sep_orb, sta_orb,
-        &ret, &applic, &ftor);
-    if (res < 0)
-        return Py_BuildValue("(OOO)", Py_None, Py_None, Py_None);
-    else if (applic == 1)
-        return Py_BuildValue("(fOf)", ret, Py_False, ftor);
-    else if (applic == -1)
-        return Py_BuildValue("(fOf)", ret, Py_True, ftor);
-    else
-        return Py_BuildValue("(fOf)", ret, Py_None, ftor);
+    x = swh_match_aspect4(pos0, sp0, pos1, sp1, asp, app_orb, sep_orb, sta_orb,
+        &diff, &applic, &ftor);
+    return Py_BuildValue("O(ddd)", x ? Py_False : Py_True, diff, applic, ftor);
 }
 
 /* swisseph._naisargika_relation */
