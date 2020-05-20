@@ -167,6 +167,7 @@ if use_swephelp:
 sources = ['pyswisseph.c'] + swe_sources
 if use_swephelp:
     sources += [
+        'swephelp/swhaspect.c',
         'swephelp/swhdatetime.c',
         'swephelp/swhformat.c',
         'swephelp/swhgeo.c',
@@ -181,6 +182,7 @@ depends = swe_depends
 if use_swephelp:
     depends += [
         'swephelp/swephelp.h',
+        'swephelp/swhaspect.h',
         'swephelp/swhdef.h',
         'swephelp/swhgeo.h',
         'swephelp/swhraman.h',
