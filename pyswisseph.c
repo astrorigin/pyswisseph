@@ -3117,6 +3117,30 @@ There is no guarantee that these functions are accurate. Use at your own risks.
 
 */
 
+/* swisseph._antiscion */
+PyDoc_STRVAR(pyswe__antiscion__doc__,
+"Calculate antiscion and contrantiscion of an object\n\n"
+"Usage example:\n\n"
+"\tpos, flg = swisseph._calc_ut(jd, pl)\n"
+"\tantis, contrantis = swisseph._antiscion(*pos)\n\n"
+"Args: float lon, float lat=0, float dist=0, float lonspeed=0, float latspeed=0,"
+" float distspeed=0\n"
+"Return: antiscion (lon, lat, dist, lonspeed, latspeed, distspeed) contrantiscion (...)");
+
+static PyObject * pyswe__antiscion FUNCARGS_KEYWDS
+{
+    double p[6] = {0,0,0,0,0,0}, antis[6], contrantis[6];
+    static char* kwlist[] = {"lon", "lat", "dist", "lonspeed", "latspeed",
+                             "distspeed", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|ddddd", kwlist,
+        &p[0], &p[1], &p[2], &p[3], &p[4], &p[5]))
+        return NULL;
+    swh_antiscion(p, antis, contrantis);
+    return Py_BuildValue("(dddddd)(dddddd)", antis[0],antis[1],antis[2],antis[3],
+        antis[4],antis[5],contrantis[0],contrantis[1],contrantis[2],contrantis[3],
+        contrantis[4],contrantis[5]);
+}
+
 /* swisseph._calc_ut */
 PyDoc_STRVAR(pyswe__calc_ut__doc__,
 "Calculate positions of either a planet (using function calc_ut)"
@@ -4348,6 +4372,8 @@ static struct PyMethodDef pyswe_methods[] = {
 
 #if PYSWE_USE_SWEPHELP
     /* pyswisseph/swephelp functions. */
+    {"_antiscion", (PyCFunction) pyswe__antiscion,
+        METH_VARARGS|METH_KEYWORDS, pyswe__antiscion__doc__},
     {"_calc_ut", (PyCFunction) pyswe__calc_ut,
         METH_VARARGS|METH_KEYWORDS, pyswe__calc_ut__doc__},
     {"_degsplit", (PyCFunction) pyswe__degsplit,
