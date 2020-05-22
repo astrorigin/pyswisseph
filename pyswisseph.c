@@ -3159,14 +3159,16 @@ static PyObject * pyswe__atlas_close FUNCARGS_SELF
 /* swisseph._atlas_connect */
 PyDoc_STRVAR(pyswe__atlas_connect__doc__,
 "Connect to the atlas database\n\n"
-"Args: str path\n"
+"If the path argument is omitted or empty (''), the environment variable"
+" SWH_ATLAS_PATH will be searched for a valid string.\n\n"
+"Args: str path=''\n"
 "Return: None");
 
 static PyObject * pyswe__atlas_connect FUNCARGS_KEYWDS
 {
-    char* p;
+    char* p = NULL;
     static char* kwlist[] = {"path", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &p))
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "|s", kwlist, &p))
         return NULL;
     if (swh_atlas_connect(p)) {
         PyErr_SetString(pyswe_Error, "swisseph._atlas_connect: error");
