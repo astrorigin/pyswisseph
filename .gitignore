@@ -18,6 +18,7 @@ MANIFEST
 
 build*/
 dist/
+docs/_build
 manifest
 pyswisseph.egg-info/*
 setup.cfg
