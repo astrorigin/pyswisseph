@@ -1,6 +1,5 @@
 # Pyswisseph - gitignore
 
-*~
 *.a
 *.bak
 *.o
@@ -8,22 +7,18 @@
 *.pyo
 *.prj
 *.pui
+*.so
 *.zip
+*~
+
+.eggs/
+.idea/
 
 MANIFEST
+
 build*/
 dist/
-doc
-epydoc/*
-make.py
 manifest
 pyswisseph.egg-info/*
 setup.cfg
-src
-swe_unix_src*
-swisseph.*.so
-swisseph.so
-
 venv/
-.eggs/
-.idea/
