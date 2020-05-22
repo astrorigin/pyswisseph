@@ -3141,6 +3141,134 @@ static PyObject * pyswe__antiscion FUNCARGS_KEYWDS
         contrantis[4],contrantis[5]);
 }
 
+/* swisseph._atlas_close */
+PyDoc_STRVAR(pyswe__atlas_close__doc__,
+"Close previously connected atlas database\n\n"
+"Args: -\n"
+"Return: None");
+
+static PyObject * pyswe__atlas_close FUNCARGS_SELF
+{
+    if (swh_atlas_close()) {
+        PyErr_SetString(pyswe_Error, "swisseph._atlas_close: error");
+        return NULL;
+    }
+    Py_RETURN_NONE;
+}
+
+/* swisseph._atlas_connect */
+PyDoc_STRVAR(pyswe__atlas_connect__doc__,
+"Connect to the atlas database\n\n"
+"Args: str path\n"
+"Return: None");
+
+static PyObject * pyswe__atlas_connect FUNCARGS_KEYWDS
+{
+    char* p;
+    static char* kwlist[] = {"path", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &p))
+        return NULL;
+    if (swh_atlas_connect(p)) {
+        PyErr_SetString(pyswe_Error, "swisseph._atlas_connect: error");
+        return NULL;
+    }
+    Py_RETURN_NONE;
+}
+
+/* swisseph._atlas_countries_list */
+PyDoc_STRVAR(pyswe__atlas_countries_list__doc__,
+"Get a list of all countries (and ISO codes) in the atlas database\n\n"
+"Args: -\n"
+"Return: list of (country, code)");
+
+int pyswe__atlas_countries_list_cb(void* p, int argc, char** argv, char** cols)
+{
+    PyObject* lst = (PyObject*) p;
+    PyObject* tup = Py_BuildValue("(ss)", argv[5], argv[1]);
+    if (!tup)
+        return 1;
+    if (PyList_Append(lst, tup))
+        return 1;
+    return 0;
+}
+
+static PyObject * pyswe__atlas_countries_list FUNCARGS_SELF
+{
+    int x;
+    char err[512] = {'\0'};
+    PyObject* p = PyList_New(0);
+    if (!p) {
+        PyErr_SetString(pyswe_Error, "swisseph._atlas_countries: nomem");
+        return NULL;
+    }
+    x = swh_atlas_countries_list(&pyswe__atlas_countries_list_cb, p, err);
+    if (x) {
+        if (*err) {
+            char e[540];
+            snprintf(e, 540, "swisseph._atlas_countries: %s", err);
+            PyErr_SetString(pyswe_Error, e);
+        }
+        else
+            PyErr_SetString(pyswe_Error, "swisseph._atlas_countries: error");
+        Py_DECREF(p);
+        return NULL;
+    }
+    return p;
+}
+
+/* swisseph._atlas_search */
+PyDoc_STRVAR(pyswe__atlas_search__doc__,
+"Search for a location in the atlas database.\n\n"
+"Location and country names can be abbreviated. If country is a 2-character"
+" string, it will be evaluated as an ISO country code, and the search will be"
+" faster.\n\n"
+"Usage example:\n\n"
+"\tlst = swisseph._atlas_search('zurich', 'swi')\n"
+"\tlst = swisseph._atlas_search('zurich', 'ch')\n\n"
+"Args: str location, str country\n"
+"Return: list of (name, country-code, latitude, longitude, elevation, timezone)");
+
+int pyswe__atlas_search_cb(void* p, int argc, char** argv, char** cols)
+{
+    PyObject* lst = (PyObject*) p;
+    PyObject* tup = Py_BuildValue("(ssffis)", argv[2], argv[9],
+        *argv[5] ? atof(argv[5]) : 0, *argv[6] ? atof(argv[6]) : 0,
+        *argv[16] ? atoi(argv[16]) : 0, argv[18]);
+    if (!tup)
+        return 1;
+    if (PyList_Append(lst, tup))
+        return 1;
+    return 0;
+}
+
+static PyObject * pyswe__atlas_search FUNCARGS_KEYWDS
+{
+    char* loc, *ctry;
+    int x;
+    char err[512] = {'\0'};
+    PyObject* p = NULL;
+    static char* kwlist[] = {"location", "country", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ss", kwlist, &loc, &ctry))
+        return NULL;
+    if (!(p = PyList_New(0))) {
+        PyErr_SetString(pyswe_Error, "swisseph._atlas_search: nomem");
+        return NULL;
+    }
+    x = swh_atlas_search(loc, ctry, &pyswe__atlas_search_cb, p, err);
+    if (x) {
+        if (*err) {
+            char e[540];
+            snprintf(e, 540, "swisseph._atlas_search: %s", err);
+            PyErr_SetString(pyswe_Error, e);
+        }
+        else
+            PyErr_SetString(pyswe_Error, "swisseph._atlas_search: error");
+        Py_DECREF(p);
+        return NULL;
+    }
+    return p;
+}
+
 /* swisseph._calc_ut */
 PyDoc_STRVAR(pyswe__calc_ut__doc__,
 "Calculate positions of either a planet (using function calc_ut)"
@@ -4372,6 +4500,14 @@ static struct PyMethodDef pyswe_methods[] = {
 
 #if PYSWE_USE_SWEPHELP
     /* pyswisseph/swephelp functions. */
+    {"_atlas_close", (PyCFunction) pyswe__atlas_close,
+        METH_NOARGS, pyswe__atlas_close__doc__},
+    {"_atlas_connect", (PyCFunction) pyswe__atlas_connect,
+        METH_VARARGS|METH_KEYWORDS, pyswe__atlas_connect__doc__},
+    {"_atlas_countries_list", (PyCFunction) pyswe__atlas_countries_list,
+        METH_NOARGS, pyswe__atlas_countries_list__doc__},
+    {"_atlas_search", (PyCFunction) pyswe__atlas_search,
+        METH_VARARGS|METH_KEYWORDS, pyswe__atlas_search__doc__},
     {"_antiscion", (PyCFunction) pyswe__antiscion,
         METH_VARARGS|METH_KEYWORDS, pyswe__antiscion__doc__},
     {"_calc_ut", (PyCFunction) pyswe__calc_ut,

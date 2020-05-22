@@ -98,6 +98,9 @@ add_library( swisseph MODULE ${SOURCES} )
 add_dependencies( swisseph swe )
 if ( PYSWE_USE_SWEPHELP )
     add_dependencies( swisseph swephelp )
+    if ( MSVC OR NOT SQLITE3_FOUND )
+        add_dependencies( swisseph sqlite3 )
+    endif()
 endif()
 
 # Linkage
@@ -107,11 +110,11 @@ elseif( MINGW )
     target_link_libraries( swisseph swe m ${PYTHON_LIBRARIES}
         pthread -Wl,-O1 -Wl,-Bsymbolic-functions )
 else()
-    target_link_libraries( swisseph swe m ${PYTHON_LIBRARIES}
+    target_link_libraries( swisseph swe m dl ${PYTHON_LIBRARIES}
         -pthread -Wl,-O1 -Wl,-Bsymbolic-functions )
 endif()
 if ( PYSWE_USE_SWEPHELP )
-    target_link_libraries( swisseph swephelp )
+    target_link_libraries( swisseph swephelp sqlite3 )
 endif()
 
 # Target properties

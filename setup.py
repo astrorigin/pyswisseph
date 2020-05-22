@@ -158,16 +158,40 @@ else: # using internal libswe
     swe_defines = []
     print('Using internal libswe')
 
-# Includes
+# Defines
+defines = swe_defines
+if use_swephelp:
+    if sys.platform in ['win32', 'win_amd64', 'darwin']:
+        defines += [
+            '-DSQLITE_DEFAULT_AUTOVACUUM=1',
+            '-DSQLITE_DEFAULT_FOREIGN_KEYS=1',
+            '-DSQLITE_DEFAULT_MEMSTATUS=0',
+            '-DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1',
+            '-DSQLITE_DOESNT_MATCH_BLOBS',
+            '-DSQLITE_DQS=0',
+            '-DSQLITE_ENABLE_COLUMN_METADATA',
+            '-DSQLITE_ENABLE_FTS4',
+            '-DSQLITE_MAX_EXPR_DEPTH=0',
+            '-DSQLITE_OMIT_DEPRECATED',
+            '-DSQLITE_OMIT_SHARED_CACHE',
+            '-DSQLITE_SECURE_DELETE',
+            '-DSQLITE_THREADSAFE=1']
+        #
+    #
+
+# Include paths
 includes = swe_includes
 if use_swephelp:
     includes += ['swephelp']
+    if sys.platform in ['win32', 'win_amd64', 'darwin']:
+        includes += ['swephelp/sqlite3']
 
 # Sources
 sources = ['pyswisseph.c'] + swe_sources
 if use_swephelp:
     sources += [
         'swephelp/swhaspect.c',
+        'swephelp/swhatlas.c',
         'swephelp/swhdatetime.c',
         'swephelp/swhformat.c',
         'swephelp/swhgeo.c',
@@ -175,6 +199,8 @@ if use_swephelp:
         'swephelp/swhraman.c',
         'swephelp/swhsearch.c'
         ]
+    if sys.platform in ['win32', 'win_amd64', 'darwin']:
+        sources += ['swephelp/sqlite3/sqlite3.c']
     #
 
 # Depends
@@ -183,6 +209,7 @@ if use_swephelp:
     depends += [
         'swephelp/swephelp.h',
         'swephelp/swhaspect.h',
+        'swephelp/swhatlas.h',
         'swephelp/swhdef.h',
         'swephelp/swhgeo.h',
         'swephelp/swhraman.h',
@@ -194,15 +221,21 @@ if use_swephelp:
         ]
     #
 
+# Libraries
+libraries = swe_libs
+if use_swephelp:
+    if sys.platform not in ['win32', 'win_amd64', 'darwin']:
+        libraries += ['sqlite3']
+
 # Pyswisseph extension
 swemodule = Extension(
     'swisseph',
-    define_macros = swe_defines,
+    define_macros = defines,
     depends = depends,
     extra_compile_args = cflags,
     extra_link_args = ldflags,
     include_dirs = includes,
-    libraries = swe_libs,
+    libraries = libraries,
     sources = sources
     )
 
