@@ -3233,9 +3233,9 @@ PyDoc_STRVAR(pyswe__atlas_search__doc__,
 int pyswe__atlas_search_cb(void* p, int argc, char** argv, char** cols)
 {
     PyObject* lst = (PyObject*) p;
-    PyObject* tup = Py_BuildValue("(ssffis)", argv[2], argv[9],
-        *argv[5] ? atof(argv[5]) : 0, *argv[6] ? atof(argv[6]) : 0,
-        *argv[16] ? atoi(argv[16]) : 0, argv[18]);
+    PyObject* tup = Py_BuildValue("(ssssffis)", argv[0], argv[1], argv[2],
+        argv[3], *argv[4] ? atof(argv[4]) : 0, *argv[5] ? atof(argv[5]) : 0,
+        *argv[6] ? atoi(argv[6]) : 0, argv[7]);
     if (!tup)
         return 1;
     if (PyList_Append(lst, tup))
