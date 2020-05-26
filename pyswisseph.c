@@ -3512,6 +3512,23 @@ static PyObject * pyswe__jdnow FUNCARGS_SELF
     return Py_BuildValue("f", swh_jdnow());
 }
 
+/* swisseph._jduration */
+PyDoc_STRVAR(pyswe__jduration__doc__,
+"Get duration between JD numbers.\n\n"
+"Args: float jdstart, float jdend\n"
+"Return: 4 ints (days, hours, minutes, seconds)");
+
+static PyObject * pyswe__jduration FUNCARGS_KEYWDS
+{
+    double jd1, jd2;
+    int ret[4];
+    static char* kwlist[] = {"jdstart", "jdend", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &jd1, &jd2))
+        return NULL;
+    swh_jduration(jd1, jd2, ret);
+    return Py_BuildValue("iiii", ret[0],ret[1],ret[2],ret[3]);
+}
+
 /* swisseph._julday */
 PyDoc_STRVAR(pyswe__julday__doc__,
 "Get Julian day number (UTC), without having to calculate hour in decimal.\n\n"
@@ -4530,6 +4547,8 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe__house_system_name__doc__},
     {"_jdnow", (PyCFunction) pyswe__jdnow,
         METH_NOARGS, pyswe__jdnow__doc__},
+    {"_jduration", (PyCFunction) pyswe__jduration,
+        METH_VARARGS|METH_KEYWORDS, pyswe__jduration__doc__},
     {"_julday", (PyCFunction) pyswe__julday,
         METH_VARARGS|METH_KEYWORDS, pyswe__julday__doc__},
     {"_long2nakshatra", (PyCFunction) pyswe__long2nakshatra,
