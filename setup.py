@@ -163,20 +163,20 @@ defines = swe_defines
 if use_swephelp:
     if sys.platform in ['win32', 'win_amd64', 'darwin']:
         defines += [
-            '-DSQLITE_DEFAULT_AUTOVACUUM=1',
-            '-DSQLITE_DEFAULT_FOREIGN_KEYS=1',
-            '-DSQLITE_DEFAULT_MEMSTATUS=0',
-            '-DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1',
-            '-DSQLITE_DOESNT_MATCH_BLOBS',
-            '-DSQLITE_DQS=0',
-            '-DSQLITE_ENABLE_COLUMN_METADATA',
-            '-DSQLITE_ENABLE_FTS4',
-            '-DSQLITE_MAX_EXPR_DEPTH=0',
-            '-DSQLITE_OMIT_DEPRECATED',
-            '-DSQLITE_OMIT_SHARED_CACHE',
-            '-DSQLITE_SECURE_DELETE',
-            '-DSQLITE_THREADSAFE=1']
-        #
+            ('SQLITE_DEFAULT_AUTOVACUUM', 1),
+            ('SQLITE_DEFAULT_FOREIGN_KEYS', 1),
+            ('SQLITE_DEFAULT_MEMSTATUS', 0),
+            ('SQLITE_DEFAULT_WAL_SYNCHRONOUS', 1),
+            ('SQLITE_DOESNT_MATCH_BLOBS',),
+            ('SQLITE_DQS', 0),
+            ('SQLITE_ENABLE_COLUMN_METADATA',),
+            ('SQLITE_ENABLE_FTS4',),
+            ('SQLITE_MAX_EXPR_DEPTH', 0),
+            ('SQLITE_OMIT_DEPRECATED',),
+            ('SQLITE_OMIT_SHARED_CACHE',),
+            ('SQLITE_SECURE_DELETE',),
+            ('SQLITE_THREADSAFE', 1)
+        ]
     #
 
 # Include paths
