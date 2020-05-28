@@ -4611,17 +4611,25 @@ static struct PyMethodDef pyswe_methods[] = {
     {NULL, (PyCFunction) NULL, 0, NULL}
 };
 
+#if PYSWE_AUTO_SET_EPHE_PATH
 PyDoc_STRVAR(pyswe_module_documentation,
 "Python extension to AstroDienst Swiss Ephemeris library.\n\n"
-#if PYSWE_AUTO_SET_EPHE_PATH
+"Extended documentation can be found at AstroDienst website.\n"
+"Please refer to: https://www.astro.com/swisseph/swephprg.htm\n\n"
 "Import of this extension module does automagicaly set the ephemeris path"
 " to \"" PYSWE_DEFAULT_EPHE_PATH "\".\n\n"
-#endif
+"    Pyswisseph homepage: https://astrorigin.com/pyswisseph/\n"
+"    AstroDienst: https://www.astro.com/swisseph/\n"
+"    PyPI: https://pypi.org/project/pyswisseph/");
+#else /* no auto set ephe path */
+PyDoc_STRVAR(pyswe_module_documentation,
+"Python extension to AstroDienst Swiss Ephemeris library.\n\n"
 "Extended documentation can be found at AstroDienst website.\n"
 "Please refer to: https://www.astro.com/swisseph/swephprg.htm\n\n"
 "    Pyswisseph homepage: https://astrorigin.com/pyswisseph/\n"
 "    AstroDienst: https://www.astro.com/swisseph/\n"
 "    PyPI: https://pypi.org/project/pyswisseph/");
+#endif
 
 #if PY_MAJOR_VERSION >= 3
 struct PyModuleDef pyswe_module =
