@@ -9,6 +9,7 @@ calculations.
 
   - Pyswisseph Homepage:    https://astrorigin.com/pyswisseph
   - Fork me on GitHub:      https://github.com/astrorigin/pyswisseph
+  - Clone with command:     git clone --recurse-submodules https://github.com/astrorigin/pyswisseph
   - Launchpad PPA:          https://launchpad.net/~astrorigin/+archive/ubuntu/python-swisseph
   - Python Package Index:   https://pypi.org/project/pyswisseph
   - AstroDienst:            https://www.astro.com/swisseph
