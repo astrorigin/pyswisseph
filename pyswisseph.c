@@ -829,7 +829,7 @@ static PyObject * pyswe_get_tid_acc FUNCARGS_SELF
 /* swisseph.heliacal_pheno_ut */
 PyDoc_STRVAR(pyswe_heliacal_pheno_ut__doc__,
 "Provides data that are relevant for the calculation of heliacal risings and settings.\n\n"
-"Args: float jd_start, seq geopos, seq atmo, seq observer, str object, int enventtype, int helflag\n"
+"Args: float jd_start, seq geopos, seq atmo, seq observer, str object, int eventtype, int helflag\n"
 "Return: tuple of 50 float");
 
 static PyObject * pyswe_heliacal_pheno_ut FUNCARGS_KEYWDS
@@ -1229,7 +1229,7 @@ PyDoc_STRVAR(pyswe_heliacal_ut__doc__,
 "Find the Julian day of the next heliacal phenomenon after a given start date.\n"
 "It works between geographic latitudes 60s - 60n.\n\n"
 "Args: float jd_start, seq geopos, seq atmo, seq observer, str object,"
-" int enventtype, int helflag\n"
+" int eventtype, int helflag\n"
 "Return: tuple with 3 julian days");
 
 static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
