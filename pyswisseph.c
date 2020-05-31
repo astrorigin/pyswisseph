@@ -4323,6 +4323,74 @@ static PyObject * pyswh_tatkalika_relation FUNCARGS_KEYWDS
     return Py_BuildValue("i", swh_tatkalika_relation(r1, r2));
 }
 
+/* swisseph.contrib.tzabbr_find */
+PyDoc_STRVAR(pyswh_tzabbr_find__doc__,
+"Find details about a timezone given its abbreviated name.\n\n"
+"If timezone is found, a list containing up to 3 tuples is returned.\n"
+"Each tuple contains the name of the timezone, a short description, its"
+" definition in the ISO 8601 standard, hours and minutes from UTC.\n\n"
+"Usage example:\n\n"
+"\t>>> swisseph.contrib.tzabbr_find('cet')\n"
+"\t[('CET', 'Central European Time', 'UTC+01', 1, 0)]\n\n"
+"Args: str tz\n"
+"Return: list of (name, description, iso, hours, minutes)");
+
+static PyObject * pyswh_tzabbr_find FUNCARGS_KEYWDS
+{
+    char* tz;
+    struct swh_tzabbr* ret[4];
+    struct swh_tzabbr** p = ret;
+    static char* kwlist[] = {"tz", NULL};
+    PyObject* lst;
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &tz))
+        return NULL;
+    if (!(lst = PyList_New(0))) {
+        PyErr_SetString(pyswe_Error, "swisseph.contrib.tzabbr_find: nomem");
+        return NULL;
+    }
+    if (swh_tzabbr_find(tz, ret))
+        return lst;
+    do {
+        PyObject* tup = Py_BuildValue("(sssii)", (*p)->name, (*p)->desc,
+                                      (*p)->iso, (*p)->hours, (*p)->minutes);
+        if (!tup) {
+            PyErr_SetString(pyswe_Error, "swisseph.contrib.tzabbr_find: nomem");
+            Py_DECREF(lst);
+            return NULL;
+        }
+        PyList_Append(lst, tup);
+    } while (*++p);
+    return lst;
+}
+
+/* swisseph.contrib.tzabbr_list */
+PyDoc_STRVAR(pyswh_tzabbr_list__doc__,
+"Provide a list of all timezone abbreviations.\n\n"
+"Args: -\n"
+"Return: list of (name, description, iso, hours, minutes)");
+
+static PyObject * pyswh_tzabbr_list FUNCARGS_SELF
+{
+    size_t i = 0;
+    struct swh_tzabbr* p = (struct swh_tzabbr*) swh_tzabbrlist;
+    PyObject* lst = PyList_New(SWH_TZABBR_NUM);
+    if (!lst) {
+        PyErr_SetString(pyswe_Error, "swisseph.contrib.tzabbr_list: nomem");
+        return NULL;
+    }
+    for (; i < SWH_TZABBR_NUM; ++p) {
+        PyObject* tup = Py_BuildValue("(sssii)", p->name, p->desc, p->iso,
+                                      p->hours, p->minutes);
+        if (!tup) {
+            PyErr_SetString(pyswe_Error, "swisseph.contrib.tzabbr_list: nomem");
+            Py_DECREF(lst);
+            return NULL;
+        }
+        PyList_SET_ITEM(lst, i++, tup);
+    }
+    return lst;
+}
+
 /* swisseph.contrib.years_diff */
 PyDoc_STRVAR(pyswh_years_diff__doc__,
 "Get number of 'astrological' years between two Julian days.\n\n"
@@ -4608,6 +4676,10 @@ static struct PyMethodDef pyswh_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswh_t2i__doc__},
     {"tatkalika_relation", (PyCFunction) pyswh_tatkalika_relation,
         METH_VARARGS|METH_KEYWORDS, pyswh_tatkalika_relation__doc__},
+    {"tzabbr_find", (PyCFunction) pyswh_tzabbr_find,
+        METH_VARARGS|METH_KEYWORDS, pyswh_tzabbr_find__doc__},
+    {"tzabbr_list", (PyCFunction) pyswh_tzabbr_list,
+        METH_NOARGS, pyswh_tzabbr_list__doc__},
     {"years_diff", (PyCFunction) pyswh_years_diff,
         METH_VARARGS|METH_KEYWORDS, pyswh_years_diff__doc__},
     {NULL, (PyCFunction) NULL, 0, NULL}
