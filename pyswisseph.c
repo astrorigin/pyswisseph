@@ -29,10 +29,10 @@
  *  Swisseph homepage: https://www.astro.com/swisseph
  *
  *  Swisseph version: 2.08.00
- *  Last revision: 2020-05-14
+ *  Last revision: 2020-06-01
  */
 
-#define PYSWISSEPH_VERSION      20200514
+#define PYSWISSEPH_VERSION      20200601
 
 /* Set the default argument for set_ephe_path function */
 #ifndef PYSWE_DEFAULT_EPHE_PATH
@@ -3501,6 +3501,27 @@ static PyObject * pyswh_house_system_name FUNCARGS_KEYWDS
     return Py_BuildValue("s", str);
 }
 
+/* swisseph.contrib.jd2isostr */
+PyDoc_STRVAR(pyswh_jd2isostr__doc__,
+"Get an ISO 8601 style string from given JD number.\n\n"
+"Args: float jd, int cal=GREG_CAL\n"
+"Return: str");
+
+static PyObject * pyswh_jd2isostr FUNCARGS_KEYWDS
+{
+    int cal = SE_GREG_CAL;
+    double jd;
+    char ret[64];
+    static char* kwlist[] = {"jd", "cal", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist, &jd, &cal))
+        return NULL;
+    if (swh_jd2isostr(jd, cal, ret)) {
+        PyErr_SetString(pyswe_Error, "swisseph.contrib.jd2isostr: error");
+        return NULL;
+    }
+    return Py_BuildValue("s", ret);
+}
+
 /* swisseph.contrib.jdnow */
 PyDoc_STRVAR(pyswh_jdnow__doc__,
 "Get current Julian day number (Gregorian calendar, UTC).\n\n"
@@ -4616,6 +4637,8 @@ static struct PyMethodDef pyswh_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswh_get_nakshatra_name__doc__},
     {"house_system_name", (PyCFunction) pyswh_house_system_name,
         METH_VARARGS|METH_KEYWORDS, pyswh_house_system_name__doc__},
+    {"jd2isostr", (PyCFunction) pyswh_jd2isostr,
+        METH_VARARGS|METH_KEYWORDS, pyswh_jd2isostr__doc__},
     {"jdnow", (PyCFunction) pyswh_jdnow,
         METH_NOARGS, pyswh_jdnow__doc__},
     {"jduration", (PyCFunction) pyswh_jduration,
