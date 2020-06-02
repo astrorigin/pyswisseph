@@ -3159,8 +3159,8 @@ static PyObject * pyswh_atlas_close FUNCARGS_SELF
 /* swisseph.contrib.atlas_connect */
 PyDoc_STRVAR(pyswh_atlas_connect__doc__,
 "Connect to the atlas database\n\n"
-"If the path argument is omitted or empty (''), the environment variable"
-" SWH_ATLAS_PATH will be searched for a valid string.\n\n"
+"The environment variable SWH_ATLAS_PATH will be searched for a valid string"
+" and will override the path argument given.\n\n"
 "Args: str path=''\n"
 "Return: None");
 
