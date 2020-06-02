@@ -3121,8 +3121,8 @@ There is no guarantee that these functions are accurate. Use at your own risks.
 PyDoc_STRVAR(pyswh_antiscion__doc__,
 "Calculate antiscion and contrantiscion of an object\n\n"
 "Usage example:\n\n"
-"\tpos, flg = swisseph.contrib.calc_ut(jd, pl)\n"
-"\tantis, contrantis = swisseph.contrib.antiscion(*pos)\n\n"
+"\tpos, flg = swh.calc_ut(jd, pl)\n"
+"\tantis, contrantis = swh.antiscion(*pos)\n\n"
 "Args: float lon, float lat=0, float dist=0, float lonspeed=0, float latspeed=0,"
 " float distspeed=0\n"
 "Return: antiscion (lon, lat, dist, lonspeed, latspeed, distspeed) contrantiscion (...)");
@@ -3225,10 +3225,11 @@ PyDoc_STRVAR(pyswh_atlas_search__doc__,
 " string, it will be evaluated as an ISO country code, and the search will be"
 " faster.\n\n"
 "Usage example:\n\n"
-"\tlst = swisseph.contrib.atlas_search('zurich', 'swi')\n"
-"\tlst = swisseph.contrib.atlas_search('zurich', 'ch')\n\n"
+"\tlst = swh.atlas_search('zurich', 'swi')\n"
+"\tlst = swh.atlas_search('zurich', 'ch')\n\n"
 "Args: str location, str country\n"
-"Return: list of (name, country-code, latitude, longitude, elevation, timezone)");
+"Return: list of (name, asciiname, alternatenames, countrycode, latitude,"
+" longitude, elevation, timezone)");
 
 int pyswh_atlas_search_cb(void* p, int argc, char** argv, char** cols)
 {
@@ -3278,8 +3279,8 @@ PyDoc_STRVAR(pyswh_calc_ut__doc__,
 "Args: float tjdut, int or str obj, flags=FLG_SWIEPH+FLG_SPEED\n"
 "Return: 2 tuples: positions of object (on success), returned flags and object name\n\n"
 "Usage examples:\n\n"
-"\tres, xtra = swisseph.contrib.calc_ut(swisseph.contrib.jdnow(), swisseph.SUN)\n"
-"\tres, xtra = swisseph.contrib.calc_ut(swisseph.contrib.jdnow(), \"Regulus\")");
+"\tres, xtra = swh.calc_ut(swh.jdnow(), swisseph.SUN)\n"
+"\tres, xtra = swh.calc_ut(swh.jdnow(), \"Regulus\")");
 
 static PyObject * pyswh_calc_ut FUNCARGS_KEYWDS
 {
@@ -3428,7 +3429,7 @@ static PyObject * pyswh_geolat2c FUNCARGS_KEYWDS
     res = swh_geolat2c(lat, ret);
     if (res == -1)
     {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.geolat2c: Invalid latitude");
+        PyErr_SetString(pyswe_Error, "swisseph.contrib.geolat2c: invalid latitude");
         return NULL;
     }
     return Py_BuildValue("s", ret);
@@ -3451,7 +3452,7 @@ static PyObject * pyswh_geolon2c FUNCARGS_KEYWDS
     res = swh_geolon2c(lon, ret);
     if (res == -1)
     {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.geolon2c: Invalid longitude");
+        PyErr_SetString(pyswe_Error, "swisseph.contrib.geolon2c: invalid longitude");
         return NULL;
     }
     return Py_BuildValue("s", ret);
@@ -3472,7 +3473,7 @@ static PyObject * pyswh_get_nakshatra_name FUNCARGS_KEYWDS
         return NULL;
     if (swh_get_nakshatra_name(nak, ret) == -1)
     {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.get_nakshatra_name: Invalid nakshatra number");
+        PyErr_SetString(pyswe_Error, "swisseph.contrib.get_nakshatra_name: invalid nakshatra number");
         return NULL;
     }
     return Py_BuildValue("s", ret);
@@ -3631,7 +3632,7 @@ static PyObject * pyswh_lord FUNCARGS_KEYWDS
     i = swh_lord(sign);
     if (i == -1)
     {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.lord: Invalid sign number");
+        PyErr_SetString(pyswe_Error, "swisseph.contrib.lord: invalid sign number");
         return NULL;
     }
     return Py_BuildValue("i", i);
@@ -3742,7 +3743,7 @@ static PyObject * pyswh_naisargika_relation FUNCARGS_KEYWDS
     i = swh_naisargika_relation(gr1, gr2, &ret);
     if (i == -1)
     {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.naisargika_relation: Invalid planet");
+        PyErr_SetString(pyswe_Error, "swisseph.contrib.naisargika_relation: invalid planet");
         return NULL;
     }
     return Py_BuildValue("i", ret);
@@ -3857,7 +3858,7 @@ static PyObject * pyswh_next_aspect_cusp FUNCARGS_KEYWDS
 #endif
     else {
         PyErr_SetString(pyswe_Error,
-            "swisseph.contrib.next_aspect_cusp: Invalid body type");
+            "swisseph.contrib.next_aspect_cusp: invalid body type");
         return NULL;
     }
     res = swh_next_aspect_cusp(plnt, star, asp, cusp, jd, lat, lon, hsys,
@@ -3923,7 +3924,7 @@ static PyObject * pyswh_next_aspect_cusp2 FUNCARGS_KEYWDS
 #endif
     else {
         PyErr_SetString(pyswe_Error,
-            "swisseph.contrib.next_aspect_cusp2: Invalid body type");
+            "swisseph.contrib.next_aspect_cusp2: invalid body type");
         return NULL;
     }
     res = swh_next_aspect_cusp2(plnt, star, asp, cusp, jd, lat, lon, hsys,
@@ -4118,7 +4119,7 @@ static PyObject * pyswh_ochchabala FUNCARGS_KEYWDS
     d = swh_ochchabala(ipl, lon);
     if (d == -1)
     {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.ochchabala: Invalid planet");
+        PyErr_SetString(pyswe_Error, "swisseph.contrib.ochchabala: invalid planet");
         return NULL;
     }
     return Py_BuildValue("f", d);
@@ -4204,7 +4205,7 @@ static PyObject * pyswh_residential_strength FUNCARGS_KEYWDS
         return NULL;
     if ((PySequence_Check(seq) != 1) || (PySequence_Length(seq) < 12))
     {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.residential_strength: Invalid bhavas");
+        PyErr_SetString(pyswe_Error, "swisseph.contrib.residential_strength: invalid bhavas");
         return NULL;
     }
     for (i = 0; i < 12; ++i) /* check sequence has 12 numbers */
@@ -4226,14 +4227,14 @@ static PyObject * pyswh_residential_strength FUNCARGS_KEYWDS
 #endif
         else
         {
-            PyErr_SetString(pyswe_Error, "swisseph.contrib.residential_strength: Invalid bhavas type");
+            PyErr_SetString(pyswe_Error, "swisseph.contrib.residential_strength: invalid bhavas type");
             return NULL;
         }
     }
     i = swh_residential_strength(plon, bh, &ret);
     if (i == -1) /* should not happen... */
     {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.residential_strength: Invalid error");
+        PyErr_SetString(pyswe_Error, "swisseph.contrib.residential_strength: invalid error");
         return NULL;
     }
     return Py_BuildValue("f", ret);
@@ -4351,7 +4352,7 @@ PyDoc_STRVAR(pyswh_tzabbr_find__doc__,
 "Each tuple contains the name of the timezone, a short description, its"
 " definition in the ISO 8601 standard, hours and minutes from UTC.\n\n"
 "Usage example:\n\n"
-"\t>>> swisseph.contrib.tzabbr_find('cet')\n"
+"\t>>> swh.tzabbr_find('cet')\n"
 "\t[('CET', 'Central European Time', 'UTC+01', 1, 0)]\n\n"
 "Args: str tz\n"
 "Return: list of (name, description, iso, hours, minutes)");
