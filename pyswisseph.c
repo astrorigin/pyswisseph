@@ -670,10 +670,8 @@ static PyObject * pyswe_gauquelin_sector FUNCARGS_KEYWDS
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
     {
-        if (PyUnicode_READY(body)) {
-            PyErr_SetString(pyswe_Error, "swisseph.gauquelin_sector: nomem");
-            return NULL;
-        }
+        if (PyUnicode_READY(body))
+            return PyErr_NoMemory();
         star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
@@ -1981,10 +1979,8 @@ static PyObject * pyswe_lun_occult_when_glob FUNCARGS_KEYWDS
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
     {
-        if (PyUnicode_READY(body)) {
-            PyErr_SetString(pyswe_Error, "swisseph.lun_occult_when_glob: nomem");
-            return NULL;
-        }
+        if (PyUnicode_READY(body))
+            return PyErr_NoMemory();
         star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
@@ -2036,10 +2032,8 @@ static PyObject * pyswe_lun_occult_when_loc FUNCARGS_KEYWDS
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
     {
-        if (PyUnicode_READY(body)) {
-            PyErr_SetString(pyswe_Error, "swisseph.lun_occult_when_loc: nomem");
-            return NULL;
-        }
+        if (PyUnicode_READY(body))
+            return PyErr_NoMemory();
         star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
@@ -2092,10 +2086,8 @@ static PyObject * pyswe_lun_occult_where FUNCARGS_KEYWDS
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
     {
-        if (PyUnicode_READY(body)) {
-            PyErr_SetString(pyswe_Error, "swisseph.lun_occult_where: nomem");
-            return NULL;
-        }
+        if (PyUnicode_READY(body))
+            return PyErr_NoMemory();
         star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
@@ -2362,10 +2354,8 @@ static PyObject * pyswe_rise_trans FUNCARGS_KEYWDS
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
     {
-        if (PyUnicode_READY(body)) {
-            PyErr_SetString(pyswe_Error, "swisseph.rise_trans: nomem");
-            return NULL;
-        }
+        if (PyUnicode_READY(body))
+            return PyErr_NoMemory();
         star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
@@ -3199,17 +3189,12 @@ static PyObject * pyswh_atlas_countries_list FUNCARGS_SELF
     int x;
     char err[512] = {'\0'};
     PyObject* p = PyList_New(0);
-    if (!p) {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.atlas_countries: nomem");
-        return NULL;
-    }
+    if (!p)
+        return PyErr_NoMemory();
     x = swh_atlas_countries_list(&pyswh_atlas_countries_list_cb, p, err);
     if (x) {
-        if (*err) {
-            char e[550];
-            snprintf(e, 550, "swisseph.contrib.atlas_countries: %s", err);
-            PyErr_SetString(pyswe_Error, e);
-        }
+        if (*err)
+            return PyErr_Format(pyswe_Error, "swisseph.contrib.atlas_countries: %s", err);
         else
             PyErr_SetString(pyswe_Error, "swisseph.contrib.atlas_countries: error");
         Py_DECREF(p);
@@ -3253,17 +3238,12 @@ static PyObject * pyswh_atlas_search FUNCARGS_KEYWDS
     static char* kwlist[] = {"location", "country", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "ss", kwlist, &loc, &ctry))
         return NULL;
-    if (!(p = PyList_New(0))) {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.atlas_search: nomem");
-        return NULL;
-    }
+    if (!(p = PyList_New(0)))
+        return PyErr_NoMemory();
     x = swh_atlas_search(loc, ctry, &pyswh_atlas_search_cb, p, err);
     if (x) {
-        if (*err) {
-            char e[550];
-            snprintf(e, 550, "swisseph.contrib.atlas_search: %s", err);
-            PyErr_SetString(pyswe_Error, e);
-        }
+        if (*err)
+            return PyErr_Format(pyswe_Error, "swisseph.contrib.atlas_search: %s", err);
         else
             PyErr_SetString(pyswe_Error, "swisseph.contrib.atlas_search: error");
         Py_DECREF(p);
@@ -3298,10 +3278,8 @@ static PyObject * pyswh_calc_ut FUNCARGS_KEYWDS
     }
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(p)) { /* unicode -> fixed star */
-        if (PyUnicode_READY(p)) {
-            PyErr_SetString(pyswe_Error, "swisseph.contrib.calc_ut: nomem");
-            return NULL;
-        }
+        if (PyUnicode_READY(p))
+            return PyErr_NoMemory();
         star = (char*) PyUnicode_1BYTE_DATA(p);
     }
 #elif PY_MAJOR_VERSION < 3
@@ -3844,10 +3822,8 @@ static PyObject * pyswh_next_aspect_cusp FUNCARGS_KEYWDS
         plnt = (int) PyLong_AsLong(body);
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) { /* unicode -> fixed star */
-        if (PyUnicode_READY(body)) {
-            PyErr_SetString(pyswe_Error, "swisseph.contrib.next_aspect_cusp: nomem");
-            return NULL;
-        }
+        if (PyUnicode_READY(body))
+            return PyErr_NoMemory();
         star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
@@ -3910,10 +3886,8 @@ static PyObject * pyswh_next_aspect_cusp2 FUNCARGS_KEYWDS
         plnt = (int) PyLong_AsLong(body);
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) { /* unicode -> fixed star */
-        if (PyUnicode_READY(body)) {
-            PyErr_SetString(pyswe_Error, "swisseph.contrib.next_aspect_cusp2: nomem");
-            return NULL;
-        }
+        if (PyUnicode_READY(body))
+            return PyErr_NoMemory();
         star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
@@ -3979,10 +3953,8 @@ static PyObject * pyswh_next_aspect_with FUNCARGS_KEYWDS
         other = (int) PyLong_AsLong(body);
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) { /* unicode -> fixed star */
-        if (PyUnicode_READY(body)) {
-            PyErr_SetString(pyswe_Error, "swisseph.contrib.next_aspect_with: nomem");
-            return NULL;
-        }
+        if (PyUnicode_READY(body))
+            return PyErr_NoMemory();
         star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
@@ -4035,10 +4007,8 @@ static PyObject * pyswh_next_aspect_with2 FUNCARGS_KEYWDS
         other = (int) PyLong_AsLong(body);
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) { /* unicode -> fixed star */
-        if (PyUnicode_READY(body)) {
-            PyErr_SetString(pyswe_Error, "swisseph.contrib.next_aspect_with2: nomem");
-            return NULL;
-        }
+        if (PyUnicode_READY(body))
+            return PyErr_NoMemory();
         star = (char*) PyUnicode_1BYTE_DATA(body);
     }
 #elif PY_MAJOR_VERSION < 3
@@ -4366,19 +4336,16 @@ static PyObject * pyswh_tzabbr_find FUNCARGS_KEYWDS
     PyObject* lst;
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &tz))
         return NULL;
-    if (!(lst = PyList_New(0))) {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.tzabbr_find: nomem");
-        return NULL;
-    }
+    if (!(lst = PyList_New(0)))
+        return PyErr_NoMemory();
     if (swh_tzabbr_find(tz, ret))
         return lst;
     do {
         PyObject* tup = Py_BuildValue("(sssii)", (*p)->name, (*p)->desc,
                                       (*p)->iso, (*p)->hours, (*p)->minutes);
         if (!tup) {
-            PyErr_SetString(pyswe_Error, "swisseph.contrib.tzabbr_find: nomem");
             Py_DECREF(lst);
-            return NULL;
+            return PyErr_NoMemory();
         }
         PyList_Append(lst, tup);
     } while (*++p);
@@ -4396,17 +4363,14 @@ static PyObject * pyswh_tzabbr_list FUNCARGS_SELF
     size_t i = 0;
     struct swh_tzabbr* p = (struct swh_tzabbr*) swh_tzabbrlist;
     PyObject* lst = PyList_New(SWH_TZABBR_NUM);
-    if (!lst) {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.tzabbr_list: nomem");
-        return NULL;
-    }
+    if (!lst)
+        return PyErr_NoMemory();
     for (; i < SWH_TZABBR_NUM; ++p) {
         PyObject* tup = Py_BuildValue("(sssii)", p->name, p->desc, p->iso,
                                       p->hours, p->minutes);
         if (!tup) {
-            PyErr_SetString(pyswe_Error, "swisseph.contrib.tzabbr_list: nomem");
             Py_DECREF(lst);
-            return NULL;
+            return PyErr_NoMemory();
         }
         PyList_SET_ITEM(lst, i++, tup);
     }
