@@ -44,6 +44,7 @@ Usage example:
 
 import os.path, sys
 from setuptools import setup, Extension
+from glob import glob
 
 # Pyswisseph version string
 # Our version string gets the version of the swisseph library (x.xx.xx)
@@ -189,37 +190,14 @@ if use_swephelp:
 # Sources
 sources = ['pyswisseph.c'] + swe_sources
 if use_swephelp:
-    sources += [
-        'swephelp/swhaspect.c',
-        'swephelp/swhatlas.c',
-        'swephelp/swhdatetime.c',
-        'swephelp/swhformat.c',
-        'swephelp/swhgeo.c',
-        'swephelp/swhmisc.c',
-        'swephelp/swhraman.c',
-        'swephelp/swhsearch.c'
-        ]
+    sources += glob('swephelp/*.c')
     if sys.platform in ['win32', 'win_amd64', 'darwin']:
         sources += ['swephelp/sqlite3/sqlite3.c']
-    #
 
 # Depends
 depends = swe_depends
 if use_swephelp:
-    depends += [
-        'swephelp/swephelp.h',
-        'swephelp/swhaspect.h',
-        'swephelp/swhatlas.h',
-        'swephelp/swhdef.h',
-        'swephelp/swhgeo.h',
-        'swephelp/swhraman.h',
-        'swephelp/swhdatetime.h',
-        'swephelp/swhformat.h',
-        'swephelp/swhmisc.h',
-        'swephelp/swhsearch.h',
-        'swephelp/swhwin.h'
-        ]
-    #
+    depends += glob('swephelp/*.h')
 
 # Libraries
 libraries = swe_libs
