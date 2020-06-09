@@ -3098,14 +3098,464 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
     }
 }
 
-#if PYSWE_USE_SWEPHELP
-/* *** Pyswisseph contrib submodule. ***
+#if PYSWE_USE_SWEPHELP /* Pyswisseph contrib submodule */
 
-Not part of the original swisseph,
-but provided here as helpers for the programmer.
-There is no guarantee that these functions are accurate. Use at your own risks.
+/* generic object holding a pointer */
 
-*/
+#define pyswh_Object_new(tp)    ((pyswh_Object*) (tp)->tp_alloc((tp), 0))
+
+typedef struct {
+    PyObject_HEAD
+    void* p;
+} pyswh_Object;
+
+typedef struct {
+    double (*get)(void*);
+    int (*set)(void*, double);
+} pyswh_double_getsetters;
+
+typedef struct {
+    int (*get)(void*);
+    int (*set)(void*, int);
+} pyswh_int_getsetters;
+
+typedef struct {
+    const char* (*get)(void*);
+    int (*set)(void*, const char*);
+} pyswh_string_getsetters;
+
+static PyObject * pyswh_Object_get_double(pyswh_Object* self, void* cl)
+{
+    double d = ((pyswh_double_getsetters*)cl)->get(self->p);
+    PyObject* o = PyFloat_FromDouble(d);
+    return o ? o : PyErr_NoMemory();
+}
+
+static int pyswh_Object_set_double(pyswh_Object* self, PyObject* val, void* cl)
+{
+    double d;
+    if (!val || (!PyLong_Check(val) && !PyFloat_Check(val))) {
+        PyErr_SetString(PyExc_TypeError, "must be a float");
+        return -1;
+    }
+    d = PyLong_Check(val) ? PyLong_AsLong(val) :
+        PyFloat_Check(val) ? PyFloat_AsDouble(val) : -1;
+    if (d == -1  && PyErr_Occurred())
+        return -1;
+    if (((pyswh_double_getsetters*)cl)->set(self->p, d)) {
+        PyErr_SetString(PyExc_AttributeError, swhxx_get_error(self->p));
+        swhxx_clear_error(self->p);
+        return -1;
+    }
+    return 0;
+}
+
+static PyObject * pyswh_Object_get_int(pyswh_Object* self, void* cl)
+{
+    int i = ((pyswh_int_getsetters*)cl)->get(self->p);
+    PyObject* o = PyLong_FromLong(i);
+    return o ? o : PyErr_NoMemory();
+}
+
+static int pyswh_Object_set_int(pyswh_Object* self, PyObject* val, void* cl)
+{
+    int i;
+    if (!val || !PyLong_Check(val)) {
+        PyErr_SetString(PyExc_TypeError, "must be an int");
+        return -1;
+    }
+    i = PyLong_AsLong(val);
+    if (i == -1 && PyErr_Occurred())
+        return -1;
+    if (((pyswh_int_getsetters*)cl)->set(self->p, i)) {
+        PyErr_SetString(PyExc_AttributeError, swhxx_get_error(self->p));
+        swhxx_clear_error(self->p);
+        return -1;
+    }
+    return 0;
+}
+
+static PyObject * pyswh_Object_get_string(pyswh_Object* self, void* cl)
+{
+    const char* s = ((pyswh_string_getsetters*)cl)->get(self->p);
+    PyObject* o = PyUnicode_FromString(s);
+    return o ? o : PyErr_NoMemory();
+}
+
+static int pyswh_Object_set_string(pyswh_Object* self, PyObject* val, void* cl)
+{
+    char* str;
+    if (!val || !PyUnicode_Check(val)) {
+        PyErr_SetString(PyExc_TypeError, "must be a string");
+        return -1;
+    }
+    str = (char*) PyUnicode_AsUTF8(val);
+    if (((pyswh_string_getsetters*)cl)->set(self->p, str)) {
+        PyErr_SetString(PyExc_AttributeError, swhxx_get_error(self->p));
+        swhxx_clear_error(self->p);
+        return -1;
+    }
+    return 0;
+}
+
+/* swisseph.contrib.User */
+PyDoc_STRVAR(pyswh_User__doc__,
+"User of the database");
+PyDoc_STRVAR(pyswh_User_name__doc__,
+"User name");
+PyDoc_STRVAR(pyswh_User_pswd__doc__,
+"User password");
+PyDoc_STRVAR(pyswh_User_mail__doc__,
+"User mail");
+PyDoc_STRVAR(pyswh_User_info__doc__,
+"User info");
+PyDoc_STRVAR(pyswh_User_drop__doc__,
+"Delete user from database.\n\n"
+"Args: -\n"
+"Return: None");
+PyDoc_STRVAR(pyswh_User_list__doc__,
+"List all users in database.\n\n"
+"Args: -\n"
+"Return: list of swh.User instances");
+PyDoc_STRVAR(pyswh_User_root__doc__,
+"Load the default user (root) from database (static method)\n\n"
+"Args: -\n"
+"Return: swh.User instance");
+PyDoc_STRVAR(pyswh_User_save__doc__,
+"Save user in database.\n\n"
+"Args: -\n"
+"Return: None");
+PyDoc_STRVAR(pyswh_User_select__doc__,
+"Load a user from database (static method)\n\n"
+"Args: str name\n"
+"Return: swh.User instance");
+
+static PyObject * pyswh_User_new(PyTypeObject* tp, PyObject* args, PyObject* kwds)
+{
+    pyswh_Object* self = pyswh_Object_new(tp);
+    if (self)
+        swhxx_db_user_new(&self->p);
+    else
+        self->p = NULL;
+    return (PyObject*) self;
+}
+
+static void pyswh_User_dealloc(pyswh_Object* self)
+{
+    if (self->p)
+        swhxx_db_user_dealloc(&self->p);
+    Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static int pyswh_User_init(pyswh_Object* self, PyObject* args, PyObject* kwds)
+{
+    char* name = "?", *pswd = "", *mail = "", *info = "";
+    static char* kwlist[] = {"name", "pswd", "mail", "info", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ssss", kwlist,
+                                     &name, &pswd, &mail, &info))
+        return -1;
+    if (swhxx_db_user_set_name(self->p, name)
+        || swhxx_db_user_set_pswd(self->p, pswd)
+        || swhxx_db_user_set_mail(self->p, mail)
+        || swhxx_db_user_set_info(self->p, info)) {
+        PyErr_SetString(PyExc_AttributeError, swhxx_get_error(self->p));
+        swhxx_clear_error(self->p);
+        return -1;
+    }
+    return 0;
+}
+
+static pyswh_string_getsetters pyswh_User_getset_name = {
+    &swhxx_db_user_get_name, &swhxx_db_user_set_name
+};
+static pyswh_string_getsetters pyswh_User_getset_pswd = {
+    &swhxx_db_user_get_pswd, &swhxx_db_user_set_pswd
+};
+static pyswh_string_getsetters pyswh_User_getset_mail = {
+    &swhxx_db_user_get_mail, &swhxx_db_user_set_mail
+};
+static pyswh_string_getsetters pyswh_User_getset_info = {
+    &swhxx_db_user_get_info, &swhxx_db_user_set_info
+};
+
+static PyGetSetDef pyswh_User_getsetters[] = {
+{"name", (getter) pyswh_Object_get_string, (setter) pyswh_Object_set_string,
+    pyswh_User_name__doc__, &pyswh_User_getset_name},
+{"pswd", (getter) pyswh_Object_get_string, (setter) pyswh_Object_set_string,
+    pyswh_User_pswd__doc__, &pyswh_User_getset_pswd},
+{"mail", (getter) pyswh_Object_get_string, (setter) pyswh_Object_set_string,
+    pyswh_User_mail__doc__, &pyswh_User_getset_mail},
+{"info", (getter) pyswh_Object_get_string, (setter) pyswh_Object_set_string,
+    pyswh_User_info__doc__, &pyswh_User_getset_info},
+{NULL}
+};
+
+PyObject * pyswh_User_drop FUNCARGS_SELF;
+PyObject * pyswh_User_list FUNCARGS_SELF;
+PyObject * pyswh_User_root FUNCARGS_SELF;
+PyObject * pyswh_User_save FUNCARGS_SELF;
+PyObject * pyswh_User_select FUNCARGS_KEYWDS;
+
+static PyMethodDef pyswh_User_methods[] = {
+{"drop", (PyCFunction) pyswh_User_drop,
+    METH_NOARGS, pyswh_User_drop__doc__},
+{"list", (PyCFunction) pyswh_User_list,
+    METH_STATIC|METH_NOARGS, pyswh_User_list__doc__},
+{"root", (PyCFunction) pyswh_User_root,
+    METH_STATIC|METH_NOARGS, pyswh_User_root__doc__},
+{"save", (PyCFunction) pyswh_User_save,
+    METH_NOARGS, pyswh_User_save__doc__},
+{"select", (PyCFunction) pyswh_User_select,
+    METH_STATIC|METH_VARARGS|METH_KEYWORDS, pyswh_User_select__doc__},
+{NULL}
+};
+
+static PyTypeObject pyswh_User_type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "swisseph.contrib.User",
+    .tp_doc = pyswh_User__doc__,
+    .tp_basicsize = sizeof(pyswh_Object),
+    .tp_itemsize = 0,
+    .tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE,
+    .tp_new = pyswh_User_new,
+    .tp_init = (initproc) pyswh_User_init,
+    .tp_dealloc = (destructor) pyswh_User_dealloc,
+    /*.tp_members = pyswh_User_members,*/
+    .tp_methods = pyswh_User_methods,
+    .tp_getset = pyswh_User_getsetters,
+};
+
+PyObject * pyswh_User_drop FUNCARGS_SELF
+{
+    pyswh_Object* o = (pyswh_Object*) self;
+    char err[512];
+    if (swhxx_db_user_drop(o->p, err)) {
+        PyErr_SetString(PyExc_KeyError, err);
+        swhxx_clear_error(o->p);
+        return NULL;
+    }
+    Py_RETURN_NONE;
+}
+
+int pyswh_User_list_cb(void* p, int argc, char** argv, char** cols)
+{
+    PyObject* lst = (PyObject*) p;
+    pyswh_Object* u = pyswh_Object_new(&pyswh_User_type);
+    if (!u)
+        return 1;
+    swhxx_db_user_new(&u->p);
+    if (!u->p
+        || swhxx_db_user_set_idx(u->p, atoi(argv[0]))
+        || swhxx_db_user_set_name(u->p, argv[1])
+        || swhxx_db_user_set_pswd(u->p, argv[2])
+        || swhxx_db_user_set_mail(u->p, argv[3])
+        || swhxx_db_user_set_info(u->p, argv[4]))
+        return 1;
+    if (PyList_Append(lst, (PyObject*) u))
+        return 1;
+    return 0;
+}
+
+PyObject * pyswh_User_list FUNCARGS_SELF
+{
+    char err[512] = {0};
+    PyObject* lst = PyList_New(0);
+    if (!lst)
+        return PyErr_NoMemory();
+    if (swh_db_exec("select * from Users order by _idx;", &pyswh_User_list_cb,
+                    lst, err)) {
+        PyErr_SetString(pyswe_Error, err);
+        Py_DECREF(lst);
+        return NULL;
+    }
+    return lst;
+}
+
+PyObject * pyswh_User_root FUNCARGS_SELF
+{
+    void* p;
+    pyswh_Object* o;
+    char err[512];
+    if (swhxx_db_user_root(&p, err)) {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    if (!(o = pyswh_Object_new(&pyswh_User_type))) {
+        swhxx_db_user_dealloc(&p);
+        return PyErr_NoMemory();
+    }
+    o->p = p;
+    return (PyObject*) o;
+}
+
+PyObject * pyswh_User_save FUNCARGS_SELF
+{
+    pyswh_Object* o = (pyswh_Object*) self;
+    char err[512];
+    int x = swhxx_db_user_save(o->p, err);
+    switch (x) {
+    case 2:
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    case 1:
+        PyErr_SetString(PyExc_KeyError, err);
+        return NULL;
+    }
+    Py_RETURN_NONE;
+}
+
+PyObject * pyswh_User_select FUNCARGS_KEYWDS
+{
+    char* name;
+    void* p;
+    pyswh_Object* o;
+    char err[512];
+    static char* kwlist[] = {"name", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &name))
+        return NULL;
+    if (swhxx_db_user_select(name, &p, err)) {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    if (!p)
+        return PyErr_Format(PyExc_KeyError, "no such user (%s)", name);
+    if (!(o = pyswh_Object_new(&pyswh_User_type))) {
+        swhxx_db_user_dealloc(&p);
+        return PyErr_NoMemory();
+    }
+    o->p = p;
+    return (PyObject*) o;
+}
+
+/* swisseph.contrib.Data */
+PyDoc_STRVAR(pyswh_Data__doc__,
+"Astro data");
+PyDoc_STRVAR(pyswh_Data_title__doc__,
+"Data title");
+PyDoc_STRVAR(pyswh_Data_jd__doc__,
+"Data julian day");
+PyDoc_STRVAR(pyswh_Data_lat__doc__,
+"Data latitude");
+PyDoc_STRVAR(pyswh_Data_lon__doc__,
+"Data longitude");
+PyDoc_STRVAR(pyswh_Data_alt__doc__,
+"Data altitude");
+PyDoc_STRVAR(pyswh_Data_datetime__doc__,
+"Data date and time");
+PyDoc_STRVAR(pyswh_Data_timezone__doc__,
+"Data timezone");
+PyDoc_STRVAR(pyswh_Data_location__doc__,
+"Data location");
+PyDoc_STRVAR(pyswh_Data_country__doc__,
+"Data country");
+
+static PyObject * pyswh_Data_new(PyTypeObject* tp, PyObject* args, PyObject* kwds)
+{
+    pyswh_Object* self = pyswh_Object_new(tp);
+    if (self)
+        swhxx_db_data_new(&self->p);
+    else
+        self->p = NULL;
+    return (PyObject*) self;
+}
+
+static void pyswh_Data_dealloc(pyswh_Object* self)
+{
+    if (self->p)
+        swhxx_db_data_dealloc(&self->p);
+    Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static int pyswh_Data_init(pyswh_Object* self, PyObject* args, PyObject* kwds)
+{
+    char* title = "now", *dt = "", *tz = "", *loc = "", *ctry = "";
+    double jd = swh_jdnow(), lat = 0, lon = 0;
+    int alt = 0;
+    static char* kwlist[] = {"title", "jd", "lat", "lon", "alt", "datetime",
+                             "timezone", "location", "country", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|sdddissss", kwlist,
+            &title, &jd, &lat, &lon, &alt, &dt, &tz, &loc, &ctry))
+        return -1;
+    if (swhxx_db_data_set_title(self->p, title)
+        || swhxx_db_data_set_jd(self->p, jd)
+        || swhxx_db_data_set_lat(self->p, lat)
+        || swhxx_db_data_set_lon(self->p, lon)
+        || swhxx_db_data_set_alt(self->p, alt)
+        || swhxx_db_data_set_datetime(self->p, dt)
+        || swhxx_db_data_set_timezone(self->p, tz)
+        || swhxx_db_data_set_location(self->p, loc)
+        || swhxx_db_data_set_country(self->p, ctry)) {
+        PyErr_SetString(PyExc_AttributeError, swhxx_get_error(self->p));
+        swhxx_clear_error(self->p);
+        return -1;
+    }
+    return 0;
+}
+
+static pyswh_string_getsetters pyswh_Data_getset_title = {
+    &swhxx_db_data_get_title, &swhxx_db_data_set_title
+};
+static pyswh_double_getsetters pyswh_Data_getset_jd = {
+    &swhxx_db_data_get_jd, &swhxx_db_data_set_jd
+};
+static pyswh_double_getsetters pyswh_Data_getset_lat = {
+    &swhxx_db_data_get_lat, &swhxx_db_data_set_lat
+};
+static pyswh_double_getsetters pyswh_Data_getset_lon = {
+    &swhxx_db_data_get_lon, &swhxx_db_data_set_lon
+};
+static pyswh_int_getsetters pyswh_Data_getset_alt = {
+    &swhxx_db_data_get_alt, &swhxx_db_data_set_alt
+};
+static pyswh_string_getsetters pyswh_Data_getset_datetime = {
+    &swhxx_db_data_get_datetime, &swhxx_db_data_set_datetime
+};
+static pyswh_string_getsetters pyswh_Data_getset_timezone = {
+    &swhxx_db_data_get_timezone, &swhxx_db_data_set_timezone
+};
+static pyswh_string_getsetters pyswh_Data_getset_location = {
+    &swhxx_db_data_get_location, &swhxx_db_data_set_location
+};
+static pyswh_string_getsetters pyswh_Data_getset_country = {
+    &swhxx_db_data_get_country, &swhxx_db_data_set_country
+};
+
+static PyGetSetDef pyswh_Data_getsetters[] = {
+{"title", (getter) pyswh_Object_get_string, (setter) pyswh_Object_set_string,
+    pyswh_Data_title__doc__, &pyswh_Data_getset_title},
+{"jd", (getter) pyswh_Object_get_double, (setter) pyswh_Object_set_double,
+    pyswh_Data_jd__doc__, &pyswh_Data_getset_jd},
+{"lat", (getter) pyswh_Object_get_double, (setter) pyswh_Object_set_double,
+    pyswh_Data_lat__doc__, &pyswh_Data_getset_lat},
+{"lon", (getter) pyswh_Object_get_double, (setter) pyswh_Object_set_double,
+    pyswh_Data_lon__doc__, &pyswh_Data_getset_lon},
+{"alt", (getter) pyswh_Object_get_int, (setter) pyswh_Object_set_int,
+    pyswh_Data_alt__doc__, &pyswh_Data_getset_alt},
+{"datetime", (getter) pyswh_Object_get_string, (setter) pyswh_Object_set_string,
+    pyswh_Data_datetime__doc__, &pyswh_Data_getset_datetime},
+{"timezone", (getter) pyswh_Object_get_string, (setter) pyswh_Object_set_string,
+    pyswh_Data_timezone__doc__, &pyswh_Data_getset_timezone},
+{"location", (getter) pyswh_Object_get_string, (setter) pyswh_Object_set_string,
+    pyswh_Data_location__doc__, &pyswh_Data_getset_location},
+{"country", (getter) pyswh_Object_get_string, (setter) pyswh_Object_set_string,
+    pyswh_Data_country__doc__, &pyswh_Data_getset_country},
+{NULL}
+};
+
+static PyTypeObject pyswh_Data_type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "swisseph.contrib.Data",
+    .tp_doc = pyswh_Data__doc__,
+    .tp_basicsize = sizeof(pyswh_Object),
+    .tp_itemsize = 0,
+    .tp_flags = Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE,
+    .tp_new = pyswh_Data_new,
+    .tp_init = (initproc) pyswh_Data_init,
+    .tp_dealloc = (destructor) pyswh_Data_dealloc,
+    /*.tp_members = pyswh_Data_members,*/
+    //.tp_methods = pyswh_Data_methods,
+    .tp_getset = pyswh_Data_getsetters,
+};
 
 /* swisseph.contrib.antiscion */
 PyDoc_STRVAR(pyswh_antiscion__doc__,
@@ -3304,6 +3754,39 @@ static PyObject * pyswh_calc_ut FUNCARGS_KEYWDS
                 x, st)
         : Py_BuildValue("(ffffff)(is)",res[0],res[1],res[2],res[3],res[4],res[5],
                 x, swe_get_planet_name(pl, nam));
+}
+
+/* swisseph.contrib.db_close */
+PyDoc_STRVAR(pyswh_db_close__doc__,
+"Close previously connected astro database\n\n"
+"Args: -\n"
+"Return: None");
+
+static PyObject * pyswh_db_close FUNCARGS_SELF
+{
+    if (swh_db_close()) {
+        PyErr_SetString(pyswe_Error, "swisseph.contrib.db_close: error");
+        return NULL;
+    }
+    Py_RETURN_NONE;
+}
+
+/* swisseph.contrib.db_connect */
+PyDoc_STRVAR(pyswh_db_connect__doc__,
+"Args: str path='', bool check=True\n"
+"Return: None");
+
+static PyObject * pyswh_db_connect FUNCARGS_KEYWDS
+{
+    int check = 1;
+    char* p = NULL;
+    char err[512];
+    static char* kwlist[] = {"path", "check", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "|sp", kwlist, &p, &check))
+        return NULL;
+    if (swh_db_connect(p, check, err))
+        return PyErr_Format(pyswe_Error, "swisseph.contrib.db_connect: %s", err);
+    Py_RETURN_NONE;
 }
 
 /* swisseph.contrib.degsplit */
@@ -4588,6 +5071,10 @@ static struct PyMethodDef pyswh_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswh_antiscion__doc__},
     {"calc_ut", (PyCFunction) pyswh_calc_ut,
         METH_VARARGS|METH_KEYWORDS, pyswh_calc_ut__doc__},
+    {"db_close", (PyCFunction) pyswh_db_close,
+        METH_NOARGS, pyswh_db_close__doc__},
+    {"db_connect", (PyCFunction) pyswh_db_connect,
+        METH_VARARGS|METH_KEYWORDS, pyswh_db_connect__doc__},
     {"degsplit", (PyCFunction) pyswh_degsplit,
         METH_VARARGS|METH_KEYWORDS, pyswh_degsplit__doc__},
     {"dt2i", (PyCFunction) pyswh_dt2i,
@@ -5111,6 +5598,17 @@ PyMODINIT_FUNC initswisseph(void)
         pyswh_module_documentation,
         (PyObject*) NULL, PYTHON_API_VERSION);
 #endif
+
+    if (PyType_Ready(&pyswh_User_type) < 0)
+        Py_FatalError("User type not ready!");
+    Py_INCREF(&pyswh_User_type);
+    PyModule_AddObject(m2, "User", (PyObject*) &pyswh_User_type);
+
+    if (PyType_Ready(&pyswh_Data_type) < 0)
+        Py_FatalError("Data type not ready!");
+    Py_INCREF(&pyswh_Data_type);
+    PyModule_AddObject(m2, "Data", (PyObject*) &pyswh_Data_type);
+
     /* *** Additional constants -- not swiss ephemeris ***/
 
     /* Aspects */

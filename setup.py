@@ -191,6 +191,7 @@ if use_swephelp:
 sources = ['pyswisseph.c'] + swe_sources
 if use_swephelp:
     sources += glob('swephelp/*.c')
+    sources += glob('swephelp/*.cpp')
     if sys.platform in ['win32', 'win_amd64', 'darwin']:
         sources += ['swephelp/sqlite3/sqlite3.c']
 
@@ -198,6 +199,7 @@ if use_swephelp:
 depends = swe_depends
 if use_swephelp:
     depends += glob('swephelp/*.h')
+    depends += glob('swephelp/*.hpp')
 
 # Libraries
 libraries = swe_libs
