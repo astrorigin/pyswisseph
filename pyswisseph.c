@@ -3078,18 +3078,18 @@ PyDoc_STRVAR(pyswh_antiscion__doc__,
 "\tpos, flg = swh.calc_ut(jd, pl)\n"
 "\tantis, contrantis = swh.antiscion(*pos)\n\n"
 "Args: float lon, float lat=0, float dist=0, float lonspeed=0, float latspeed=0,"
-" float distspeed=0\n"
+" float distspeed=0, float axis=90\n"
 "Return: antiscion (lon, lat, dist, lonspeed, latspeed, distspeed) contrantiscion (...)");
 
 static PyObject * pyswh_antiscion FUNCARGS_KEYWDS
 {
-    double p[6] = {0,0,0,0,0,0}, antis[6], contrantis[6];
+    double p[6] = {0,0,0,0,0,0}, antis[6], contrantis[6], axis = 90;
     static char* kwlist[] = {"lon", "lat", "dist", "lonspeed", "latspeed",
-                             "distspeed", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|ddddd", kwlist,
-        &p[0], &p[1], &p[2], &p[3], &p[4], &p[5]))
+                             "distspeed", "axis", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|dddddd", kwlist,
+        &p[0], &p[1], &p[2], &p[3], &p[4], &p[5], &axis))
         return NULL;
-    swh_antiscion(p, antis, contrantis);
+    swh_antiscion(p, axis, antis, contrantis);
     return Py_BuildValue("(dddddd)(dddddd)", antis[0],antis[1],antis[2],antis[3],
         antis[4],antis[5],contrantis[0],contrantis[1],contrantis[2],contrantis[3],
         contrantis[4],contrantis[5]);
