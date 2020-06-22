@@ -2361,7 +2361,7 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
     static char *kwlist[] = {"jd", "geopos", "atmo", "observer", "object",
         "helflag", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOOOsi", kwlist,
-        &jd, o1, o2, o3, obj, &flg))
+        &jd, &o1, &o2, &o3, &obj, &flg))
         return NULL;
 
     if (!PySequence_Check(o1) || PySequence_Length(o1) != 3) {
