@@ -1,20 +1,21 @@
 /*
     This file is part of Pyswisseph.
 
-    Copyright (c) 2007-2020 Stanislas Marquis <stan@astrorigin.com>
+    Copyright (c) 2007-2021 Stanislas Marquis <stan@astrorigin.com>
 
     Pyswisseph is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 2 of the License, or
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
     Pyswisseph is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    GNU Affero General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Pyswisseph.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Affero General Public License
+    along with Pyswisseph.  If not, see <https://www.gnu.org/licenses/>.
+
 */
 
 /**

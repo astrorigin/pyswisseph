@@ -17,11 +17,11 @@ calculations.
 Licensing
 =========
 
-The Pyswisseph package adopts the GNU Public License version 2.
+The Pyswisseph package adopts the GNU Affero General Public License version 3.
 See the LICENSE file.
 
 The original swisseph library is distributed under a dual licensing system:
-GNU Public License, or Swiss Ephemeris Professional License.
+GNU Affero General Public License, or Swiss Ephemeris Professional License.
 For more information, see file libswe/LICENSE.
 
 Credits
