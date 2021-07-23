@@ -49,10 +49,10 @@ from glob import glob
 # Pyswisseph version string
 # Our version string gets the version of the swisseph library (x.xx.xx)
 # and our increment as suffix (-x).
-VERSION = '2.08.00-2'
+VERSION = '2.10.01-0'
 
 # Corresponding swisseph version string
-swe_version = '2.08.00'
+swe_version = '2.10.01'
 
 # libswe-dev detection
 # Set to True to find libswe in system.
@@ -69,7 +69,8 @@ if sys.platform in ['win32', 'win_amd64']: # Windows
 elif sys.platform == 'darwin': # OSX
     cflags.append('-Wno-error=unused-command-line-argument-hard-error-in-future')
 else: # Linux etc
-    cflags.append('-std=gnu99')
+    #cflags.append('-std=gnu99')
+    pass
 
 # Link flags
 ldflags = []
@@ -140,7 +141,6 @@ else: # using internal libswe
         'libswe/swejpl.c',
         'libswe/swemmoon.c',
         'libswe/swemplan.c',
-        'libswe/swepcalc.c',
         'libswe/sweph.c',
         'libswe/swephlib.c']
     swe_depends = [
@@ -148,7 +148,6 @@ else: # using internal libswe
         'libswe/swehouse.h',
         'libswe/swemptab.h',
         'libswe/swenut2000a.h',
-        'libswe/swepcalc.h',
         'libswe/sweph.h',
         #'libswe/swedll.h',
         'libswe/swejpl.h',

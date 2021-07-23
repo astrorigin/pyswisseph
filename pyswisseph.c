@@ -33,7 +33,7 @@
  *  Last revision: 2020-06-01
  */
 
-#define PYSWISSEPH_VERSION      20200601
+#define PYSWISSEPH_VERSION      20210723
 
 /* Set the default argument for set_ephe_path function */
 #ifndef PYSWE_DEFAULT_EPHE_PATH
@@ -146,6 +146,29 @@ static PyObject * pyswe_calc FUNCARGS_KEYWDS
         return NULL;
     }
     return Py_BuildValue("(ffffff)i",val[0],val[1],val[2],val[3],val[4],val[5],ret);
+}
+
+/* swisseph.calc_pctr */
+PyDoc_STRVAR(pyswe_calc_pctr__doc__,
+"Calculate planetocentric positions (terrestrial time).\n\n"
+"Args: float julday, int planet, int center, int flag=FLG_SWIEPH|FLG_SPEED\n"
+"Return: tuple of 6 float, and returned flags");
+
+static PyObject * pyswe_calc_pctr FUNCARGS_KEYWDS
+{
+    double jd, xx[6];
+    int ret, ipl, iplctr, flag = SEFLG_SWIEPH|SEFLG_SPEED;
+    char err[256] = {0};
+    static char* kwlist[] = {"julday", "planet", "center", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dii|i", kwlist,
+        &jd, &ipl, &iplctr, &flag))
+        return NULL;
+    ret = swe_calc_pctr(jd, ipl, iplctr, flag, xx, err);
+    if (ret < 0) {
+        PyErr_SetString(pyswe_Error, err);
+        return NULL;
+    }
+    return Py_BuildValue("(dddddd)i",xx[0],xx[1],xx[2],xx[3],xx[4],xx[5],ret);
 }
 
 /* swisseph.calc_ut */
@@ -727,6 +750,24 @@ static PyObject * pyswe_get_ayanamsa_ut FUNCARGS_KEYWDS
         return NULL;
     ret = swe_get_ayanamsa_ut(jd);
     return Py_BuildValue("f", ret);
+}
+
+/* swisseph.get_current_file_data */
+PyDoc_STRVAR(pyswe_get_current_file_data__doc__,
+"Find start and end date of an se1 ephemeris file after a function call.\n\n"
+"Args: int fno\n"
+"Return: str path or None, float start, float end, int denum");
+
+static PyObject * pyswe_get_current_file_data FUNCARGS_KEYWDS
+{
+    int fno, denum = 0;
+    char* path = NULL;
+    double start = 0, end = 0;
+    static char* kwlist[] = {"fno", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &fno))
+        return NULL;
+    path = (char*) swe_get_current_file_data(fno, &start, &end, &denum);
+    return Py_BuildValue("sddi", path, start, end, denum);
 }
 
 /* swisseph.get_library_path */
@@ -1444,6 +1485,53 @@ static PyObject * pyswe_houses_armc FUNCARGS_KEYWDS
     ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
 }
 
+/* swisseph.houses_armc_ex2 */
+PyDoc_STRVAR(pyswe_houses_armc_ex2__doc__,
+"Calculate houses cusps and speeds with ARMC.\n\n"
+"Args: float armc, float lat, float obliquity, char hsys='P'\n"
+"Return: 4 tuples of 12 and 8 float (cusps, ascmc, cusps_speed, ascmc_speed)");
+
+static PyObject * pyswe_houses_armc_ex2 FUNCARGS_KEYWDS
+{
+    double armc, lat, obl, cusps[37], ascmc[10], cuspspeed[37], ascmcspeed[10];
+    int ret, hsys = 'P';
+    char err[256] = {0};
+    static char *kwlist[] = {"armc", "lat", "obliquity", "hsys", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|c", kwlist,
+        &armc, &lat, &obl, &hsys))
+        return NULL;
+    ret = swe_houses_armc_ex2(armc, lat, obl, hsys, cusps, ascmc,
+                              cuspspeed, ascmcspeed, err);
+    if (ret < 0)
+        return PyErr_Format(pyswe_Error, "swisseph.houses_armc_ex2: %s", err);
+    if (hsys == 71) /* Gauquelin sectors */
+        return Py_BuildValue("(dddddddddddddddddddddddddddddddddddd)(dddddddd)"
+                             "(dddddddddddddddddddddddddddddddddddd)(dddddddd)",
+        cusps[1],cusps[2],cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],
+        cusps[9],cusps[10],cusps[11],cusps[12],cusps[13],cusps[14],cusps[15],
+        cusps[16],cusps[17],cusps[18],cusps[19],cusps[20],cusps[21],cusps[22],
+        cusps[23],cusps[24],cusps[25],cusps[26],cusps[27],cusps[28],cusps[29],
+        cusps[30],cusps[31],cusps[32],cusps[33],cusps[34],cusps[35],cusps[36],
+        ascmc[0],ascmc[1],ascmc[2],ascmc[3],ascmc[4],ascmc[5],ascmc[6],ascmc[7],
+        cuspspeed[1],cuspspeed[2],cuspspeed[3],cuspspeed[4],cuspspeed[5],
+        cuspspeed[6],cuspspeed[7],cuspspeed[8],cuspspeed[9],cuspspeed[10],
+        cuspspeed[11],cuspspeed[12],cuspspeed[13],cuspspeed[14],cuspspeed[15],
+        cuspspeed[16],cuspspeed[17],cuspspeed[18],cuspspeed[19],cuspspeed[20],
+        cuspspeed[21],cuspspeed[22],cuspspeed[23],cuspspeed[24],cuspspeed[25],
+        cuspspeed[26],cuspspeed[27],cuspspeed[28],cuspspeed[29],cuspspeed[30],
+        cuspspeed[31],cuspspeed[32],cuspspeed[33],cuspspeed[34],cuspspeed[35],
+        cuspspeed[36],ascmcspeed[0],ascmcspeed[1],ascmcspeed[2],ascmcspeed[3],
+        ascmcspeed[4],ascmcspeed[5],ascmcspeed[6],ascmcspeed[7]);
+    return Py_BuildValue("(dddddddddddd)(dddddddd)(dddddddddddd)(dddddddd)",
+    cusps[1],cusps[2],cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],
+    cusps[9],cusps[10],cusps[11],cusps[12],ascmc[0],ascmc[1],ascmc[2],ascmc[3],
+    ascmc[4],ascmc[5],ascmc[6],ascmc[7],cuspspeed[1],cuspspeed[2],cuspspeed[3],
+    cuspspeed[4],cuspspeed[5],cuspspeed[6],cuspspeed[7],cuspspeed[8],
+    cuspspeed[9],cuspspeed[10],cuspspeed[11],cuspspeed[12],ascmcspeed[0],
+    ascmcspeed[1],ascmcspeed[2],ascmcspeed[3],ascmcspeed[4],ascmcspeed[5],
+    ascmcspeed[6],ascmcspeed[7]);
+}
+
 /* swisseph.houses_ex */
 PyDoc_STRVAR(pyswe_houses_ex__doc__,
 "Calculate houses cusps (extended) (UT).\n\n"
@@ -1475,6 +1563,53 @@ static PyObject * pyswe_houses_ex FUNCARGS_KEYWDS
     cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],cusps[9],
     cusps[10],cusps[11],cusps[12],ascmc[0],ascmc[1],ascmc[2],ascmc[3],
     ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
+}
+
+/* swisseph.houses_ex2 */
+PyDoc_STRVAR(pyswe_houses_ex2__doc__,
+"Calculate houses cusps and cusps speeds (UT).\n\n"
+"Args: float julday, float lat, float lon, char hsys='P', int flag=0\n"
+"Return: 4 tuples of 12 and 8 float (cusps, ascmc, cusps_speed, ascmc_speed)");
+
+static PyObject * pyswe_houses_ex2 FUNCARGS_KEYWDS
+{
+    double jd, lat, lon, cusps[37], ascmc[10], cuspspeed[37], ascmcspeed[10];
+    int ret, hsys = 'P', flag = 0;
+    char err[256] = {0};
+    static char *kwlist[] = {"julday", "lat", "lon", "hsys", "flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|ci", kwlist,
+        &jd, &lat, &lon, &hsys, &flag))
+        return NULL;
+    ret = swe_houses_ex2(jd, flag, lat, lon, hsys, cusps, ascmc,
+                         cuspspeed, ascmcspeed, err);
+    if (ret < 0)
+        return PyErr_Format(pyswe_Error, "swisseph.houses_ex2: %s", err);
+    if (hsys == 71) /* Gauquelin sectors */
+        return Py_BuildValue("(dddddddddddddddddddddddddddddddddddd)(dddddddd)"
+                             "(dddddddddddddddddddddddddddddddddddd)(dddddddd)",
+        cusps[1],cusps[2],cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],
+        cusps[9],cusps[10],cusps[11],cusps[12],cusps[13],cusps[14],cusps[15],
+        cusps[16],cusps[17],cusps[18],cusps[19],cusps[20],cusps[21],cusps[22],
+        cusps[23],cusps[24],cusps[25],cusps[26],cusps[27],cusps[28],cusps[29],
+        cusps[30],cusps[31],cusps[32],cusps[33],cusps[34],cusps[35],cusps[36],
+        ascmc[0],ascmc[1],ascmc[2],ascmc[3],ascmc[4],ascmc[5],ascmc[6],ascmc[7],
+        cuspspeed[1],cuspspeed[2],cuspspeed[3],cuspspeed[4],cuspspeed[5],
+        cuspspeed[6],cuspspeed[7],cuspspeed[8],cuspspeed[9],cuspspeed[10],
+        cuspspeed[11],cuspspeed[12],cuspspeed[13],cuspspeed[14],cuspspeed[15],
+        cuspspeed[16],cuspspeed[17],cuspspeed[18],cuspspeed[19],cuspspeed[20],
+        cuspspeed[21],cuspspeed[22],cuspspeed[23],cuspspeed[24],cuspspeed[25],
+        cuspspeed[26],cuspspeed[27],cuspspeed[28],cuspspeed[29],cuspspeed[30],
+        cuspspeed[31],cuspspeed[32],cuspspeed[33],cuspspeed[34],cuspspeed[35],
+        cuspspeed[36],ascmcspeed[0],ascmcspeed[1],ascmcspeed[2],ascmcspeed[3],
+        ascmcspeed[4],ascmcspeed[5],ascmcspeed[6],ascmcspeed[7]);
+    return Py_BuildValue("(dddddddddddd)(dddddddd)(dddddddddddd)(dddddddd)",
+    cusps[1],cusps[2],cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],
+    cusps[9],cusps[10],cusps[11],cusps[12],ascmc[0],ascmc[1],ascmc[2],ascmc[3],
+    ascmc[4],ascmc[5],ascmc[6],ascmc[7],cuspspeed[1],cuspspeed[2],cuspspeed[3],
+    cuspspeed[4],cuspspeed[5],cuspspeed[6],cuspspeed[7],cuspspeed[8],
+    cuspspeed[9],cuspspeed[10],cuspspeed[11],cuspspeed[12],ascmcspeed[0],
+    ascmcspeed[1],ascmcspeed[2],ascmcspeed[3],ascmcspeed[4],ascmcspeed[5],
+    ascmcspeed[6],ascmcspeed[7]);
 }
 
 /* swisseph.jdet_to_utc */
@@ -4431,6 +4566,8 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe_azalt_rev__doc__},
     {"calc", (PyCFunction) pyswe_calc,
         METH_VARARGS|METH_KEYWORDS, pyswe_calc__doc__},
+    {"calc_pctr", (PyCFunction) pyswe_calc_pctr,
+        METH_VARARGS|METH_KEYWORDS, pyswe_calc_pctr__doc__},
     {"calc_ut", (PyCFunction) pyswe_calc_ut,
         METH_VARARGS|METH_KEYWORDS, pyswe_calc_ut__doc__},
     {"close", (PyCFunction) pyswe_close,
@@ -4491,6 +4628,8 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe_get_ayanamsa_name__doc__},
     {"get_ayanamsa_ut", (PyCFunction) pyswe_get_ayanamsa_ut,
         METH_VARARGS|METH_KEYWORDS, pyswe_get_ayanamsa_ut__doc__},
+    {"get_current_file_data", (PyCFunction) pyswe_get_current_file_data,
+        METH_VARARGS|METH_KEYWORDS, pyswe_get_current_file_data__doc__},
     {"get_library_path", (PyCFunction) pyswe_get_library_path,
         METH_NOARGS, pyswe_get_library_path__doc__},
     {"get_orbital_elements", (PyCFunction) pyswe_get_orbital_elements,
@@ -4511,8 +4650,12 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe_houses__doc__},
     {"houses_armc", (PyCFunction) pyswe_houses_armc,
         METH_VARARGS|METH_KEYWORDS, pyswe_houses_armc__doc__},
+    {"houses_armc_ex2", (PyCFunction) pyswe_houses_armc_ex2,
+        METH_VARARGS|METH_KEYWORDS, pyswe_houses_armc_ex2__doc__},
     {"houses_ex", (PyCFunction) pyswe_houses_ex,
         METH_VARARGS|METH_KEYWORDS, pyswe_houses_ex__doc__},
+    {"houses_ex2", (PyCFunction) pyswe_houses_ex2,
+        METH_VARARGS|METH_KEYWORDS, pyswe_houses_ex2__doc__},
     {"jdet_to_utc", (PyCFunction) pyswe_jdet_to_utc,
         METH_VARARGS|METH_KEYWORDS, pyswe_jdet_to_utc__doc__},
     {"jdut1_to_utc", (PyCFunction) pyswe_jdut1_to_utc,
@@ -4811,6 +4954,7 @@ PyMODINIT_FUNC initswisseph(void)
 
     PyModule_AddIntConstant(m, "NPLANETS", SE_NPLANETS);
 
+    PyModule_AddIntConstant(m, "PLMOON_OFFSET", SE_PLMOON_OFFSET);
     PyModule_AddIntConstant(m, "AST_OFFSET", SE_AST_OFFSET);
     PyModule_AddIntConstant(m, "VARUNA", SE_VARUNA);
     PyModule_AddIntConstant(m, "FICT_OFFSET", SE_FICT_OFFSET);
@@ -4872,16 +5016,22 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "FLG_BARYCTR", SEFLG_BARYCTR);
     PyModule_AddIntConstant(m, "FLG_TOPOCTR", SEFLG_TOPOCTR);
     PyModule_AddIntConstant(m, "FLG_ORBEL_AA", SEFLG_ORBEL_AA);
+    PyModule_AddIntConstant(m, "FLG_TROPICAL", SEFLG_TROPICAL);
     PyModule_AddIntConstant(m, "FLG_SIDEREAL", SEFLG_SIDEREAL);
     PyModule_AddIntConstant(m, "FLG_ICRS", SEFLG_ICRS);
     PyModule_AddIntConstant(m, "FLG_DPSIDEPS_1980", SEFLG_DPSIDEPS_1980);
     PyModule_AddIntConstant(m, "FLG_JPLHOR", SEFLG_JPLHOR);
     PyModule_AddIntConstant(m, "FLG_JPLHOR_APPROX", SEFLG_JPLHOR_APPROX);
+    PyModule_AddIntConstant(m, "FLG_CENTER_BODY", SEFLG_CENTER_BODY);
+    PyModule_AddIntConstant(m, "FLG_TEST_PLMOON", SEFLG_TEST_PLMOON);
 
     PyModule_AddIntConstant(m, "SIDBITS", SE_SIDBITS);
     PyModule_AddIntConstant(m, "SIDBIT_ECL_T0", SE_SIDBIT_ECL_T0);
     PyModule_AddIntConstant(m, "SIDBIT_SSY_PLANE", SE_SIDBIT_SSY_PLANE);
     PyModule_AddIntConstant(m, "SIDBIT_USER_UT", SE_SIDBIT_USER_UT);
+    PyModule_AddIntConstant(m, "SIDBIT_ECL_DATE", SE_SIDBIT_ECL_DATE);
+    PyModule_AddIntConstant(m, "SIDBIT_NO_PREC_OFFSET", SE_SIDBIT_NO_PREC_OFFSET);
+    PyModule_AddIntConstant(m, "SIDBIT_PREC_ORIG", SE_SIDBIT_PREC_ORIG);
 
     PyModule_AddIntConstant(m, "SIDM_FAGAN_BRADLEY", SE_SIDM_FAGAN_BRADLEY);
     PyModule_AddIntConstant(m, "SIDM_LAHIRI", SE_SIDM_LAHIRI);
@@ -4926,6 +5076,10 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "SIDM_GALCENT_COCHRANE", SE_SIDM_GALCENT_COCHRANE);
     PyModule_AddIntConstant(m, "SIDM_GALEQU_FIORENZA", SE_SIDM_GALEQU_FIORENZA);
     PyModule_AddIntConstant(m, "SIDM_VALENS_MOON", SE_SIDM_VALENS_MOON);
+    PyModule_AddIntConstant(m, "SIDM_LAHIRI_1940", SE_SIDM_LAHIRI_1940);
+    PyModule_AddIntConstant(m, "SIDM_LAHIRI_VP285", SE_SIDM_LAHIRI_VP285);
+    PyModule_AddIntConstant(m, "SIDM_KRISHNAMURTI_VP291", SE_SIDM_KRISHNAMURTI_VP291);
+    PyModule_AddIntConstant(m, "SIDM_LAHIRI_ICRC", SE_SIDM_LAHIRI_ICRC);
     PyModule_AddIntConstant(m, "SIDM_USER", SE_SIDM_USER);
 
     PyModule_AddIntConstant(m, "NSIDM_PREDEF", SE_NSIDM_PREDEF);
@@ -4945,6 +5099,7 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "ECL_ANNULAR", SE_ECL_ANNULAR);
     PyModule_AddIntConstant(m, "ECL_PARTIAL", SE_ECL_PARTIAL);
     PyModule_AddIntConstant(m, "ECL_ANNULAR_TOTAL", SE_ECL_ANNULAR_TOTAL);
+    PyModule_AddIntConstant(m, "ECL_HYBRID", SE_ECL_HYBRID);
     PyModule_AddIntConstant(m, "ECL_PENUMBRAL", SE_ECL_PENUMBRAL);
     PyModule_AddIntConstant(m, "ECL_ALLTYPES_SOLAR", SE_ECL_ALLTYPES_SOLAR);
     PyModule_AddIntConstant(m, "ECL_ALLTYPES_LUNAR", SE_ECL_ALLTYPES_LUNAR);
@@ -5063,6 +5218,7 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddFloatConstant(m, "TIDAL_DE422", SE_TIDAL_DE422);
     PyModule_AddFloatConstant(m, "TIDAL_DE430", SE_TIDAL_DE430);
     PyModule_AddFloatConstant(m, "TIDAL_DE431", SE_TIDAL_DE431);
+    PyModule_AddFloatConstant(m, "TIDAL_DE441", SE_TIDAL_DE441);
     PyModule_AddFloatConstant(m, "TIDAL_26", SE_TIDAL_26);
     PyModule_AddFloatConstant(m, "TIDAL_STEPHENSON_2016", SE_TIDAL_STEPHENSON_2016);
     PyModule_AddFloatConstant(m, "TIDAL_DEFAULT", SE_TIDAL_DEFAULT);
@@ -5093,6 +5249,7 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "MOD_PREC_IAU_2006", SEMOD_PREC_IAU_2006);
     PyModule_AddIntConstant(m, "MOD_PREC_VONDRAK_2011", SEMOD_PREC_VONDRAK_2011);
     PyModule_AddIntConstant(m, "MOD_PREC_OWEN_1990", SEMOD_PREC_OWEN_1990);
+    PyModule_AddIntConstant(m, "MOD_PREC_NEWCOMB", SEMOD_PREC_NEWCOMB);
     PyModule_AddIntConstant(m, "MOD_PREC_DEFAULT", SEMOD_PREC_DEFAULT);
     PyModule_AddIntConstant(m, "MOD_PREC_DEFAULT_SHORT", SEMOD_PREC_DEFAULT_SHORT);
 
@@ -5101,6 +5258,7 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "MOD_NUT_IAU_CORR_1987", SEMOD_NUT_IAU_CORR_1987);
     PyModule_AddIntConstant(m, "MOD_NUT_IAU_2000A", SEMOD_NUT_IAU_2000A);
     PyModule_AddIntConstant(m, "MOD_NUT_IAU_2000B", SEMOD_NUT_IAU_2000B);
+    PyModule_AddIntConstant(m, "MOD_NUT_WOOLARD", SEMOD_NUT_WOOLARD);
     PyModule_AddIntConstant(m, "MOD_NUT_DEFAULT", SEMOD_NUT_DEFAULT);
 
     PyModule_AddIntConstant(m, "MOD_NBIAS", SEMOD_NBIAS);
