@@ -73,8 +73,8 @@
 /* Macros */
 #define FUNCARGS_SELF       (PyObject *self)
 #define FUNCARGS_KEYWDS     (PyObject *self, PyObject *args, PyObject *keywds)
-#define PyModule_AddFloatConstant(m, nam, f) \
-        PyModule_AddObject(m, nam, Py_BuildValue("f", f))
+#define PyModule_AddFloatConstant(m, nam, d) \
+        PyModule_AddObject(m, nam, Py_BuildValue("d", d))
 
 /* swisseph.Error (module exception type) */
 static PyObject * pyswe_Error;
@@ -99,7 +99,7 @@ static PyObject * pyswe_azalt FUNCARGS_KEYWDS
         &temp, &flag))
         return NULL;
     swe_azalt(jd, flag, geo, press, temp, xin, xaz);
-    return Py_BuildValue("(fff)", xaz[0], xaz[1], xaz[2]);
+    return Py_BuildValue("(ddd)", xaz[0], xaz[1], xaz[2]);
 }
 
 /* swisseph.azalt_rev */
@@ -120,7 +120,7 @@ static PyObject * pyswe_azalt_rev FUNCARGS_KEYWDS
         &jd, &geo[0], &geo[1], &geo[2], &xin[0], &xin[1], &flag))
         return NULL;
     swe_azalt_rev(jd, flag, geo, xin, xout);
-    return Py_BuildValue("(ff)", xout[0], xout[1]);
+    return Py_BuildValue("(dd)", xout[0], xout[1]);
 }
 
 /* swisseph.calc */
@@ -145,7 +145,7 @@ static PyObject * pyswe_calc FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)i",val[0],val[1],val[2],val[3],val[4],val[5],ret);
+    return Py_BuildValue("(dddddd)i",val[0],val[1],val[2],val[3],val[4],val[5],ret);
 }
 
 /* swisseph.calc_pctr */
@@ -193,7 +193,7 @@ static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)i",val[0],val[1],val[2],val[3],val[4],val[5],ret);
+    return Py_BuildValue("(dddddd)i",val[0],val[1],val[2],val[3],val[4],val[5],ret);
 }
 
 /* swisseph.close */
@@ -222,7 +222,7 @@ static PyObject * pyswe_cotrans FUNCARGS_KEYWDS
         &xpo[0], &xpo[1], &xpo[2], &eps))
         return NULL;
     swe_cotrans(xpo, xpn, eps);
-    return Py_BuildValue("(fff)", xpn[0], xpn[1], xpn[2]);
+    return Py_BuildValue("(ddd)", xpn[0], xpn[1], xpn[2]);
 }
 
 /* swisseph.cotrans_sp */
@@ -242,7 +242,7 @@ static PyObject * pyswe_cotrans_sp FUNCARGS_KEYWDS
         &xpo[0], &xpo[1], &xpo[2], &xpo[3], &xpo[4], &xpo[5], &eps))
         return NULL;
     swe_cotrans(xpo, xpn, eps);
-    return Py_BuildValue("(ffffff)", xpn[0], xpn[1], xpn[2], xpn[3],
+    return Py_BuildValue("(dddddd)", xpn[0], xpn[1], xpn[2], xpn[3],
         xpn[4], xpn[5]);
 }
 
@@ -365,7 +365,7 @@ static PyObject * pyswe_date_conversion FUNCARGS_KEYWDS
         return NULL;
     }
     ret = swe_date_conversion(year, month, day, hour, cal, &jd);
-    return Py_BuildValue("if", ret, jd);
+    return Py_BuildValue("id", ret, jd);
 }
 
 /* swisseph.day_of_week */
@@ -395,7 +395,7 @@ static PyObject * pyswe_deg_midp FUNCARGS_KEYWDS
     static char *kwlist[] = {"x", "y", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &x, &y))
         return NULL;
-    return Py_BuildValue("f", swe_deg_midp(x, y));
+    return Py_BuildValue("d", swe_deg_midp(x, y));
 }
 
 /* swisseph.degnorm */
@@ -410,7 +410,7 @@ static PyObject * pyswe_degnorm FUNCARGS_KEYWDS
     static char *kwlist[] = {"x", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &x))
         return NULL;
-    return Py_BuildValue("f", swe_degnorm(x));
+    return Py_BuildValue("d", swe_degnorm(x));
 }
 
 /* swisseph.deltat */
@@ -425,7 +425,7 @@ static PyObject * pyswe_deltat FUNCARGS_KEYWDS
     static char *kwlist[] = {"julday", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
         return NULL;
-    return Py_BuildValue("f", swe_deltat(jd));
+    return Py_BuildValue("d", swe_deltat(jd));
 }
 
 /* swisseph.difcs2n */
@@ -470,7 +470,7 @@ static PyObject * pyswe_difdeg2n FUNCARGS_KEYWDS
     static char *kwlist[] = {"p1", "p2", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &p1, &p2))
         return NULL;
-    return Py_BuildValue("f", swe_difdeg2n(p1, p2));
+    return Py_BuildValue("d", swe_difdeg2n(p1, p2));
 }
 
 /* swisseph.difdegn */
@@ -485,7 +485,7 @@ static PyObject * pyswe_difdegn FUNCARGS_KEYWDS
     static char *kwlist[] = {"p1", "p2", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &p1, &p2))
         return NULL;
-    return Py_BuildValue("f", swe_difdegn(p1, p2));
+    return Py_BuildValue("d", swe_difdegn(p1, p2));
 }
 
 /* swisseph.difrad2n */
@@ -500,7 +500,7 @@ static PyObject * pyswe_difrad2n FUNCARGS_KEYWDS
     static char *kwlist[] = {"p1", "p2", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &p1, &p2))
         return NULL;
-    return Py_BuildValue("f", swe_difrad2n(p1, p2));
+    return Py_BuildValue("d", swe_difrad2n(p1, p2));
 }
 
 /* swisseph.fixstar */
@@ -527,7 +527,7 @@ static PyObject * pyswe_fixstar FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
+    return Py_BuildValue("(dddddd)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
 }
 
 /* swisseph.fixstar2 */
@@ -554,7 +554,7 @@ static PyObject * pyswe_fixstar2 FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
+    return Py_BuildValue("(dddddd)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
 }
 
 /* swisseph.fixstar2_mag */
@@ -578,7 +578,7 @@ static PyObject * pyswe_fixstar2_mag FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("f", mag);
+    return Py_BuildValue("d", mag);
 }
 
 /* swisseph.fixstar2_ut */
@@ -605,7 +605,7 @@ static PyObject * pyswe_fixstar2_ut FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
+    return Py_BuildValue("(dddddd)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
 }
 
 /* swisseph.fixstar_mag */
@@ -629,7 +629,7 @@ static PyObject * pyswe_fixstar_mag FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("f", mag);
+    return Py_BuildValue("d", mag);
 }
 
 /* swisseph.fixstar_ut */
@@ -656,7 +656,7 @@ static PyObject * pyswe_fixstar_ut FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
+    return Py_BuildValue("(dddddd)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
 }
 
 /* swisseph.gauquelin_sector */
@@ -700,7 +700,7 @@ static PyObject * pyswe_gauquelin_sector FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("f", ret);
+    return Py_BuildValue("d", ret);
 }
 
 /* swisseph.get_ayanamsa */
@@ -716,7 +716,7 @@ static PyObject * pyswe_get_ayanamsa FUNCARGS_KEYWDS
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
         return NULL;
     ret = swe_get_ayanamsa(jd);
-    return Py_BuildValue("f", ret);
+    return Py_BuildValue("d", ret);
 }
 
 /* swisseph.get_ayanamsa_name */
@@ -749,7 +749,7 @@ static PyObject * pyswe_get_ayanamsa_ut FUNCARGS_KEYWDS
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
         return NULL;
     ret = swe_get_ayanamsa_ut(jd);
-    return Py_BuildValue("f", ret);
+    return Py_BuildValue("d", ret);
 }
 
 /* swisseph.get_current_file_data */
@@ -836,7 +836,7 @@ PyDoc_STRVAR(pyswe_get_tid_acc__doc__,
 
 static PyObject * pyswe_get_tid_acc FUNCARGS_SELF
 {
-    return Py_BuildValue("f", swe_get_tid_acc());
+    return Py_BuildValue("d", swe_get_tid_acc());
 }
 
 /* swisseph.heliacal_pheno_ut */
@@ -1416,7 +1416,7 @@ static PyObject * pyswe_house_pos FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("f", res);
+    return Py_BuildValue("d", res);
 }
 
 /* swisseph.houses */
@@ -1439,14 +1439,14 @@ static PyObject * pyswe_houses FUNCARGS_KEYWDS
         return NULL;
     }
     if (hsys == 71) /* Gauquelin houses */
-        return Py_BuildValue("(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
+        return Py_BuildValue("(dddddddddddddddddddddddddddddddddddd)(dddddddd)",
         cusps[1],cusps[2],cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],
         cusps[9],cusps[10],cusps[11],cusps[12],cusps[13],cusps[14],cusps[15],
         cusps[16],cusps[17],cusps[18],cusps[19],cusps[20],cusps[21],cusps[22],
         cusps[23],cusps[24],cusps[25],cusps[26],cusps[27],cusps[28],cusps[29],
         cusps[30],cusps[31],cusps[32],cusps[33],cusps[34],cusps[35],cusps[36],
         ascmc[0],ascmc[1],ascmc[2],ascmc[3],ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
-    return Py_BuildValue("(ffffffffffff)(ffffffff)", cusps[1],cusps[2],
+    return Py_BuildValue("(dddddddddddd)(dddddddd)", cusps[1],cusps[2],
     cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],cusps[9],cusps[10],
     cusps[11],cusps[12],ascmc[0],ascmc[1],ascmc[2],ascmc[3],ascmc[4],ascmc[5],
     ascmc[6],ascmc[7]);
@@ -1472,14 +1472,14 @@ static PyObject * pyswe_houses_armc FUNCARGS_KEYWDS
         return NULL;
     }
     if (hsys == 71) /* Gauquelin houses */
-        return Py_BuildValue("(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
+        return Py_BuildValue("(dddddddddddddddddddddddddddddddddddd)(dddddddd)",
         cusps[1],cusps[2],cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],
         cusps[9],cusps[10],cusps[11],cusps[12],cusps[13],cusps[14],cusps[15],
         cusps[16],cusps[17],cusps[18],cusps[19],cusps[20],cusps[21],cusps[22],
         cusps[23],cusps[24],cusps[25],cusps[26],cusps[27],cusps[28],cusps[29],
         cusps[30],cusps[31],cusps[32],cusps[33],cusps[34],cusps[35],cusps[36],
         ascmc[0],ascmc[1],ascmc[2],ascmc[3],ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
-    return Py_BuildValue("(ffffffffffff)(ffffffff)", cusps[1],cusps[2],
+    return Py_BuildValue("(dddddddddddd)(dddddddd)", cusps[1],cusps[2],
     cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],cusps[9],
     cusps[10],cusps[11],cusps[12],ascmc[0],ascmc[1],ascmc[2],ascmc[3],
     ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
@@ -1552,14 +1552,14 @@ static PyObject * pyswe_houses_ex FUNCARGS_KEYWDS
         return NULL;
     }
     if (hsys == 71) /* Gauquelin houses */
-        return Py_BuildValue("(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
+        return Py_BuildValue("(dddddddddddddddddddddddddddddddddddd)(dddddddd)",
         cusps[1],cusps[2],cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],
         cusps[9],cusps[10],cusps[11],cusps[12],cusps[13],cusps[14],cusps[15],
         cusps[16],cusps[17],cusps[18],cusps[19],cusps[20],cusps[21],cusps[22],
         cusps[23],cusps[24],cusps[25],cusps[26],cusps[27],cusps[28],cusps[29],
         cusps[30],cusps[31],cusps[32],cusps[33],cusps[34],cusps[35],cusps[36],
         ascmc[0],ascmc[1],ascmc[2],ascmc[3],ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
-    return Py_BuildValue("(ffffffffffff)(ffffffff)", cusps[1],cusps[2],
+    return Py_BuildValue("(dddddddddddd)(dddddddd)", cusps[1],cusps[2],
     cusps[3],cusps[4],cusps[5],cusps[6],cusps[7],cusps[8],cusps[9],
     cusps[10],cusps[11],cusps[12],ascmc[0],ascmc[1],ascmc[2],ascmc[3],
     ascmc[4],ascmc[5],ascmc[6],ascmc[7]);
@@ -1662,7 +1662,7 @@ static PyObject * pyswe_julday FUNCARGS_KEYWDS
         &year, &month, &day, &hour, &cal))
         return NULL;
     ret = swe_julday(year, month, day, hour, cal);
-    return Py_BuildValue("f", ret);
+    return Py_BuildValue("d", ret);
 }
 
 /* swisseph.lat_to_lmt */
@@ -1684,7 +1684,7 @@ static PyObject * pyswe_lat_to_lmt FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("f", ret);
+    return Py_BuildValue("d", ret);
 }
 
 /* swisseph.lmt_to_lat */
@@ -1706,7 +1706,7 @@ static PyObject * pyswe_lmt_to_lat FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("f", ret);
+    return Py_BuildValue("d", ret);
 }
 
 /* swisseph.lun_eclipse_how */
@@ -1730,7 +1730,7 @@ static PyObject * pyswe_lun_eclipse_how FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(fffffffffff)", res,attr[0],attr[1],attr[2],attr[3],
+    return Py_BuildValue("(i)(ddddddddddd)", res,attr[0],attr[1],attr[2],attr[3],
         attr[4],attr[5],attr[6],attr[7],attr[8],attr[9],attr[10]);
 }
 
@@ -1754,7 +1754,7 @@ static PyObject * pyswe_lun_eclipse_when FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(ffffffff)", res,tret[0],tret[1],tret[2],tret[3],
+    return Py_BuildValue("(i)(dddddddd)", res,tret[0],tret[1],tret[2],tret[3],
         tret[4],tret[5],tret[6],tret[7]);
 }
 
@@ -1825,7 +1825,7 @@ static PyObject * pyswe_lun_occult_when_glob FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(ffffffffff)", res,tret[0],tret[1],tret[2],
+    return Py_BuildValue("(i)(dddddddddd)", res,tret[0],tret[1],tret[2],
         tret[3],tret[4],tret[5],tret[6],tret[7],tret[8],tret[9]);
 }
 
@@ -1866,7 +1866,7 @@ static PyObject * pyswe_lun_occult_when_loc FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(fffffff)(ffffffff)", res,tret[0],tret[1],
+    return Py_BuildValue("(i)(ddddddd)(dddddddd)", res,tret[0],tret[1],
         tret[2],tret[3],tret[4],tret[5],tret[6],attr[0],attr[1],attr[2],
         attr[3],attr[4],attr[5],attr[6],attr[7]);
 }
@@ -1908,7 +1908,7 @@ static PyObject * pyswe_lun_occult_where FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(ffffffffff)(ffffffff)", res,geopos[0],geopos[1],
+    return Py_BuildValue("(i)(dddddddddd)(dddddddd)", res,geopos[0],geopos[1],
         geopos[2],geopos[3],geopos[4],geopos[5],geopos[6],geopos[7],geopos[8],
         geopos[9],attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],attr[7]);
 }
@@ -1933,7 +1933,7 @@ static PyObject * pyswe_nod_aps FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)(ffffff)(ffffff)(ffffff)", xasc[0],xasc[1],
+    return Py_BuildValue("(dddddd)(dddddd)(dddddd)(dddddd)", xasc[0],xasc[1],
         xasc[2],xasc[3],xasc[4],xasc[5],xdsc[0],xdsc[1],xdsc[2],xdsc[3],xdsc[4],
         xdsc[5],xper[0],xper[1],xper[2],xper[3],xper[4],xper[5],xaph[0],xaph[1],
         xaph[2],xaph[3],xaph[4],xaph[5]);
@@ -1959,7 +1959,7 @@ static PyObject * pyswe_nod_aps_ut FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)(ffffff)(ffffff)(ffffff)", xasc[0],xasc[1],
+    return Py_BuildValue("(dddddd)(dddddd)(dddddd)(dddddd)", xasc[0],xasc[1],
         xasc[2],xasc[3],xasc[4],xasc[5],xdsc[0],xdsc[1],xdsc[2],xdsc[3],xdsc[4],
         xdsc[5],xper[0],xper[1],xper[2],xper[3],xper[4],xper[5],xaph[0],xaph[1],
         xaph[2],xaph[3],xaph[4],xaph[5]);
@@ -2009,7 +2009,7 @@ static PyObject * pyswe_pheno FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(fffff)", attr[0],attr[1],attr[2],attr[3],attr[4]);
+    return Py_BuildValue("(ddddd)", attr[0],attr[1],attr[2],attr[3],attr[4]);
 }
 
 /* swisseph.pheno_ut */
@@ -2032,7 +2032,7 @@ static PyObject * pyswe_pheno_ut FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(fffff)", attr[0],attr[1],attr[2],attr[3],attr[4]);
+    return Py_BuildValue("(ddddd)", attr[0],attr[1],attr[2],attr[3],attr[4]);
 }
 
 /* swisseph.rad_midp */
@@ -2047,7 +2047,7 @@ static PyObject * pyswe_rad_midp FUNCARGS_KEYWDS
     static char *kwlist[] = {"x", "y", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &x, &y))
         return NULL;
-    return Py_BuildValue("f", swe_rad_midp(x, y));
+    return Py_BuildValue("d", swe_rad_midp(x, y));
 }
 
 /* swisseph.radnorm */
@@ -2062,7 +2062,7 @@ static PyObject * pyswe_radnorm FUNCARGS_KEYWDS
     static char *kwlist[] = {"x", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &x))
         return NULL;
-    return Py_BuildValue("f", swe_radnorm(x));
+    return Py_BuildValue("d", swe_radnorm(x));
 }
 
 /* swisseph.refrac */
@@ -2080,7 +2080,7 @@ static PyObject * pyswe_refrac FUNCARGS_KEYWDS
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|ddi", kwlist,
         &alt, &press, &temp, &flag))
         return NULL;
-    return Py_BuildValue("f", swe_refrac(alt, press, temp, flag));
+    return Py_BuildValue("d", swe_refrac(alt, press, temp, flag));
 }
 
 /* swisseph.refrac_extended */
@@ -2101,7 +2101,7 @@ static PyObject * pyswe_refrac_extended FUNCARGS_KEYWDS
         &alt, &geoalt, &lapserate, &press, &temp, &flag))
         return NULL;
     ret = swe_refrac_extended(alt, geoalt, press, temp, lapserate, flag, dret);
-    return Py_BuildValue("(f)(ffff)", ret, dret[0], dret[1], dret[2], dret[3]);
+    return Py_BuildValue("(d)(dddd)", ret, dret[0], dret[1], dret[2], dret[3]);
 }
 
 /* swisseph.revjul */
@@ -2119,7 +2119,7 @@ static PyObject * pyswe_revjul FUNCARGS_KEYWDS
         &jd, &cal))
         return NULL;
     swe_revjul(jd, cal, &year, &month, &day, &hour);
-    return Py_BuildValue("(iiif)", year, month, day, hour);
+    return Py_BuildValue("(iiid)", year, month, day, hour);
 }
 
 /* swisseph.rise_trans */
@@ -2160,7 +2160,7 @@ static PyObject * pyswe_rise_trans FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(ffffffffff)", res,tret[0],tret[1],tret[2],
+    return Py_BuildValue("(i)(dddddddddd)", res,tret[0],tret[1],tret[2],
         tret[3],tret[4],tret[5],tret[6],tret[7],tret[8],tret[9]);
 }
 
@@ -2275,7 +2275,7 @@ static PyObject * pyswe_sidtime FUNCARGS_KEYWDS
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
         return NULL;
     ret = swe_sidtime(jd);
-    return Py_BuildValue("f", ret);
+    return Py_BuildValue("d", ret);
 }
 
 /* swisseph.sidtime0 */
@@ -2292,7 +2292,7 @@ static PyObject * pyswe_sidtime0 FUNCARGS_KEYWDS
         &jd, &obliquity, &nutation))
         return NULL;
     ret = swe_sidtime0(jd, obliquity, nutation);
-    return Py_BuildValue("f", ret);
+    return Py_BuildValue("d", ret);
 }
 
 /* swisseph.sol_eclipse_how */
@@ -2316,7 +2316,7 @@ static PyObject * pyswe_sol_eclipse_how FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(fffffffffff)", res,attr[0],attr[1],attr[2],attr[3],
+    return Py_BuildValue("(i)(ddddddddddd)", res,attr[0],attr[1],attr[2],attr[3],
         attr[4],attr[5],attr[6],attr[7],attr[8],attr[9],attr[10]);
 }
 
@@ -2340,7 +2340,7 @@ static PyObject * pyswe_sol_eclipse_when_glob FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(ffffffffff)", res,tret[0],tret[1],tret[2],tret[3],
+    return Py_BuildValue("(i)(dddddddddd)", res,tret[0],tret[1],tret[2],tret[3],
         tret[4],tret[5],tret[6],tret[7],tret[8],tret[9]);
 }
 
@@ -2367,7 +2367,7 @@ static PyObject * pyswe_sol_eclipse_when_loc FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(fffffff)(fffffffffff)", res,
+    return Py_BuildValue("(i)(ddddddd)(ddddddddddd)", res,
         tret[0],tret[1],tret[2],tret[3],tret[4],tret[5],tret[6],
         attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],attr[7],attr[8],
         attr[9],attr[10]);
@@ -2393,7 +2393,7 @@ static PyObject * pyswe_sol_eclipse_where FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(ffffffffff)(fffffffffff)", res,geopos[0],geopos[1],
+    return Py_BuildValue("(i)(dddddddddd)(ddddddddddd)", res,geopos[0],geopos[1],
         geopos[2],geopos[3],geopos[4],geopos[5],geopos[6],geopos[7],geopos[8],
         geopos[9],attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],
         attr[7],attr[8],attr[9],attr[10]);
@@ -2436,7 +2436,7 @@ static PyObject * pyswe_time_equ FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("f", ret);
+    return Py_BuildValue("d", ret);
 }
 
 /* swisseph.utc_time_zone */
@@ -3379,7 +3379,7 @@ PyDoc_STRVAR(pyswh_atlas_search__doc__,
 int pyswh_atlas_search_cb(void* p, int argc, char** argv, char** cols)
 {
     PyObject* lst = (PyObject*) p;
-    PyObject* tup = Py_BuildValue("(ssssffis)", argv[0], argv[1], argv[2],
+    PyObject* tup = Py_BuildValue("(ssssddis)", argv[0], argv[1], argv[2],
         argv[3], *argv[4] ? atof(argv[4]) : 0, *argv[5] ? atof(argv[5]) : 0,
         *argv[6] ? atoi(argv[6]) : 0, argv[7]);
     if (!tup)
@@ -3454,9 +3454,9 @@ static PyObject * pyswh_calc_ut FUNCARGS_KEYWDS
         return NULL;
     }
     return star ?
-        Py_BuildValue("(ffffff)(is)",res[0],res[1],res[2],res[3],res[4],res[5],
+        Py_BuildValue("(dddddd)(is)",res[0],res[1],res[2],res[3],res[4],res[5],
                 x, st)
-        : Py_BuildValue("(ffffff)(is)",res[0],res[1],res[2],res[3],res[4],res[5],
+        : Py_BuildValue("(dddddd)(is)",res[0],res[1],res[2],res[3],res[4],res[5],
                 x, swe_get_planet_name(pl, nam));
 }
 
@@ -3574,7 +3574,7 @@ static PyObject * pyswh_geoc2d FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, "swisseph.contrib.geoc2d: invalid coord string");
         return NULL;
     }
-    return Py_BuildValue("f", ret);
+    return Py_BuildValue("d", ret);
 }
 
 /* swisseph.contrib.geolat2c */
@@ -3692,7 +3692,7 @@ PyDoc_STRVAR(pyswh_jdnow__doc__,
 
 static PyObject * pyswh_jdnow FUNCARGS_SELF
 {
-    return Py_BuildValue("f", swh_jdnow());
+    return Py_BuildValue("d", swh_jdnow());
 }
 
 /* swisseph.contrib.jduration */
@@ -3727,7 +3727,7 @@ static PyObject * pyswh_julday FUNCARGS_KEYWDS
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "iii|iiii", kwlist,
         &year, &mon, &day, &hour, &min, &sec, &flag))
         return NULL;
-    return Py_BuildValue("f", swh_julday(year, mon, day, hour,
+    return Py_BuildValue("d", swh_julday(year, mon, day, hour,
         min, sec, flag));
 }
 
@@ -3939,7 +3939,7 @@ static PyObject * pyswh_next_aspect FUNCARGS_KEYWDS
         return Py_BuildValue("O(OOOOOO)", Py_None, Py_None, Py_None, Py_None,
             Py_None, Py_None, Py_None);
     default:
-        return Py_BuildValue("f(ffffff)", jdret, posret[0], posret[1],
+        return Py_BuildValue("d(dddddd)", jdret, posret[0], posret[1],
             posret[2], posret[3], posret[4], posret[5]);
     }
 }
@@ -3971,7 +3971,7 @@ static PyObject * pyswh_next_aspect2 FUNCARGS_KEYWDS
         return Py_BuildValue("O(OOOOOO)", Py_None, Py_None, Py_None, Py_None,
             Py_None, Py_None, Py_None);
     default:
-        return Py_BuildValue("f(ffffff)", jdret, posret[0], posret[1],
+        return Py_BuildValue("d(dddddd)", jdret, posret[0], posret[1],
             posret[2], posret[3], posret[4], posret[5]);
     }
 }
@@ -4023,7 +4023,7 @@ static PyObject * pyswh_next_aspect_cusp FUNCARGS_KEYWDS
     }
     assert(!res);
     if (hsys == 71) /* Gauquelin sectors */
-        return Py_BuildValue("f(ffffff)(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
+        return Py_BuildValue("d(dddddd)(dddddddddddddddddddddddddddddddddddd)(dddddddd)",
         jdret,
         posret[0], posret[1], posret[2], posret[3], posret[4], posret[5],
         cusps[1], cusps[2], cusps[3], cusps[4], cusps[5], cusps[6], cusps[7],
@@ -4034,7 +4034,7 @@ static PyObject * pyswh_next_aspect_cusp FUNCARGS_KEYWDS
         cusps[32], cusps[33], cusps[34], cusps[35], cusps[36],
         ascmc[0], ascmc[1], ascmc[2], ascmc[3], ascmc[4], ascmc[5], ascmc[6],
         ascmc[7]);
-    return Py_BuildValue("f(ffffff)(ffffffffffff)(ffffffff)", jdret,
+    return Py_BuildValue("d(dddddd)(dddddddddddd)(dddddddd)", jdret,
     posret[0], posret[1], posret[2], posret[3], posret[4], posret[5],
     cusps[1], cusps[2], cusps[3], cusps[4], cusps[5], cusps[6], cusps[7],
     cusps[8], cusps[9], cusps[10], cusps[11], cusps[12],
@@ -4084,7 +4084,7 @@ static PyObject * pyswh_next_aspect_cusp2 FUNCARGS_KEYWDS
     }
     assert(!res);
     if (hsys == 71) /* Gauquelin sectors */
-        return Py_BuildValue("f(ffffff)(ffffffffffffffffffffffffffffffffffff)(ffffffff)",
+        return Py_BuildValue("d(dddddd)(dddddddddddddddddddddddddddddddddddd)(dddddddd)",
         jdret,
         posret[0], posret[1], posret[2], posret[3], posret[4], posret[5],
         cusps[1], cusps[2], cusps[3], cusps[4], cusps[5], cusps[6], cusps[7],
@@ -4095,7 +4095,7 @@ static PyObject * pyswh_next_aspect_cusp2 FUNCARGS_KEYWDS
         cusps[32], cusps[33], cusps[34], cusps[35], cusps[36],
         ascmc[0], ascmc[1], ascmc[2], ascmc[3], ascmc[4], ascmc[5], ascmc[6],
         ascmc[7]);
-    return Py_BuildValue("f(ffffff)(ffffffffffff)(ffffffff)", jdret,
+    return Py_BuildValue("d(dddddd)(dddddddddddd)(dddddddd)", jdret,
     posret[0], posret[1], posret[2], posret[3], posret[4], posret[5],
     cusps[1], cusps[2], cusps[3], cusps[4], cusps[5], cusps[6], cusps[7],
     cusps[8], cusps[9], cusps[10], cusps[11], cusps[12],
@@ -4151,7 +4151,7 @@ static PyObject * pyswh_next_aspect_with FUNCARGS_KEYWDS
         Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None,
         Py_None, Py_None);
     default:
-        return Py_BuildValue("f(ffffff)(ffffff)", jdret, posret0[0],
+        return Py_BuildValue("d(dddddd)(dddddd)", jdret, posret0[0],
         posret0[1], posret0[2], posret0[3], posret0[4], posret0[5], posret1[0],
         posret1[1], posret1[2], posret1[3], posret1[4], posret1[5]);
     }
@@ -4202,7 +4202,7 @@ static PyObject * pyswh_next_aspect_with2 FUNCARGS_KEYWDS
         Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None, Py_None,
         Py_None, Py_None);
     default:
-        return Py_BuildValue("f(ffffff)(ffffff)", jdret, posret0[0],
+        return Py_BuildValue("d(dddddd)(dddddd)", jdret, posret0[0],
         posret0[1], posret0[2], posret0[3], posret0[4], posret0[5], posret1[0],
         posret1[1], posret1[2], posret1[3], posret1[4], posret1[5]);
     }
@@ -4237,7 +4237,7 @@ static PyObject * pyswh_next_retro FUNCARGS_KEYWDS
         return Py_BuildValue("O(OOOOOO)", Py_None, Py_None, Py_None, Py_None,
             Py_None, Py_None, Py_None);
     default:
-        return Py_BuildValue("f(ffffff)", jdret, posret[0], posret[1],
+        return Py_BuildValue("d(dddddd)", jdret, posret[0], posret[1],
             posret[2], posret[3], posret[4], posret[5]);
     }
 }
@@ -4260,7 +4260,7 @@ static PyObject * pyswh_ochchabala FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, "swisseph.contrib.ochchabala: invalid planet");
         return NULL;
     }
-    return Py_BuildValue("f", d);
+    return Py_BuildValue("d", d);
 }
 
 /* swisseph.contrib.raman_houses */
@@ -4277,7 +4277,7 @@ static PyObject * pyswh_raman_houses FUNCARGS_KEYWDS
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|b", kwlist, &asc, &mc, &sdi))
         return NULL;
     swh_raman_houses(asc, mc, ret, sdi);
-    return Py_BuildValue("ffffffffffff", ret[0],ret[1],ret[2],ret[3],ret[4],
+    return Py_BuildValue("dddddddddddd", ret[0],ret[1],ret[2],ret[3],ret[4],
         ret[5],ret[6],ret[7],ret[8],ret[9],ret[10],ret[11]);
 }
 
@@ -4365,7 +4365,7 @@ static PyObject * pyswh_residential_strength FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, "swisseph.contrib.residential_strength: invalid error");
         return NULL;
     }
-    return Py_BuildValue("f", ret);
+    return Py_BuildValue("d", ret);
 }
 
 /* swisseph.contrib.revjul */
@@ -4405,7 +4405,7 @@ static PyObject * pyswh_saturn_4_stars FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(ffffff)", ret[0],ret[1],ret[2],ret[3],ret[4],ret[5]);
+    return Py_BuildValue("(dddddd)", ret[0],ret[1],ret[2],ret[3],ret[4],ret[5]);
 }
 
 /* swisseph.contrib.signtostr */
@@ -4553,7 +4553,7 @@ static PyObject * pyswh_years_diff FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("f", years);
+    return Py_BuildValue("d", years);
 }
 
 #endif /* PYSWE_USE_SWEPHELP */
