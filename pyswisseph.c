@@ -1713,7 +1713,7 @@ static PyObject * pyswe_lmt_to_lat FUNCARGS_KEYWDS
 PyDoc_STRVAR(pyswe_lun_eclipse_how__doc__,
 "Calculate attributes of a lunar eclipse (UTC).\n\n"
 "Args: float julday, float lon, float lat, float alt=0.0, int flag=FLG_SWIEPH\n"
-"Return: tuples (retflag)(attr)");
+"Return: int retflag, (float attr)");
 
 static PyObject * pyswe_lun_eclipse_how FUNCARGS_KEYWDS
 {
@@ -1730,7 +1730,7 @@ static PyObject * pyswe_lun_eclipse_how FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(ddddddddddd)", res,attr[0],attr[1],attr[2],attr[3],
+    return Py_BuildValue("i(ddddddddddd)", res,attr[0],attr[1],attr[2],attr[3],
         attr[4],attr[5],attr[6],attr[7],attr[8],attr[9],attr[10]);
 }
 
@@ -1738,7 +1738,7 @@ static PyObject * pyswe_lun_eclipse_how FUNCARGS_KEYWDS
 PyDoc_STRVAR(pyswe_lun_eclipse_when__doc__,
 "Find the next lunar eclipse (UTC).\n\n"
 "Args: float jd_start, int ecl_type=0, bool backward=False, int flag=FLG_SWIEPH\n"
-"Return: tuples (retflag)(tret)");
+"Return: int retflag, (float tret)");
 
 static PyObject * pyswe_lun_eclipse_when FUNCARGS_KEYWDS
 {
@@ -1754,7 +1754,7 @@ static PyObject * pyswe_lun_eclipse_when FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(dddddddd)", res,tret[0],tret[1],tret[2],tret[3],
+    return Py_BuildValue("i(dddddddd)", res,tret[0],tret[1],tret[2],tret[3],
         tret[4],tret[5],tret[6],tret[7]);
 }
 
@@ -1763,7 +1763,7 @@ PyDoc_STRVAR(pyswe_lun_eclipse_when_loc__doc__,
 "Find the next lunar eclipse observable from a given geographic position.\n\n"
 "Args: float jd_start, float lon, float lat, float alt=0.0, bool backward=False,"
 " int flag=FLG_SWIEPH\n"
-"Return: 3 tuples (retflag, tret, attr)");
+"Return: int retflag, (float tret), (float attr)");
 
 static PyObject * pyswe_lun_eclipse_when_loc FUNCARGS_KEYWDS
 {
@@ -1782,7 +1782,7 @@ static PyObject * pyswe_lun_eclipse_when_loc FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(dddddddddd)(dddddddddd)", res,tret[0],tret[1],
+    return Py_BuildValue("i(dddddddddd)(dddddddddd)", res,tret[0],tret[1],
         tret[2],tret[3],tret[4],tret[5],tret[6],tret[7],tret[8],tret[9],
         attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],attr[7],
         attr[8],attr[9]);
@@ -1793,7 +1793,7 @@ PyDoc_STRVAR(pyswe_lun_occult_when_glob__doc__,
 "Find the next occultation of a planet or star by the moon globally (UTC).\n\n"
 "Args: float jd_start, int or str body, int ecl_type=0, bool backward=False,"
 " int flag=FLG_SWIEPH\n"
-"Return: tuple of results");
+"Return: int retflag, (float tret)");
 
 static PyObject * pyswe_lun_occult_when_glob FUNCARGS_KEYWDS
 {
@@ -1825,7 +1825,7 @@ static PyObject * pyswe_lun_occult_when_glob FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(dddddddddd)", res,tret[0],tret[1],tret[2],
+    return Py_BuildValue("i(dddddddddd)", res,tret[0],tret[1],tret[2],
         tret[3],tret[4],tret[5],tret[6],tret[7],tret[8],tret[9]);
 }
 
@@ -1834,7 +1834,7 @@ PyDoc_STRVAR(pyswe_lun_occult_when_loc__doc__,
 "Find next occultation of a body by the moon for a given geographic position (UTC).\n\n"
 "Args: float julday, int or str body, float lon, float lat, float alt=0.0,"
 " bool backward=False, int flag=FLG_SWIEPH\n"
-"Return: tuple of results");
+"Return: int retflag, (float tret), (float attr)");
 
 static PyObject * pyswe_lun_occult_when_loc FUNCARGS_KEYWDS
 {
@@ -1866,7 +1866,7 @@ static PyObject * pyswe_lun_occult_when_loc FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(ddddddd)(dddddddd)", res,tret[0],tret[1],
+    return Py_BuildValue("i(ddddddd)(dddddddd)", res,tret[0],tret[1],
         tret[2],tret[3],tret[4],tret[5],tret[6],attr[0],attr[1],attr[2],
         attr[3],attr[4],attr[5],attr[6],attr[7]);
 }
@@ -1875,7 +1875,7 @@ static PyObject * pyswe_lun_occult_when_loc FUNCARGS_KEYWDS
 PyDoc_STRVAR(pyswe_lun_occult_where__doc__,
 "Find where a lunar occultation is central or maximal (UTC).\n\n"
 "Args: float julday, int or str body, int flag=FLG_SWIEPH\n"
-"Return: tuples (retval)(geopos)(attr)");
+"Return: int retval, (float geopos), (float attr)");
 
 static PyObject * pyswe_lun_occult_where FUNCARGS_KEYWDS
 {
@@ -1908,7 +1908,7 @@ static PyObject * pyswe_lun_occult_where FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(dddddddddd)(dddddddd)", res,geopos[0],geopos[1],
+    return Py_BuildValue("i(dddddddddd)(dddddddd)", res,geopos[0],geopos[1],
         geopos[2],geopos[3],geopos[4],geopos[5],geopos[6],geopos[7],geopos[8],
         geopos[9],attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],attr[7]);
 }
@@ -2127,7 +2127,7 @@ PyDoc_STRVAR(pyswe_rise_trans__doc__,
 "Calculate times of rising, setting and meridian transits.\n\n"
 "Args: float jd_start, int or str body, float lon, float lat, float alt=0.0,"
 " float press=0.0, float temp=0.0, int rsmi=0, int flag=FLG_SWIEPH\n"
-"Return: tuple of results");
+"Return: int res, (float tret)");
 
 static PyObject * pyswe_rise_trans FUNCARGS_KEYWDS
 {
@@ -2160,7 +2160,7 @@ static PyObject * pyswe_rise_trans FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(dddddddddd)", res,tret[0],tret[1],tret[2],
+    return Py_BuildValue("i(dddddddddd)", res,tret[0],tret[1],tret[2],
         tret[3],tret[4],tret[5],tret[6],tret[7],tret[8],tret[9]);
 }
 
@@ -2299,7 +2299,7 @@ static PyObject * pyswe_sidtime0 FUNCARGS_KEYWDS
 PyDoc_STRVAR(pyswe_sol_eclipse_how__doc__,
 "Calculate attributes of a solar eclipse.\n\n"
 "Args: float julday, float lon, float lat, float alt=0.0, int flag=FLG_SWIEPH\n"
-"Return: tuples (retflag)(attr)");
+"Return: int res, (float attr)");
 
 static PyObject * pyswe_sol_eclipse_how FUNCARGS_KEYWDS
 {
@@ -2316,7 +2316,7 @@ static PyObject * pyswe_sol_eclipse_how FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(ddddddddddd)", res,attr[0],attr[1],attr[2],attr[3],
+    return Py_BuildValue("i(ddddddddddd)", res,attr[0],attr[1],attr[2],attr[3],
         attr[4],attr[5],attr[6],attr[7],attr[8],attr[9],attr[10]);
 }
 
@@ -2324,7 +2324,7 @@ static PyObject * pyswe_sol_eclipse_how FUNCARGS_KEYWDS
 PyDoc_STRVAR(pyswe_sol_eclipse_when_glob__doc__,
 "Find the next solar eclipse globally (UTC).\n\n"
 "Args: float jd_start, ecl_type=0, bool backward=False, int flag=FLG_SWIEPH\n"
-"Return: tuples (retflag)(tret)");
+"Return: int res, (float tret)");
 
 static PyObject * pyswe_sol_eclipse_when_glob FUNCARGS_KEYWDS
 {
@@ -2340,7 +2340,7 @@ static PyObject * pyswe_sol_eclipse_when_glob FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(dddddddddd)", res,tret[0],tret[1],tret[2],tret[3],
+    return Py_BuildValue("i(dddddddddd)", res,tret[0],tret[1],tret[2],tret[3],
         tret[4],tret[5],tret[6],tret[7],tret[8],tret[9]);
 }
 
@@ -2349,7 +2349,7 @@ PyDoc_STRVAR(pyswe_sol_eclipse_when_loc__doc__,
 "Find the next solar eclipse for a given geographic position (UTC).\n\n"
 "Args: float julday, float lon, float lat, float alt=0.0, bool backward=False,"
 " int flag=FLG_SWIEPH\n"
-"Return: tuples (retflag)(tret)(attr)");
+"Return: int res, (float tret), (float attr)");
 
 static PyObject * pyswe_sol_eclipse_when_loc FUNCARGS_KEYWDS
 {
@@ -2367,7 +2367,7 @@ static PyObject * pyswe_sol_eclipse_when_loc FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(ddddddd)(ddddddddddd)", res,
+    return Py_BuildValue("i(ddddddd)(ddddddddddd)", res,
         tret[0],tret[1],tret[2],tret[3],tret[4],tret[5],tret[6],
         attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],attr[7],attr[8],
         attr[9],attr[10]);
@@ -2377,7 +2377,7 @@ static PyObject * pyswe_sol_eclipse_when_loc FUNCARGS_KEYWDS
 PyDoc_STRVAR(pyswe_sol_eclipse_where__doc__,
 "Find where a solar eclipse is central or maximal (UTC).\n\n"
 "Args: float julday, int flag=FLG_SWIEPH\n"
-"Return: tuples (retval)(geopos)(attr)");
+"Return: int res, (float geopos), (float attr)");
 
 static PyObject * pyswe_sol_eclipse_where FUNCARGS_KEYWDS
 {
@@ -2393,7 +2393,7 @@ static PyObject * pyswe_sol_eclipse_where FUNCARGS_KEYWDS
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(i)(dddddddddd)(ddddddddddd)", res,geopos[0],geopos[1],
+    return Py_BuildValue("i(dddddddddd)(ddddddddddd)", res,geopos[0],geopos[1],
         geopos[2],geopos[3],geopos[4],geopos[5],geopos[6],geopos[7],geopos[8],
         geopos[9],attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],
         attr[7],attr[8],attr[9],attr[10]);
