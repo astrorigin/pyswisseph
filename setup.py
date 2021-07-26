@@ -48,19 +48,26 @@ from glob import glob
 
 # Pyswisseph version string
 # Our version string gets the version of the swisseph library (x.xx.xx)
-# and our increment as suffix (-x).
-VERSION = '2.10.01-0'
+# and our increment as suffix (.x), plus an eventual pre-release tag (.dev).
+VERSION = '2.10.01.0.dev'
 
-# Corresponding swisseph version string
+# Corresponding swisseph version string (for pkg-config)
 swe_version = '2.10.01'
 
-# libswe-dev detection
-# Set to True to find libswe in system.
-# Set to False to use internal libswe.
+# Debian libswe-dev detection
+# Set to True to try and find libswe in system.
+# Set to False to use bundled libswe.
+# Disabled by default until that package is updated.
 swe_detection = False
 
-# Additional functions and constants
+# Include additional functions and constants (contrib submodule)
 use_swephelp = True
+
+# Sqlite3 detection
+# Set to True to try and find libsqlite3-dev in system.
+# Set to False to use bundled sqlite3.
+# This is relevant only for the contrib submodule.
+sqlite3_detection = True
 
 # Compile flags
 cflags = []
@@ -69,46 +76,45 @@ if sys.platform in ['win32', 'win_amd64']: # Windows
 elif sys.platform == 'darwin': # OSX
     cflags.append('-Wno-error=unused-command-line-argument-hard-error-in-future')
 else: # Linux etc
-    #cflags.append('-std=gnu99')
     pass
 
 # Link flags
 ldflags = []
 
-# Don't modify below
-
+# Should not modify below...
 
 # Test for pkg-config
 has_pkgconfig = False
-if swe_detection:
-    print('Searching system libswe...')
+if swe_detection or (use_swephelp and sqlite3_detection):
+    print('Searching for pkg-config...')
     try:
         import subprocess
         try:
             subprocess.check_output(['pkg-config'], stderr=subprocess.STDOUT)
-        except AttributeError: # < Python 2.7
-            # detection without pkg-config (or use popen)
-            pass
+        except AttributeError: # Python < 2.7
+            print('Python < 2.7, skipping pkg-config')
     except subprocess.CalledProcessError:
         has_pkgconfig = True
         print('Found pkg-config')
     except OSError:
         print('pkg-config not found')
-        pass
     except ImportError: # Python < 2.4
-        pass
+        print('Python < 2.4, skipping pkg-config')
     #
 
 # Find libswe-dev
 libswe_found = False
-if has_pkgconfig:
+if has_pkgconfig and swe_detection:
+    print('Searching for libswe-dev...')
     try:
-        swe_includes = subprocess.check_output(
-            ['pkg-config', '--cflags', 'libswe-'+swe_version],
-            stderr=subprocess.STDOUT)
-        swe_libs = subprocess.check_output(
-            ['pkg-config', '--libs', 'libswe-'+swe_version],
-            stderr=subprocess.STDOUT)
+        out = subprocess.check_output(
+            ['pkg-config', '--cflags-only-I', 'libswe-'+swe_version],
+            stderr=subprocess.STDOUT).decode().strip().split(' ')
+        swe_includes = [x[2:] for x in out if x != '']
+        out = subprocess.check_output(
+            ['pkg-config', '--libs-only-l', 'libswe-'+swe_version],
+            stderr=subprocess.STDOUT).decode().strip().split(' ')
+        swe_libs = [x[2:] for x in out if x != '']
         swe_sources = []
         swe_depends = []
         swe_defines = [('PYSWE_DEFAULT_EPHE_PATH',
@@ -116,22 +122,11 @@ if has_pkgconfig:
         libswe_found = True
         print('pkg-config found libswe-'+swe_version)
     except subprocess.CalledProcessError:
-        pass
+        print('pkg-config has not found libswe-dev')
     #
 
-# Another attempt at finding libswe-dev -- without pkg-config
-# (pkg-config may be uninstalled but pc file should be in place)
-# (and assuming there is only one version installed...)
-if ( swe_detection and not libswe_found
-    and os.path.isfile( '/usr/lib/pkgconfig/libswe-'+swe_version+'.pc' )):
-    swe_includes = ['/usr/include']
-    swe_sources = []
-    swe_depends = []
-    swe_libs = ['swe']
-    swe_defines = [('PYSWE_DEFAULT_EPHE_PATH',
-        '"/usr/share/libswe/ephe2:/usr/share/libswe/ephe"')]
-    print('Found system libswe')
-else: # using internal libswe
+if not libswe_found: # using internal libswe
+    print('Using internal libswe')
     swe_includes = ['libswe']
     swe_sources = [
         'libswe/swecl.c',
@@ -156,55 +151,80 @@ else: # using internal libswe
         'libswe/swephlib.h']
     swe_libs = []
     swe_defines = []
-    print('Using internal libswe')
+
+# Find sqlite3
+sqlite3_found = False
+if has_pkgconfig and use_swephelp and sqlite3_detection:
+    print('Searching for libsqlite3-dev')
+    try:
+        out = subprocess.check_output(
+            ['pkg-config', '--cflags-only-I', 'sqlite3'],
+            stderr=subprocess.STDOUT).decode().strip().split(' ')
+        sqlite3_includes = [x[2:] for x in out if x != '']
+        out = subprocess.check_output(
+            ['pkg-config', '--libs-only-l', 'sqlite3'],
+            stderr=subprocess.STDOUT).decode().strip().split(' ')
+        sqlite3_libs = [x[2:] for x in out if x != '']
+        sqlite3_defines = []
+        sqlite3_sources = []
+        sqlite3_depends = []
+        sqlite3_found = True
+        print('pkg-config has found libsqlite3-dev')
+    except subprocess.CalledProcessError:
+        print('pkg-config has not found libsqlite3-dev')
+    #
+
+if use_swephelp and not sqlite3_found: # using internal sqlite3
+    print('Using internal sqlite3')
+    sqlite3_defines = [
+        ('SQLITE_DEFAULT_AUTOVACUUM', 1),
+        ('SQLITE_DEFAULT_FOREIGN_KEYS', 1),
+        ('SQLITE_DEFAULT_MEMSTATUS', 0),
+        ('SQLITE_DEFAULT_WAL_SYNCHRONOUS', 1),
+        ('SQLITE_DOESNT_MATCH_BLOBS', 1),
+        ('SQLITE_DQS', 0),
+        ('SQLITE_ENABLE_COLUMN_METADATA', 1),
+        ('SQLITE_ENABLE_FTS4', 1),
+        ('SQLITE_MAX_EXPR_DEPTH', 0),
+        ('SQLITE_OMIT_DEPRECATED', 1),
+        ('SQLITE_OMIT_SHARED_CACHE', 1),
+        ('SQLITE_SECURE_DELETE', 1),
+        ('SQLITE_THREADSAFE', 1)
+    ]
+    sqlite3_includes = ['swephelp/sqlite3']
+    sqlite3_sources = ['swephelp/sqlite3/sqlite3.c']
+    sqlite3_depends = ['swephelp/sqlite3/sqlite3.h']
+    sqlite3_libs = []
 
 # Defines
 defines = swe_defines
 if use_swephelp:
-    if sys.platform in ['win32', 'win_amd64', 'darwin']:
-        defines += [
-            ('SQLITE_DEFAULT_AUTOVACUUM', 1),
-            ('SQLITE_DEFAULT_FOREIGN_KEYS', 1),
-            ('SQLITE_DEFAULT_MEMSTATUS', 0),
-            ('SQLITE_DEFAULT_WAL_SYNCHRONOUS', 1),
-            ('SQLITE_DOESNT_MATCH_BLOBS',),
-            ('SQLITE_DQS', 0),
-            ('SQLITE_ENABLE_COLUMN_METADATA',),
-            ('SQLITE_ENABLE_FTS4',),
-            ('SQLITE_MAX_EXPR_DEPTH', 0),
-            ('SQLITE_OMIT_DEPRECATED',),
-            ('SQLITE_OMIT_SHARED_CACHE',),
-            ('SQLITE_SECURE_DELETE',),
-            ('SQLITE_THREADSAFE', 1)
-        ]
-    #
+    defines += sqlite3_defines
 
 # Include paths
 includes = swe_includes
 if use_swephelp:
     includes += ['swephelp']
-    if sys.platform in ['win32', 'win_amd64', 'darwin']:
-        includes += ['swephelp/sqlite3']
+    includes += sqlite3_includes
 
 # Sources
 sources = ['pyswisseph.c'] + swe_sources
 if use_swephelp:
     sources += glob('swephelp/*.c')
     sources += glob('swephelp/*.cpp')
-    if sys.platform in ['win32', 'win_amd64', 'darwin']:
-        sources += ['swephelp/sqlite3/sqlite3.c']
+    sources += sqlite3_sources
 
 # Depends
 depends = swe_depends
 if use_swephelp:
     depends += glob('swephelp/*.h')
     depends += glob('swephelp/*.hpp')
+    depends += sqlite3_depends
 
 # Libraries
 libraries = swe_libs
 if use_swephelp:
-    if sys.platform not in ['win32', 'win_amd64', 'darwin']:
-        libraries += ['sqlite3']
+    libraries += sqlite3_libs
 
 # Pyswisseph extension
 swemodule = Extension(
