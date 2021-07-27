@@ -124,18 +124,30 @@ static PyObject * pyswe_azalt FUNCARGS_KEYWDS
 PyDoc_STRVAR(pyswe_azalt_rev__doc__,
 "Calculate either ecliptical or equatorial coordinates from azimuth and true"
 " altitude.\n\n"
-"Args: float julday, float lon, float lat, float hei, double azim, double alt,"
-" int flag=HOR2ECL\n"
-"Return: tuple of 2 float");
+"Args: float tjdut, int calcflag, float geolon, float geolat, float geohei,"
+" double azimuth, double true_altitude\n"
+"Return: (float x1, float x2)\n\n"
+" - tjdut: julian day (UT)\n"
+" - calcflag: either HOR2ECL (to ecliptical coord) or HOR2EQU (to equatorial)\n"
+" - geolon: geographical longitude\n"
+" - geolat: geographical latitude\n"
+" - geohei: geographical height\n"
+" - azimuth: position degree, measured from south point to west\n"
+" - true_altitude: true altitude above horizon in degrees\n"
+" - x1, x2: ecliptical or equatorial coordinates, depending on calcflag\n\n"
+"This function is not precisely the reverse of azalt(). It computes either"
+" ecliptical or equatorial coordinates from azimuth and true altitude. If"
+" only an apparent altitude is given, the true altitude has to be computed"
+" first with the function refrac().");
 
 static PyObject * pyswe_azalt_rev FUNCARGS_KEYWDS
 {
     double jd, geo[3], xin[2], xout[2];
-    int flag = SE_HOR2ECL;
-    static char *kwlist[] = {"julday", "lon", "lat", "hei",
-        "azim", "alt", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddd|i", kwlist,
-        &jd, &geo[0], &geo[1], &geo[2], &xin[0], &xin[1], &flag))
+    int flag;
+    static char *kwlist[] = {"tjdut", "calcflag", "geolon", "geolat", "geohei",
+        "azimuth", "true_altitude", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "diddddd", kwlist,
+        &jd, &flag, &geo[0], &geo[1], &geo[2], &xin[0], &xin[1]))
         return NULL;
     swe_azalt_rev(jd, flag, geo, xin, xout);
     return Py_BuildValue("(dd)", xout[0], xout[1]);
