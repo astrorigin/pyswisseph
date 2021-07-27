@@ -2174,7 +2174,7 @@ static PyObject * pyswe_set_ephe_path FUNCARGS_KEYWDS
 {
     char *path = PYSWE_DEFAULT_EPHE_PATH;
     static char *kwlist[] = {"path", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "|s", kwlist, &path))
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "|z", kwlist, &path))
         return NULL;
     swe_set_ephe_path(path);
     Py_RETURN_NONE;
