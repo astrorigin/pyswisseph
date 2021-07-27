@@ -155,18 +155,22 @@ static PyObject * pyswe_azalt_rev FUNCARGS_KEYWDS
 
 /* swisseph.calc */
 PyDoc_STRVAR(pyswe_calc__doc__,
-"Calculate body positions (ET).\n\n"
-"Args: float julday, int planet, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: tuple of 6 float, and returned flags\n\n"
-"Usage example:\n\n"
-"\tres, flg = swisseph.calc(jd, pl)");
+"Calculate planetary positions (ET).\n\n"
+"Args: float tjdet, int planet, int flags=FLG_SWIEPH|FLG_SPEED\n"
+"Return: ((float x1, x2, x3, x4, x5, x6), int retflags)\n\n"
+" - tjdet: julian day, ephemeris time, where tjdet == tjdut + deltat(tjdut)\n"
+" - planet: body number\n"
+" - flags: bit flags indicating what kind of computation is wanted\n"
+" - x1, x2, x3, x4, x5, x6: results\n"
+" - retflags: bit flags indicating what kind of computation was done\n\n"
+"This function can raise an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_calc FUNCARGS_KEYWDS
 {
     double jd, val[6];
-    int ret, ipl, flag = SEFLG_SWIEPH + SEFLG_SPEED;
-    char err[256];
-    static char *kwlist[] = {"julday", "planet", "flag", NULL};
+    int ret, ipl, flag = SEFLG_SWIEPH|SEFLG_SPEED;
+    char err[256] = {0};
+    static char *kwlist[] = {"tjdet", "planet", "flags", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|i", kwlist,
         &jd, &ipl, &flag))
         return NULL;
