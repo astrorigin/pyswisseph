@@ -82,21 +82,39 @@ static PyObject * pyswe_Error;
 /* swisseph.azalt */
 PyDoc_STRVAR(pyswe_azalt__doc__,
 "Calculate horizontal coordinates (azimuth and altitude) of a planet or a star"
-" from either ecliptical or equatorial coordinates (UTC).\n\n"
-"Args: float julday, float lon, float lat, float hei, float x, float y,"
-" float z=0.0, float press=0.0, float temp=0.0, int flag=ECL2HOR\n"
-"Return: tuple of 3 float (azimuth, true altitude, apparent altitude)");
+" from either ecliptical or equatorial coordinates.\n\n"
+"Args: float tjdut, int calcflag, float geolon, float geolat, float geohei,"
+" float x1, float x2, float x3, float atpress, float attemp\n"
+"Return: (float azimuth, float true_altitude, float apparent_altitude)\n\n"
+" - tjdut: julian day (UT)\n"
+" - calcflag: either ECL2HOR (from ecliptical coord) or EQU2HOR (equatorial)\n"
+" - geolon: geographical longitude\n"
+" - geolat: geographical latitude\n"
+" - geohei: geographical height\n"
+" - x1: if calcflag==ECL2HOR, ecl. longitude. If EQU2HOR, right ascension.\n"
+" - x2: if calcflag==ECL2HOR, ecl. latitude. If EQU2HOR, declination.\n"
+" - x3: distance (not required)\n"
+" - atpress: atmospheric pressure in mbar (hPa)\n"
+" - attemp: atmospheric temperature in degrees Celsius\n"
+" - azimuth: position degree, measured from south point to west\n"
+" - true_altitude: true altitude above horizon in degrees\n"
+" - apparent_altitude: apparent (refracted) altitude above horizon in degrees\n\n"
+"The apparent altitude of a body depends on the atmospheric pressure and temperature."
+" If only the true altitude is required, these parameters can be neglected.\n"
+"If atpress is given the value 0, the function estimates the pressure from the"
+" geographical altitude given in x3 and attemp. If x3 is 0, atpress will be"
+" estimated for sea level.");
 
 static PyObject * pyswe_azalt FUNCARGS_KEYWDS
 {
-    double jd, geo[3], xin[3], press = 0.0, temp = 0.0, xaz[3];
-    int flag = SE_ECL2HOR;
-    static char *kwlist[] = {"julday", "lon", "lat", "hei",
-        "x", "y", "z", "press", "temp", "flag", NULL};
+    double jd, geo[3], xin[3], press, temp, xaz[3];
+    int flag;
+    static char *kwlist[] = {"tjdut", "calcflag", "geolon", "geolat", "geohei",
+        "x1", "x2", "x3", "atpress", "attemp", NULL};
     xin[2] = 0.0;
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddd|dddi", kwlist,
-        &jd, &geo[0], &geo[1], &geo[2], &xin[0], &xin[1], &xin[2], &press,
-        &temp, &flag))
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "didddddddd", kwlist,
+        &jd, &flag, &geo[0], &geo[1], &geo[2], &xin[0], &xin[1], &xin[2],
+        &press, &temp))
         return NULL;
     swe_azalt(jd, flag, geo, press, temp, xin, xaz);
     return Py_BuildValue("(ddd)", xaz[0], xaz[1], xaz[2]);
