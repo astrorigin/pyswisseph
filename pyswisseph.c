@@ -184,16 +184,28 @@ static PyObject * pyswe_calc FUNCARGS_KEYWDS
 
 /* swisseph.calc_pctr */
 PyDoc_STRVAR(pyswe_calc_pctr__doc__,
-"Calculate planetocentric positions (terrestrial time).\n\n"
-"Args: float julday, int planet, int center, int flag=FLG_SWIEPH|FLG_SPEED\n"
-"Return: tuple of 6 float, and returned flags");
+"Calculate planetocentric positions of planets (terrestrial time).\n\n"
+"Args: float tjd, int planet, int center, int flags=FLG_SWIEPH|FLG_SPEED\n"
+"Return: ((float x1, x2, x3, x4, x5, x6), int retflags)\n\n"
+" - tjd: julian day in TT (ET)\n"
+" - planet: body number of target object\n"
+" - center: body number of center object\n"
+" - flags: bit flags indicating what kind of computation is wanted\n"
+" - x1, x2, x3, x4, x5, x6: results\n"
+" - retflags: bit flags indicating what kind of computation was done\n\n"
+"This function calculates planetocentric positions of planets, ie. positions as"
+" observed from some different planet, eg. Jupiter-centric ephemerides. The"
+" function can actually calculate any object as observed from any other object,"
+" eg. also the position of some asteroid as observed from another asteroid or"
+" from a planetary moon.\n"
+"This function can raise an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_calc_pctr FUNCARGS_KEYWDS
 {
     double jd, xx[6];
     int ret, ipl, iplctr, flag = SEFLG_SWIEPH|SEFLG_SPEED;
     char err[256] = {0};
-    static char* kwlist[] = {"julday", "planet", "center", "flag", NULL};
+    static char* kwlist[] = {"tjd", "planet", "center", "flags", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dii|i", kwlist,
         &jd, &ipl, &iplctr, &flag))
         return NULL;
