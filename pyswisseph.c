@@ -271,7 +271,17 @@ static PyObject * pyswe_close FUNCARGS_SELF
 PyDoc_STRVAR(pyswe_cotrans__doc__,
 "Coordinate transformation from ecliptic to equator or vice-versa.\n\n"
 "Args: float lon, float lat, float dist, float obliquity\n"
-"Return: tuple of 3 float (longitude, latitude, distance)");
+"Return: (float longitude, latitude, distance)\n\n"
+" - lon: longitude to convert\n"
+" - lat: latitude to convert\n"
+" - dist: distance to convert (unchanged, can be set to 1)\n"
+" - obliquity: obliquity of ecliptic, in degrees\n"
+" - longitude: converted longitude\n"
+" - latitude: converted latitude\n"
+" - distance: converted distance\n\n"
+"For equatorial to ecliptical, obliquity must be positive. From ecliptical to"
+" equatorial, obliquity must be negative. lon, lat and obliquity are in"
+" positive degrees.");
 
 static PyObject * pyswe_cotrans FUNCARGS_KEYWDS
 {
