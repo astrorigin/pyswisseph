@@ -219,27 +219,36 @@ static PyObject * pyswe_calc_pctr FUNCARGS_KEYWDS
 
 /* swisseph.calc_ut */
 PyDoc_STRVAR(pyswe_calc_ut__doc__,
-"Calculate body positions (UT).\n\n"
-"Args: float julday, int planet, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: tuple of 6 float, and returned flags\n\n"
-"Usage example:\n\n"
-"\tres, flg = swisseph.calc_ut(jd, pl)");
+"Calculate planetary positions (UT).\n\n"
+"Args: float tjdut, int planet, int flags=FLG_SWIEPH|FLG_SPEED\n"
+"Return: ((float x1, x2, x3, x4, x5, x6), int retflags)\n\n"
+" - tjdut: julian day number, universla time\n"
+" - planet: body number\n"
+" - flags: bit flags indicating what kind of computation is wanted\n"
+" - x1, x2, x3, x4, x5, x6: results\n"
+" - retflags: bit flags indicating what kind of computation was done\n\n"
+"Functions calc_ut() and calc() work exactly the same way except that calc()"
+" requires Ephemeris Time (more accurately Terrestrial Time) as a parameter"
+" whereas calc_ut() expects Universal Time (UT). For common astrological"
+" calculations, you will only need calc_ut() and will not have to think any"
+" more about the conversion between Universal Time and Ephemeris Time.\n"
+"This function can raise an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
 {
-    double jd, val[6];
-    int ret, ipl, flag = SEFLG_SWIEPH + SEFLG_SPEED;
-    char err[256];
-    static char *kwlist[] = {"julday", "planet", "flag", NULL};
+    double jd, xx[6];
+    int ret, ipl, flag = SEFLG_SWIEPH|SEFLG_SPEED;
+    char err[256] = {0};
+    static char *kwlist[] = {"tjdut", "planet", "flags", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|i", kwlist,
         &jd, &ipl, &flag))
         return NULL;
-    ret = swe_calc_ut(jd, ipl, flag, val, err);
+    ret = swe_calc_ut(jd, ipl, flag, xx, err);
     if (ret < 0) {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(dddddd)i",val[0],val[1],val[2],val[3],val[4],val[5],ret);
+    return Py_BuildValue("(dddddd)i",xx[0],xx[1],xx[2],xx[3],xx[4],xx[5],ret);
 }
 
 /* swisseph.close */
