@@ -255,7 +255,11 @@ static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
 PyDoc_STRVAR(pyswe_close__doc__,
 "Close swiss ephemeris.\n\n"
 "Args: -\n"
-"Return: None");
+"Return: None\n\n"
+"At the end of your computations you can release all resources (open files and"
+" allocated memory) used by the swisseph library. After close(), no swisseph"
+" functions should be used unless you call set_ephe_path() again and, if"
+" required, set_jpl_file().");
 
 static PyObject * pyswe_close FUNCARGS_SELF
 {
