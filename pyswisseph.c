@@ -426,24 +426,32 @@ static PyObject * pyswe_d2l FUNCARGS_KEYWDS
 /* swisseph.date_conversion */
 PyDoc_STRVAR(pyswe_date_conversion__doc__,
 "Calculate Julian day number with check wether date is correct.\n\n"
-"Args: int year, int month, int day, float hour=12.0, char cal='g'\n"
-"Return: tuple (int result, float jd)");
+"Args: int year, int month, int day, float hour=12.0, str cal='g'\n"
+"Return: (int result, float jd)\n\n"
+" - year, month, day: input date\n"
+" - hour: input time, decimal with fraction\n"
+" - cal: calendar type, gregorian (g) or julian (j)\n"
+" - result: is either 0 if the input date and time are legal, else -1\n"
+" - jd: returned Julian day number\n\n"
+"This function can raise an exception (swisseph.Error) if cal is invalid.");
 
 static PyObject * pyswe_date_conversion FUNCARGS_KEYWDS
 {
     int year, month, day, ret;
     double jd, hour = 12.0;
-    char cal = 'g';
+    char* cal = "g";
+    char c;
     static char *kwlist[] = {"year", "month", "day", "hour", "cal", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iii|dc", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iii|ds", kwlist,
         &year, &month, &day, &hour, &cal))
         return NULL;
-    if (cal != 'g' && cal != 'j') {
-        PyErr_SetString(pyswe_Error,
-            "swisseph.date_conversion: Invalid calendar (g/j)");
+    c = tolower(cal[0]);
+    if (strlen(cal) != 1 || (c != 'g' && c != 'j')) {
+        PyErr_Format(pyswe_Error, "swisseph.date_conversion:"
+            " Invalid calendar '%s', must be 'g' or 'j'", cal);
         return NULL;
     }
-    ret = swe_date_conversion(year, month, day, hour, cal, &jd);
+    ret = swe_date_conversion(year, month, day, hour, c, &jd);
     return Py_BuildValue("id", ret, jd);
 }
 
