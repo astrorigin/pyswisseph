@@ -502,9 +502,34 @@ static PyObject * pyswe_degnorm FUNCARGS_KEYWDS
 
 /* swisseph.deltat */
 PyDoc_STRVAR(pyswe_deltat__doc__,
-"Calculate value of delta T.\n\n"
+"Calculate value of delta T from Julian day number.\n\n"
 "Args: float julday\n"
-"Return: float");
+"Return: float\n\n"
+"Reminder: tjdet == tjdut + deltat(tjdut)\n"
+"This function is safe only if your application consistently uses the same"
+" ephemeris flags, if your application consistently uses the same ephemeris"
+" files, if you first call set_ephe_path() (with flag FLG_SWIEPH) or"
+" set_jpl_file() (with flag FLG_JPLEPH).\n"
+"Also, it is safe if you first call set_tid_acc() with the tidal acceleration"
+" you want. However, do not use that function unless you know what you are"
+" doing.\n"
+"For best control of the values returned, use function deltat_ex() instead.\n"
+"The calculation of ephemerides in UT depends on Delta T, which depends on the"
+" ephemeris-inherent value of the tidal acceleration of the Moon. In default"
+" mode, the function deltat() automatically tries to find the required values."
+" Two warnings must be made, though:\n"
+"It is not recommended to use a mix of old and new ephemeris files, because"
+" the old files were based on JPL Ephemeris DE406, whereas the new ones are"
+" based on DE431, and both ephemerides have a different inherent tidal"
+" acceleration of the Moon. A mixture of old and new ephemeris files may lead"
+" to inconsistent ephemeris output. Using old asteroid files se99999.se1"
+" together with new ones, can be tolerated, though.\n"
+"The function deltat() uses a default value of tidal acceleration (that of"
+" DE431). However, after calling some older ephemeris, like Moshier ephemeris,"
+" DE200, or DE406, deltat() might provide slightly different values.\n"
+"In case of troubles related to these two points, it is recommended to either"
+" use function deltat_ex(), or control the value of the tidal acceleration"
+" using the functions set_tid_acc() and get_tid_acc().");
 
 static PyObject * pyswe_deltat FUNCARGS_KEYWDS
 {
