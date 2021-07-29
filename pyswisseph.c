@@ -300,7 +300,18 @@ PyDoc_STRVAR(pyswe_cotrans_sp__doc__,
 " or vice-versa.\n\n"
 "Args: float lon, float lat, float dist, float lonspeed, float latspeed,"
 " float distspeed, float obliquity\n"
-"Return: tuple of 6 float");
+"Return: (float longitude, latitude, distance, longitude_speed, latitude_speed,"
+" distance_speed)\n\n"
+" - lon, lonspeed: longitude and its speed to convert\n"
+" - lat, latspeed: latitude and its speed to convert\n"
+" - dist, distspeed: distance and its speed to convert\n"
+" - obliquity: obliquity of ecliptic, in degrees.\n"
+" - longitude, longitude_speed: converted longitude and its speed\n"
+" - latitude, latitude_speed: converted latitude and its speed\n"
+" - distance, distance_speed: converted distance and its speed\n\n"
+"For equatorial to ecliptical, obliquity must be positive. From ecliptical to"
+" equatorial, obliquity must be negative. lon, lat, their speeds and obliquity"
+" are in positive degrees.");
 
 static PyObject * pyswe_cotrans_sp FUNCARGS_KEYWDS
 {
@@ -311,8 +322,7 @@ static PyObject * pyswe_cotrans_sp FUNCARGS_KEYWDS
         &xpo[0], &xpo[1], &xpo[2], &xpo[3], &xpo[4], &xpo[5], &eps))
         return NULL;
     swe_cotrans(xpo, xpn, eps);
-    return Py_BuildValue("(dddddd)", xpn[0], xpn[1], xpn[2], xpn[3],
-        xpn[4], xpn[5]);
+    return Py_BuildValue("(dddddd)", xpn[0],xpn[1],xpn[2],xpn[3],xpn[4],xpn[5]);
 }
 
 /* swisseph.cs2degstr */
