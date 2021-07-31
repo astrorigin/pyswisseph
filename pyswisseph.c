@@ -684,29 +684,34 @@ static PyObject * pyswe_fixstar FUNCARGS_KEYWDS
 
 /* swisseph.fixstar2 */
 PyDoc_STRVAR(pyswe_fixstar2__doc__,
-"Calculate fixed star positions (fast) (ET).\n\n"
-"Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float, returned star name, and returned flags\n\n"
-"Usage example:\n\n"
-"\tres, stnam, flg = swisseph.fixstar2(st, jd)");
+"Calculate fixed star positions (faster version) (ET).\n\n"
+"Args: str star, float tjdet, int flags=FLG_SWIEPH\n"
+"Return: ((float x1, x2, x3, x4, x5, x6), str stnam, int retflags)\n\n"
+" - star: name of fixed star to search for\n"
+" - tjdet: Julian day in Ephemeris Time\n"
+" - flags: bit flags indicating what kind of computation is wanted\n"
+" - x1, x2, x3, x4, x5, x6: results\n"
+" - stnam: returned star name\n"
+" - retflags: bit flags indicating what kind of computation was done\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_fixstar2 FUNCARGS_KEYWDS
 {
-    char *star, st[(SE_MAX_STNAME*2)+1], err[256];
-    double jd, val[6];
+    char *star, st[(SE_MAX_STNAME*2)+1], err[256] = {0};
+    double jd, xx[6];
     int ret, flag = SEFLG_SWIEPH;
-    static char *kwlist[] = {"star", "julday", "flag", NULL};
+    static char *kwlist[] = {"star", "tjdet", "flags", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
         &star, &jd, &flag))
         return NULL;
     memset(st, 0, (SE_MAX_STNAME*2)+1);
     strncpy(st, star, SE_MAX_STNAME*2);
-    ret = swe_fixstar2(st, jd, flag, val, err);
+    ret = swe_fixstar2(st, jd, flag, xx, err);
     if (ret < 0) {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(dddddd)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
+    return Py_BuildValue("(dddddd)si",xx[0],xx[1],xx[2],xx[3],xx[4],xx[5],st,ret);
 }
 
 /* swisseph.fixstar2_mag */
