@@ -540,6 +540,41 @@ static PyObject * pyswe_deltat FUNCARGS_KEYWDS
     return Py_BuildValue("d", swe_deltat(jd));
 }
 
+/* swisseph.deltat_ex */
+PyDoc_STRVAR(pyswe_deltat_ex__doc__,
+"Calculate value of Delta T from Julian day number (extended).\n\n"
+"Args: float julday, int ephe_flag\n"
+"Return: float deltat\n\n"
+" - julday: Julian day number in UT\n"
+" - ephe_flag: ephemeris flag, one of FLG_SWIEPH, FLG_JPLEPH, FLG_MOSEPH\n\n"
+"Calling this function without a previous call of set_ephe_path() or "
+" set_jpl_file() will raise an exception (swisseph.Error).\n"
+"The calculation of ephemerides in UT depends on the ephemeris-inherent value"
+" of the tidal acceleration of the Moon. The function deltat_ex() can provide"
+" ephemeris-dependent values of Delta T and is therefore better than the old"
+" function deltat(), which has to make un uncertain guess of what ephemeris is"
+" being used. One warning must be made, though:\n"
+"It is not recommended to use a mix of old and new ephemeris files, because the"
+" old files were based on JPL Ephemeris DE406, whereas the new ones are based"
+" on DE431, and both ephemerides have a different inherent tidal acceleration"
+" of the Moon. A mixture of old and new ephemeris files may lead to"
+" inconsistent ephemeris output. Using old asteroid files se99999.se1 together"
+" with new ones, can be tolerated, though.");
+
+static PyObject * pyswe_deltat_ex FUNCARGS_KEYWDS
+{
+    double jd, ret;
+    int flag;
+    char err[256] = {0};
+    static char* kwlist[] = {"julday", "ephe_flag", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di", kwlist, &jd, &flag))
+        return NULL;
+    ret = swe_deltat_ex(jd, flag, err);
+    if (err[0] != 0)
+        return PyErr_Format(pyswe_Error, "swisseph.deltat_ex: %s", err);
+    return Py_BuildValue("d", ret);
+}
+
 /* swisseph.difcs2n */
 PyDoc_STRVAR(pyswe_difcs2n__doc__,
 "Calculate distance in centisecs p1 - p2 normalized to [-180;180].\n\n"
@@ -4710,6 +4745,8 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe_degnorm__doc__},
     {"deltat", (PyCFunction) pyswe_deltat,
         METH_VARARGS|METH_KEYWORDS, pyswe_deltat__doc__},
+    {"deltat_ex", (PyCFunction) pyswe_deltat_ex,
+        METH_VARARGS|METH_KEYWORDS, pyswe_deltat_ex__doc__},
     {"difcs2n", (PyCFunction) pyswe_difcs2n,
         METH_VARARGS|METH_KEYWORDS, pyswe_difcs2n__doc__},
     {"difcsn", (PyCFunction) pyswe_difcsn,
