@@ -716,13 +716,22 @@ static PyObject * pyswe_fixstar2 FUNCARGS_KEYWDS
 
 /* swisseph.fixstar2_mag */
 PyDoc_STRVAR(pyswe_fixstar2_mag__doc__,
-"Get fixed star magnitude (fast).\n\n"
+"Get fixed star magnitude (faster version).\n\n"
 "Args: str star\n"
-"Return: float");
+"Return: float mag\n\n"
+" - star: name of fixed star\n"
+" - mag: returned magnitude\n\n"
+"Strictly speaking, the magnitudes returned by this function are valid for the"
+" year 2000 only. Variations in brightness due to the starÕs variability or"
+" due to the increase or decrease of the star's distance cannot be taken into"
+" account. With stars of constant absolute magnitude, the change in brightness"
+" can be ignored for the historical period. Eg. the current magnitude of"
+" Sirius is -1.46. In 3000 BCE it was -1.44.\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_fixstar2_mag FUNCARGS_KEYWDS
 {
-    char *star, st[41], err[256];
+    char *star, st[41], err[256] = {0};
     int ret;
     double mag;
     static char *kwlist[] = {"star", NULL};
