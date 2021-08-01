@@ -718,9 +718,10 @@ static PyObject * pyswe_fixstar2 FUNCARGS_KEYWDS
 PyDoc_STRVAR(pyswe_fixstar2_mag__doc__,
 "Get fixed star magnitude (faster version).\n\n"
 "Args: str star\n"
-"Return: float mag\n\n"
+"Return: float mag, str stnam\n\n"
 " - star: name of fixed star\n"
-" - mag: returned magnitude\n\n"
+" - mag: returned magnitude\n"
+" - stnam: returned star name\n\n"
 "Strictly speaking, the magnitudes returned by this function are valid for the"
 " year 2000 only. Variations in brightness due to the starÕs variability or"
 " due to the increase or decrease of the star's distance cannot be taken into"
@@ -731,20 +732,20 @@ PyDoc_STRVAR(pyswe_fixstar2_mag__doc__,
 
 static PyObject * pyswe_fixstar2_mag FUNCARGS_KEYWDS
 {
-    char *star, st[41], err[256] = {0};
+    char *star, st[(SE_MAX_STNAME*2)+1], err[256] = {0};
     int ret;
     double mag;
     static char *kwlist[] = {"star", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &star))
         return NULL;
-    memset(st, 0, 41);
-    strncpy(st, star, 40);
+    memset(st, 0, (SE_MAX_STNAME*2)+1);
+    strncpy(st, star, SE_MAX_STNAME*2);
     ret = swe_fixstar2_mag(st, &mag, err);
     if (ret < 0) {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("d", mag);
+    return Py_BuildValue("ds", mag, st);
 }
 
 /* swisseph.fixstar2_ut */
@@ -783,24 +784,34 @@ static PyObject * pyswe_fixstar2_ut FUNCARGS_KEYWDS
 PyDoc_STRVAR(pyswe_fixstar_mag__doc__,
 "Get fixed star magnitude.\n\n"
 "Args: str star\n"
-"Return: float");
+"Return: float mag, str stnam\n\n"
+" - star: name of fixed star\n"
+" - mag: returned magnitude\n"
+" - stnam: returned star name\n\n"
+"Strictly speaking, the magnitudes returned by this function are valid for the"
+" year 2000 only. Variations in brightness due to the starÕs variability or"
+" due to the increase or decrease of the star's distance cannot be taken into"
+" account. With stars of constant absolute magnitude, the change in brightness"
+" can be ignored for the historical period. Eg. the current magnitude of"
+" Sirius is -1.46. In 3000 BCE it was -1.44.\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_fixstar_mag FUNCARGS_KEYWDS
 {
-    char *star, st[41], err[256];
+    char *star, st[(SE_MAX_STNAME*2)+1], err[256] = {0};
     int ret;
     double mag;
     static char *kwlist[] = {"star", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &star))
         return NULL;
-    memset(st, 0, 41);
-    strncpy(st, star, 40);
+    memset(st, 0, (SE_MAX_STNAME*2)+1);
+    strncpy(st, star, SE_MAX_STNAME*2);
     ret = swe_fixstar_mag(st, &mag, err);
     if (ret < 0) {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("d", mag);
+    return Py_BuildValue("ds", mag, st);
 }
 
 /* swisseph.fixstar_ut */
