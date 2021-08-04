@@ -29,11 +29,11 @@
  *  Swisseph authors: Alois Treindl, Dieter Koch (et al.)
  *  Swisseph homepage: https://www.astro.com/swisseph
  *
- *  Swisseph version: 2.08.00
- *  Last revision: 2020-06-01
+ *  Swisseph version: 2.10.02
+ *  Last revision: 2020-08-04
  */
 
-#define PYSWISSEPH_VERSION      20210723
+#define PYSWISSEPH_VERSION      20210804
 
 /* Set the default argument for set_ephe_path function */
 #ifndef PYSWE_DEFAULT_EPHE_PATH
@@ -1525,6 +1525,66 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
     return NULL;
 }
 
+/* swisseph.helio_cross */
+PyDoc_STRVAR(pyswe_helio_cross__doc__,
+"Compute a planet heliocentric crossing over some longitude (ET).\n\n"
+"Args: int planet, float x2cross, float tjdet, int flags=FLG_SWIEPH,"
+" bool backwards=False\n"
+"Return: float jd_cross\n\n"
+" - planet = planet number\n"
+" - x2cross = longitude to search\n"
+" - tjdet: start time of search, as Julian day number, Ephemeris Time\n"
+" - flags: bit flags indicating what computation is wanted\n"
+" - backwards: a boolean indicating if we search back in time\n"
+" - jd_cross: Julian day found\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
+
+static PyObject * pyswe_helio_cross FUNCARGS_KEYWDS
+{
+    int ipl, flags = SEFLG_SWIEPH, backw = 0;
+    double x2, jd, jdcross;
+    char err[256] = {0};
+    static char* kwlist[] = {"planet", "x2cross", "tjdet", "flags",
+                             "backwards", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "idd|ii", kwlist,
+                                     &ipl, &x2, &jd, &flags, &backw))
+        return NULL;
+    backw = backw ? -1 : 1;
+    if (swe_helio_cross(ipl, x2, jd, flags, backw, &jdcross, err))
+        return PyErr_Format(pyswe_Error, "helio_cross: %s", err);
+    return Py_BuildValue("d", jdcross);
+}
+
+/* swisseph.helio_cross_ut */
+PyDoc_STRVAR(pyswe_helio_cross_ut__doc__,
+"Compute a planet heliocentric crossing over some longitude (UT).\n\n"
+"Args: int planet, float x2cross, float tjdut, int flags=FLG_SWIEPH,"
+" bool backwards=False\n"
+"Return: float jd_cross\n\n"
+" - planet = planet number\n"
+" - x2cross = longitude to search\n"
+" - tjdut: start time of search, as Julian day number, Universal Time\n"
+" - flags: bit flags indicating what computation is wanted\n"
+" - backwards: a boolean indicating if we search back in time\n"
+" - jd_cross: Julian day found\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
+
+static PyObject * pyswe_helio_cross_ut FUNCARGS_KEYWDS
+{
+    int ipl, flags = SEFLG_SWIEPH, backw = 0;
+    double x2, jd, jdcross;
+    char err[256] = {0};
+    static char* kwlist[] = {"planet", "x2cross", "tjdut", "flags",
+                             "backwards", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "idd|ii", kwlist,
+                                     &ipl, &x2, &jd, &flags, &backw))
+        return NULL;
+    backw = backw ? -1 : 1;
+    if (swe_helio_cross(ipl, x2, jd, flags, backw, &jdcross, err))
+        return PyErr_Format(pyswe_Error, "helio_cross_ut: %s", err);
+    return Py_BuildValue("d", jdcross);
+}
+
 /* swisseph.house_name */
 PyDoc_STRVAR(pyswe_house_name__doc__,
 "Get the name of the house method.\n\n"
@@ -2060,6 +2120,106 @@ static PyObject * pyswe_lun_occult_where FUNCARGS_KEYWDS
         geopos[9],attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],attr[7]);
 }
 
+/* swisseph.mooncross */
+PyDoc_STRVAR(pyswe_mooncross__doc__,
+"Compute Moon crossing over some longitude (ET).\n\n"
+"Args: float x2cross, float tjdet, int flags=FLG_SWIEPH\n"
+"Return: float jd_cross\n\n"
+" - x2cross: longitude to search\n"
+" - tjdet: start time of search, Julian day number, Ephemeris Time\n"
+" - flags: bit flags indicating what computation is wanted\n"
+" - jd_cross: Julian day number found\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
+
+static PyObject * pyswe_mooncross FUNCARGS_KEYWDS
+{
+    int flags = SEFLG_SWIEPH;
+    double x2, jd, res;
+    char err[256] = {0};
+    static char* kwlist[] = {"x2cross", "tjdet", "flags", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|i", kwlist,
+                                     &x2, &jd, &flags))
+        return NULL;
+    if ((res = swe_mooncross(x2, jd, flags, err)) < jd)
+        return PyErr_Format(pyswe_Error, "mooncross: %s", err);
+    return Py_BuildValue("d", res);
+}
+
+/* swisseph.mooncross_node */
+PyDoc_STRVAR(pyswe_mooncross_node__doc__,
+"Compute next Moon crossing over node, by finding zero latitude crossing (ET).\n\n"
+"Args: float tjdet, int flags=FLG_SWIEPH\n"
+"Return: (float jd_cross, xlon, xlat)\n\n"
+" - tjdet: start time of search, Julian day number, Ephemeris Time\n"
+" - flags: bit flags indicating what computation is wanted\n"
+" - jd_cross: Julian day number found\n"
+" - xlon: Moon longitude found\n"
+" - xlat: Moon latitude found\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
+
+static PyObject * pyswe_mooncross_node FUNCARGS_KEYWDS
+{
+    int flags = SEFLG_SWIEPH;
+    double jd, xlon, xlat, res;
+    char err[256] = {0};
+    static char* kwlist[] = {"tjdet", "flags", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist, &jd, &flags))
+        return NULL;
+    if ((res = swe_mooncross_node(jd, flags, &xlon, &xlat, err)) < jd)
+        return PyErr_Format(pyswe_Error, "mooncross_node: %s", err);
+    return Py_BuildValue("ddd", res, xlon, xlat);
+}
+
+/* swisseph.mooncross_node_ut */
+PyDoc_STRVAR(pyswe_mooncross_node_ut__doc__,
+"Compute next Moon crossing over node, by finding zero latitude crossing (UT).\n\n"
+"Args: float tjdut, int flags=FLG_SWIEPH\n"
+"Return: (float jd_cross, xlon, xlat)\n\n"
+" - tjdut: start time of search, Julian day number, Universal Time\n"
+" - flags: bit flags indicating what computation is wanted\n"
+" - jd_cross: Julian day number found\n"
+" - xlon: Moon longitude found\n"
+" - xlat: Moon latitude found\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
+
+static PyObject * pyswe_mooncross_node_ut FUNCARGS_KEYWDS
+{
+    int flags = SEFLG_SWIEPH;
+    double jd, xlon, xlat, res;
+    char err[256] = {0};
+    static char* kwlist[] = {"tjdut", "flags", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist, &jd, &flags))
+        return NULL;
+    if ((res = swe_mooncross_node(jd, flags, &xlon, &xlat, err)) < jd)
+        return PyErr_Format(pyswe_Error, "mooncross_node: %s", err);
+    return Py_BuildValue("ddd", res, xlon, xlat);
+}
+
+/* swisseph.mooncross_ut */
+PyDoc_STRVAR(pyswe_mooncross_ut__doc__,
+"Compute Moon crossing over some longitude (UT).\n\n"
+"Args: float x2cross, float tjdut, int flags=FLG_SWIEPH\n"
+"Return: float jd_cross\n\n"
+" - x2cross: longitude to search\n"
+" - tjdut: start time of search, Julian day number, Universal Time\n"
+" - flags: bit flags indicating what computation is wanted\n"
+" - jd_cross: Julian day number found\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
+
+static PyObject * pyswe_mooncross_ut FUNCARGS_KEYWDS
+{
+    int flags = SEFLG_SWIEPH;
+    double x2, jd, res;
+    char err[256] = {0};
+    static char* kwlist[] = {"x2cross", "tjdut", "flags", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|i", kwlist,
+                                     &x2, &jd, &flags))
+        return NULL;
+    if ((res = swe_mooncross_ut(x2, jd, flags, err)) < jd)
+        return PyErr_Format(pyswe_Error, "mooncross_ut: %s", err);
+    return Py_BuildValue("d", res);
+}
+
 /* swisseph.nod_aps */
 PyDoc_STRVAR(pyswe_nod_aps__doc__,
 "Calculate planetary nodes and apsides (ET).\n\n"
@@ -2544,6 +2704,56 @@ static PyObject * pyswe_sol_eclipse_where FUNCARGS_KEYWDS
         geopos[2],geopos[3],geopos[4],geopos[5],geopos[6],geopos[7],geopos[8],
         geopos[9],attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],
         attr[7],attr[8],attr[9],attr[10]);
+}
+
+/* swisseph.solcross */
+PyDoc_STRVAR(pyswe_solcross__doc__,
+"Compute next Sun crossing over some longitude (ET).\n\n"
+"Args: float x2cross, float tjdet, int flags=FLG_SWIEPH\n"
+"Return: float jd_cross\n\n"
+" - x2cross: longitude to search\n"
+" - tjdet: start time of search, Julian day number, Ephemeris Time\n"
+" - flags: bit flags indicating what computation is wanted\n"
+" - jd_cross: Julian day number found\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
+
+static PyObject * pyswe_solcross FUNCARGS_KEYWDS
+{
+    int flags = SEFLG_SWIEPH;
+    double x2, jd, res;
+    char err[256] = {0};
+    static char* kwlist[] = {"x2cross", "tjdet", "flags", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|i", kwlist,
+                                     &x2, &jd, &flags))
+        return NULL;
+    if ((res = swe_solcross(x2, jd, flags, err)) < jd)
+        return PyErr_Format(pyswe_Error, "solcross: %s", err);
+    return Py_BuildValue("d", res);
+}
+
+/* swisseph.solcross_ut */
+PyDoc_STRVAR(pyswe_solcross_ut__doc__,
+"Compute next Sun crossing over some longitude (UT).\n\n"
+"Args: float x2cross, float tjdut, int flags=FLG_SWIEPH\n"
+"Return: float jd_cross\n\n"
+" - x2cross: longitude to search\n"
+" - tjdut: start time of search, Julian day number, Ephemeris Time\n"
+" - flags: bit flags indicating what computation is wanted\n"
+" - jd_cross: Julian day number found\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
+
+static PyObject * pyswe_solcross_ut FUNCARGS_KEYWDS
+{
+    int flags = SEFLG_SWIEPH;
+    double x2, jd, res;
+    char err[256] = {0};
+    static char* kwlist[] = {"x2cross", "tjdut", "flags", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|i", kwlist,
+                                     &x2, &jd, &flags))
+        return NULL;
+    if ((res = swe_solcross_ut(x2, jd, flags, err)) < jd)
+        return PyErr_Format(pyswe_Error, "solcross_ut: %s", err);
+    return Py_BuildValue("d", res);
 }
 
 /* swisseph.split_deg */
@@ -4791,6 +5001,10 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe_heliacal_pheno_ut__doc__},
     {"heliacal_ut", (PyCFunction) pyswe_heliacal_ut,
         METH_VARARGS|METH_KEYWORDS, pyswe_heliacal_ut__doc__},
+    {"helio_cross", (PyCFunction) pyswe_helio_cross,
+        METH_VARARGS|METH_KEYWORDS, pyswe_helio_cross__doc__},
+    {"helio_cross_ut", (PyCFunction) pyswe_helio_cross_ut,
+        METH_VARARGS|METH_KEYWORDS, pyswe_helio_cross_ut__doc__},
     {"house_name", (PyCFunction) pyswe_house_name,
         METH_VARARGS|METH_KEYWORDS, pyswe_house_name__doc__},
     {"house_pos", (PyCFunction) pyswe_house_pos,
@@ -4827,6 +5041,14 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe_lun_occult_when_loc__doc__},
     {"lun_occult_where", (PyCFunction) pyswe_lun_occult_where,
         METH_VARARGS|METH_KEYWORDS, pyswe_lun_occult_where__doc__},
+    {"mooncross", (PyCFunction) pyswe_mooncross,
+        METH_VARARGS|METH_KEYWORDS, pyswe_mooncross__doc__},
+    {"mooncross_node", (PyCFunction) pyswe_mooncross_node,
+        METH_VARARGS|METH_KEYWORDS, pyswe_mooncross_node__doc__},
+    {"mooncross_node_ut", (PyCFunction) pyswe_mooncross_node_ut,
+        METH_VARARGS|METH_KEYWORDS, pyswe_mooncross_node_ut__doc__},
+    {"mooncross_ut", (PyCFunction) pyswe_mooncross_ut,
+        METH_VARARGS|METH_KEYWORDS, pyswe_mooncross_ut__doc__},
     {"nod_aps", (PyCFunction) pyswe_nod_aps,
         METH_VARARGS|METH_KEYWORDS, pyswe_nod_aps__doc__},
     {"nod_aps_ut", (PyCFunction) pyswe_nod_aps_ut,
@@ -4873,6 +5095,10 @@ static struct PyMethodDef pyswe_methods[] = {
         METH_VARARGS|METH_KEYWORDS, pyswe_sol_eclipse_when_loc__doc__},
     {"sol_eclipse_where", (PyCFunction) pyswe_sol_eclipse_where,
         METH_VARARGS|METH_KEYWORDS, pyswe_sol_eclipse_where__doc__},
+    {"solcross", (PyCFunction) pyswe_solcross,
+        METH_VARARGS|METH_KEYWORDS, pyswe_solcross__doc__},
+    {"solcross_ut", (PyCFunction) pyswe_solcross_ut,
+        METH_VARARGS|METH_KEYWORDS, pyswe_solcross_ut__doc__},
     {"split_deg", (PyCFunction) pyswe_split_deg,
         METH_VARARGS|METH_KEYWORDS, pyswe_split_deg__doc__},
     {"time_equ", (PyCFunction) pyswe_time_equ,
