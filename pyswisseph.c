@@ -76,6 +76,68 @@
 #define PyModule_AddFloatConstant(m, nam, d) \
         PyModule_AddObject(m, nam, Py_BuildValue("d", d))
 
+/* Helper functions */
+
+/* Take a sequence and extract double
+ * Return > 0 on error
+ * Return > 3 if an exception is already raised
+ */
+int py_seq2d(PyObject* seq, int len, double* res, char err[128])
+{
+    int i;
+    PyObject* o;
+    /* check it is a sequence */
+    if (!PySequence_Check(seq)) {
+        strncpy(err, "is not a sequence object", 128);
+        return 1;
+    }
+    /* check sequence length */
+    if (PySequence_Length(seq) != len) {
+        snprintf(err, 128, "is not a sequence of size %d", len);
+        return 2;
+    }
+    /* check there are numbers */
+    for (i = 0; i < len; ++i) {
+        o = PySequence_ITEM(seq, i);
+        if (!PyNumber_Check(o)) {
+            snprintf(err, 128, "item %d is not a number", i);
+            Py_DECREF(o);
+            return 3;
+        }
+        /* extract number */
+        if (PyFloat_Check(o)) {
+            res[i] = PyFloat_AsDouble(o);
+            if (res[i] == -1 && PyErr_Occurred()) {
+                Py_DECREF(o);
+                return 4;
+            }
+        }
+#if PY_MAJOR_VERSION < 3
+        else if (PyInt_Check(o)) {
+            res[i] = (double) PyInt_AsLong(o);
+            if (res[i] == -1 && PyErr_Occurred()) {
+                Py_DECREF(o);
+                return 4;
+            }
+        }
+#endif
+        else if (PyLong_Check(o)) {
+            res[i] = PyLong_AsDouble(o);
+            if (res[i] == -1 && PyErr_Occurred()) {
+                Py_DECREF(o);
+                return 4;
+            }
+        }
+        else { /* not an int or a float */
+            snprintf(err, 128, "item %d must be a float or int", i);
+            Py_DECREF(o);
+            return 3;
+        }
+        Py_DECREF(o);
+    }
+    return 0;
+}
+
 /* swisseph.Error (module exception type) */
 static PyObject * pyswe_Error;
 
@@ -653,157 +715,197 @@ static PyObject * pyswe_difrad2n FUNCARGS_KEYWDS
 /* swisseph.fixstar */
 PyDoc_STRVAR(pyswe_fixstar__doc__,
 "Calculate fixed star positions (ET).\n\n"
-"Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float, returned star name, and returned flags\n\n"
-"Usage example:\n\n"
-"\tres, stnam, flg = swisseph.fixstar(st, jd)");
+"Args: str star, float tjdet, int flags=FLG_SWIEPH\n"
+"Return: ((float x1, x2, x3, x4, x5, x6), str stnam, int retflags)\n\n"
+" - star: name of fixed star to search for\n"
+" - tjdet: Julian day in Ephemeris Time\n"
+" - flags: bit flags indicating what kind of computation is wanted\n"
+" - x1, x2, x3, x4, x5, x6: results\n"
+" - stnam: returned star name\n"
+" - retflags: bit flags indicating what kind of computation was done\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_fixstar FUNCARGS_KEYWDS
 {
-    char *star, st[(SE_MAX_STNAME*2)+1], err[256];
-    double jd, val[6];
+    char *star, st[(SE_MAX_STNAME*2)+1], err[256] = {0};
+    double jd, xx[6];
     int ret, flag = SEFLG_SWIEPH;
-    static char *kwlist[] = {"star", "julday", "flag", NULL};
+    static char *kwlist[] = {"star", "tjdet", "flags", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
         &star, &jd, &flag))
         return NULL;
     memset(st, 0, (SE_MAX_STNAME*2)+1);
     strncpy(st, star, SE_MAX_STNAME*2);
-    ret = swe_fixstar(st, jd, flag, val, err);
+    ret = swe_fixstar(st, jd, flag, xx, err);
     if (ret < 0) {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(dddddd)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
+    return Py_BuildValue("(dddddd)si",xx[0],xx[1],xx[2],xx[3],xx[4],xx[5],st,ret);
 }
 
 /* swisseph.fixstar2 */
 PyDoc_STRVAR(pyswe_fixstar2__doc__,
-"Calculate fixed star positions (fast) (ET).\n\n"
-"Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float, returned star name, and returned flags\n\n"
-"Usage example:\n\n"
-"\tres, stnam, flg = swisseph.fixstar2(st, jd)");
+"Calculate fixed star positions (faster version) (ET).\n\n"
+"Args: str star, float tjdet, int flags=FLG_SWIEPH\n"
+"Return: ((float x1, x2, x3, x4, x5, x6), str stnam, int retflags)\n\n"
+" - star: name of fixed star to search for\n"
+" - tjdet: Julian day in Ephemeris Time\n"
+" - flags: bit flags indicating what kind of computation is wanted\n"
+" - x1, x2, x3, x4, x5, x6: results\n"
+" - stnam: returned star name\n"
+" - retflags: bit flags indicating what kind of computation was done\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_fixstar2 FUNCARGS_KEYWDS
 {
-    char *star, st[(SE_MAX_STNAME*2)+1], err[256];
-    double jd, val[6];
+    char *star, st[(SE_MAX_STNAME*2)+1], err[256] = {0};
+    double jd, xx[6];
     int ret, flag = SEFLG_SWIEPH;
-    static char *kwlist[] = {"star", "julday", "flag", NULL};
+    static char *kwlist[] = {"star", "tjdet", "flags", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
         &star, &jd, &flag))
         return NULL;
     memset(st, 0, (SE_MAX_STNAME*2)+1);
     strncpy(st, star, SE_MAX_STNAME*2);
-    ret = swe_fixstar2(st, jd, flag, val, err);
+    ret = swe_fixstar2(st, jd, flag, xx, err);
     if (ret < 0) {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(dddddd)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
+    return Py_BuildValue("(dddddd)si",xx[0],xx[1],xx[2],xx[3],xx[4],xx[5],st,ret);
 }
 
 /* swisseph.fixstar2_mag */
 PyDoc_STRVAR(pyswe_fixstar2_mag__doc__,
-"Get fixed star magnitude (fast).\n\n"
+"Get fixed star magnitude (faster version).\n\n"
 "Args: str star\n"
-"Return: float");
+"Return: float mag, str stnam\n\n"
+" - star: name of fixed star\n"
+" - mag: returned magnitude\n"
+" - stnam: returned star name\n\n"
+"Strictly speaking, the magnitudes returned by this function are valid for the"
+" year 2000 only. Variations in brightness due to the starÕs variability or"
+" due to the increase or decrease of the star's distance cannot be taken into"
+" account. With stars of constant absolute magnitude, the change in brightness"
+" can be ignored for the historical period. Eg. the current magnitude of"
+" Sirius is -1.46. In 3000 BCE it was -1.44.\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_fixstar2_mag FUNCARGS_KEYWDS
 {
-    char *star, st[41], err[256];
+    char *star, st[(SE_MAX_STNAME*2)+1], err[256] = {0};
     int ret;
     double mag;
     static char *kwlist[] = {"star", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &star))
         return NULL;
-    memset(st, 0, 41);
-    strncpy(st, star, 40);
+    memset(st, 0, (SE_MAX_STNAME*2)+1);
+    strncpy(st, star, SE_MAX_STNAME*2);
     ret = swe_fixstar2_mag(st, &mag, err);
     if (ret < 0) {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("d", mag);
+    return Py_BuildValue("ds", mag, st);
 }
 
 /* swisseph.fixstar2_ut */
 PyDoc_STRVAR(pyswe_fixstar2_ut__doc__,
-"Calculate fixed star positions (fast) (UT).\n\n"
-"Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float, returned star name, and returned flags\n\n"
-"Usage example:\n\n"
-"\tres, stnam, flg = swisseph.fixstar2_ut(st, jd)");
+"Calculate fixed star positions (faster version) (UT).\n\n"
+"Args: str star, float tjdut, int flags=FLG_SWIEPH\n"
+"Return: ((float x1, x2, x3, x4, x5, x6), str stnam, int retflags)\n\n"
+" - star: name of fixed star to search for\n"
+" - tjdut: Julian day in Universal Time\n"
+" - flags: bit flags indicating what kind of computation is wanted\n"
+" - x1, x2, x3, x4, x5, x6: results\n"
+" - stnam: returned star name\n"
+" - retflags: bit flags indicating what kind of computation was done\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_fixstar2_ut FUNCARGS_KEYWDS
 {
-    char *star, st[(SE_MAX_STNAME*2)+1], err[256];
-    double jd, val[6];
+    char *star, st[(SE_MAX_STNAME*2)+1], err[256] = {0};
+    double jd, xx[6];
     int ret, flag = SEFLG_SWIEPH;
-    static char *kwlist[] = {"star", "julday", "flag", NULL};
+    static char *kwlist[] = {"star", "tjdut", "flags", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
         &star, &jd, &flag))
         return NULL;
     memset(st, 0, (SE_MAX_STNAME*2)+1);
     strncpy(st, star, SE_MAX_STNAME*2);
-    ret = swe_fixstar2_ut(st, jd, flag, val, err);
+    ret = swe_fixstar2_ut(st, jd, flag, xx, err);
     if (ret < 0) {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(dddddd)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
+    return Py_BuildValue("(dddddd)si",xx[0],xx[1],xx[2],xx[3],xx[4],xx[5],st,ret);
 }
 
 /* swisseph.fixstar_mag */
 PyDoc_STRVAR(pyswe_fixstar_mag__doc__,
 "Get fixed star magnitude.\n\n"
 "Args: str star\n"
-"Return: float");
+"Return: float mag, str stnam\n\n"
+" - star: name of fixed star\n"
+" - mag: returned magnitude\n"
+" - stnam: returned star name\n\n"
+"Strictly speaking, the magnitudes returned by this function are valid for the"
+" year 2000 only. Variations in brightness due to the starÕs variability or"
+" due to the increase or decrease of the star's distance cannot be taken into"
+" account. With stars of constant absolute magnitude, the change in brightness"
+" can be ignored for the historical period. Eg. the current magnitude of"
+" Sirius is -1.46. In 3000 BCE it was -1.44.\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_fixstar_mag FUNCARGS_KEYWDS
 {
-    char *star, st[41], err[256];
+    char *star, st[(SE_MAX_STNAME*2)+1], err[256] = {0};
     int ret;
     double mag;
     static char *kwlist[] = {"star", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &star))
         return NULL;
-    memset(st, 0, 41);
-    strncpy(st, star, 40);
+    memset(st, 0, (SE_MAX_STNAME*2)+1);
+    strncpy(st, star, SE_MAX_STNAME*2);
     ret = swe_fixstar_mag(st, &mag, err);
     if (ret < 0) {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("d", mag);
+    return Py_BuildValue("ds", mag, st);
 }
 
 /* swisseph.fixstar_ut */
 PyDoc_STRVAR(pyswe_fixstar_ut__doc__,
 "Calculate fixed star positions (UT).\n\n"
-"Args: str star, float julday, int flag=FLG_SWIEPH\n"
-"Return: tuple of 6 float, returned star name, and returned flags\n\n"
-"Usage example:\n\n"
-"\tres, stnam, flg = swisseph.fixstar_ut(st, jd)");
+"Args: str star, float tjdut, int flags=FLG_SWIEPH\n"
+"Return: ((float x1, x2, x3, x4, x5, x6), str stnam, int retflags)\n\n"
+" - star: name of fixed star to search for\n"
+" - tjdut: Julian day in Universal Time\n"
+" - flags: bit flags indicating what kind of computation is wanted\n"
+" - x1, x2, x3, x4, x5, x6: results\n"
+" - stnam: returned star name\n"
+" - retflags: bit flags indicating what kind of computation was done\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_fixstar_ut FUNCARGS_KEYWDS
 {
-    char *star, st[(SE_MAX_STNAME*2)+1], err[256];
-    double jd, val[6];
+    char *star, st[(SE_MAX_STNAME*2)+1], err[256] = {0};
+    double jd, xx[6];
     int ret, flag = SEFLG_SWIEPH;
-    static char *kwlist[] = {"star", "julday", "flag", NULL};
+    static char *kwlist[] = {"star", "tjdut", "flags", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
         &star, &jd, &flag))
         return NULL;
     memset(st, 0, (SE_MAX_STNAME*2)+1);
     strncpy(st, star, SE_MAX_STNAME*2);
-    ret = swe_fixstar_ut(st, jd, flag, val, err);
+    ret = swe_fixstar_ut(st, jd, flag, xx, err);
     if (ret < 0) {
         PyErr_SetString(pyswe_Error, err);
         return NULL;
     }
-    return Py_BuildValue("(dddddd)si",val[0],val[1],val[2],val[3],val[4],val[5],st,ret);
+    return Py_BuildValue("(dddddd)si",xx[0],xx[1],xx[2],xx[3],xx[4],xx[5],st,ret);
 }
 
 /* swisseph.gauquelin_sector */
@@ -995,266 +1097,44 @@ PyDoc_STRVAR(pyswe_heliacal_pheno_ut__doc__,
 static PyObject * pyswe_heliacal_pheno_ut FUNCARGS_KEYWDS
 {
     double jdstart, geopos[3], atmo[4], observ[6], dret[50];
-    char serr[255], *obj = 0; /* dummy assign */
+    char serr[256] = {0}, *obj;
     int i, evnt, flg;
-    PyObject *o1=0, *o2=0, *o3=0, *o4, *o5, *o6, *o7, *o8, *o9;
+    PyObject *o1, *o2, *o3;
     memset(dret, 0, sizeof(double) * 50);
     static char *kwlist[] = {"jd_start", "geopos", "atmo", "observer", "object",
         "eventtype", "helflag", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOOOsii", kwlist,
         &jdstart, &o1, &o2, &o3, &obj, &evnt, &flg))
         return NULL;
-    if (!PySequence_Check(o1) || PySequence_Length(o1) != 3) {
-        PyErr_SetString(pyswe_Error, "Invalid geopos sequence");
+    /* extract geopos sequence */
+    i = py_seq2d(o1, 3, geopos, serr);
+    if (i > 3)
         return NULL;
-    }
-    else {
-        o4 = PySequence_ITEM(o1, 0);
-        o5 = PySequence_ITEM(o1, 1);
-        o6 = PySequence_ITEM(o1, 2);
-        if (!PyNumber_Check(o4) || !PyNumber_Check(o5) || !PyNumber_Check(o6)) {
-            PyErr_SetString(pyswe_Error, "Invalid geopos value type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-            return NULL;
-        }
-        /* checking longitude */
-        if (PyFloat_Check(o4))
-            geopos[0] = PyFloat_AsDouble(o4);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-            geopos[0] = (double) PyInt_AsLong(o4);
-#endif
-        else if (PyLong_Check(o4))
-            geopos[0] = (double) PyLong_AsLong(o4);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid longitude type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-            return NULL;
-        }
-        /* checking latitude */
-        if (PyFloat_Check(o5))
-            geopos[1] = PyFloat_AsDouble(o5);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-            geopos[1] = (double) PyInt_AsLong(o5);
-#endif
-        else if (PyLong_Check(o5))
-            geopos[1] = (double) PyLong_AsLong(o5);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid latitude type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-            return NULL;
-        }
-        /* checking altitude */
-        if (PyFloat_Check(o6))
-            geopos[2] = PyFloat_AsDouble(o6);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-            geopos[2] = (double) PyInt_AsLong(o6);
-#endif
-        else if (PyLong_Check(o6))
-            geopos[2] = (double) PyLong_AsLong(o6);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid altitude type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-            return NULL;
-        }
-        Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-    }
-    if (!PySequence_Check(o2) || PySequence_Length(o2) != 4) {
-        PyErr_SetString(pyswe_Error, "Invalid atmospheric sequence");
+    if (i > 0)
+        return PyErr_Format(pyswe_Error, "heliacal_pheno_ut: geopos: %s", serr);
+    /* extract atmospheric sequence */
+    i = py_seq2d(o2, 4, atmo, serr);
+    if (i > 3)
         return NULL;
-    }
-    else {
-        o4 = PySequence_ITEM(o2, 0);
-        o5 = PySequence_ITEM(o2, 1);
-        o6 = PySequence_ITEM(o2, 2);
-        o7 = PySequence_ITEM(o2, 3);
-        if (!PyNumber_Check(o4) || !PyNumber_Check(o5) || !PyNumber_Check(o6)
-            || !PyNumber_Check(o7)) {
-            PyErr_SetString(pyswe_Error, "Invalid atmospheric value type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-        /* atmospheric pressure */
-        if (PyFloat_Check(o4))
-            atmo[0] = PyFloat_AsDouble(o4);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o4))
-            atmo[0] = (double) PyInt_AsLong(o4);
-#endif
-        else if (PyLong_Check(o4))
-            atmo[0] = (double) PyLong_AsLong(o4);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid atmospheric pressure");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-        /* atmospheric temperature */
-        if (PyFloat_Check(o5))
-            atmo[1] = PyFloat_AsDouble(o5);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-            atmo[1] = (double) PyInt_AsLong(o5);
-#endif
-        else if (PyLong_Check(o5))
-            atmo[1] = (double) PyLong_AsLong(o5);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid atmospheric temperature");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-        /* humidity */
-        if (PyFloat_Check(o6))
-            atmo[2] = PyFloat_AsDouble(o6);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o6))
-            atmo[2] = (double) PyInt_AsLong(o6);
-#endif
-        else if (PyLong_Check(o6))
-            atmo[2] = (double) PyLong_AsLong(o6);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid humidity");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-        /* meteorological range */
-        if (PyFloat_Check(o7))
-            atmo[3] = PyFloat_AsDouble(o7);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o7))
-            atmo[3] = (double) PyInt_AsLong(o7);
-#endif
-        else if (PyLong_Check(o7))
-            atmo[3] = (double) PyLong_AsLong(o7);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid meteorological range");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-        Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-    }
-    if (!PySequence_Check(o3) || PySequence_Length(o3) != 6) {
-        PyErr_SetString(pyswe_Error, "Invalid observer sequence");
+    if (i > 0)
+        return PyErr_Format(pyswe_Error, "heliacal_pheno_ut: atmo: %s", serr);
+    /* extract observer sequence */
+    i = py_seq2d(o3, 6, observ, serr);
+    if (i > 3)
         return NULL;
-    }
-    else {
-        o4 = PySequence_ITEM(o3, 0);
-        o5 = PySequence_ITEM(o3, 1);
-        o6 = PySequence_ITEM(o3, 2);
-        o7 = PySequence_ITEM(o3, 3);
-        o8 = PySequence_ITEM(o3, 4);
-        o9 = PySequence_ITEM(o3, 5);
-        if (!PyNumber_Check(o4) || !PyNumber_Check(o5) || !PyNumber_Check(o6)
-            || !PyNumber_Check(o7) || !PyNumber_Check(o8) || !PyNumber_Check(o9)) {
-            PyErr_SetString(pyswe_Error, "Invalid observer value type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* observer age */
-        if (PyFloat_Check(o4))
-            observ[0] = PyFloat_AsDouble(o4);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o4))
-            observ[0] = (double) PyInt_AsLong(o4);
-#endif
-        else if (PyLong_Check(o4))
-            observ[0] = (double) PyLong_AsLong(o4);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid observer age");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* snellen ratio */
-        if (PyFloat_Check(o5))
-            observ[1] = PyFloat_AsDouble(o5);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-            observ[1] = (double) PyInt_AsLong(o5);
-#endif
-        else if (PyLong_Check(o5))
-            observ[1] = (double) PyLong_AsLong(o5);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid snellen ratio");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* mono/binocular */
-        if (PyFloat_Check(o6))
-            observ[2] = PyFloat_AsDouble(o6);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o6))
-            observ[2] = (double) PyInt_AsLong(o6);
-#endif
-        else if (PyLong_Check(o6))
-            observ[2] = (double) PyLong_AsLong(o6);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid telescope");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* telescope magnification */
-        if (PyFloat_Check(o7))
-            observ[3] = PyFloat_AsDouble(o7);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o7))
-            observ[3] = (double) PyInt_AsLong(o7);
-#endif
-        else if (PyLong_Check(o7))
-            observ[3] = (double) PyLong_AsLong(o7);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid telescope magnification");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* optical aperture */
-        if (PyFloat_Check(o8))
-            observ[4] = PyFloat_AsDouble(o8);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o8))
-            observ[4] = (double) PyInt_AsLong(o8);
-#endif
-        else if (PyLong_Check(o8))
-            observ[4] = (double) PyLong_AsLong(o8);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid telescope aperture");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* optical transmission */
-        if (PyFloat_Check(o9))
-            observ[5] = PyFloat_AsDouble(o9);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o9))
-            observ[5] = (double) PyInt_AsLong(o9);
-#endif
-        else if (PyLong_Check(o9))
-            observ[5] = (double) PyLong_AsLong(o9);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid telescope aperture");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-        Py_DECREF(o8); Py_DECREF(o9);
-    }
+    if (i > 0)
+        return PyErr_Format(pyswe_Error, "heliacal_pheno_ut: observer: %s", serr);
     i = swe_heliacal_pheno_ut(jdstart, geopos, atmo, observ, obj, evnt, flg, dret, serr);
     if (i == 0)
         return Py_BuildValue("dddddddddddddddddddddddddddddddddddddddddddddddddd",
-            dret[0],dret[1],dret[2],dret[3],dret[4],dret[5],dret[6],dret[7],dret[8],dret[9],
-            dret[10],dret[11],dret[12],dret[13],dret[14],dret[15],dret[16],dret[17],dret[18],dret[19],
-            dret[20],dret[21],dret[22],dret[23],dret[24],dret[25],dret[26],dret[27],dret[28],dret[29],
-            dret[30],dret[31],dret[32],dret[33],dret[34],dret[35],dret[36],dret[37],dret[38],dret[39],
-            dret[40],dret[41],dret[42],dret[43],dret[44],dret[45],dret[46],dret[47],dret[48],dret[49]);
-    PyErr_SetString(pyswe_Error, serr);
-    return NULL;
+        dret[0],dret[1],dret[2],dret[3],dret[4],dret[5],dret[6],dret[7],dret[8],
+        dret[9],dret[10],dret[11],dret[12],dret[13],dret[14],dret[15],dret[16],
+        dret[17],dret[18],dret[19],dret[20],dret[21],dret[22],dret[23],dret[24],
+        dret[25],dret[26],dret[27],dret[28],dret[29],dret[30],dret[31],dret[32],
+        dret[33],dret[34],dret[35],dret[36],dret[37],dret[38],dret[39],dret[40],
+        dret[41],dret[42],dret[43],dret[44],dret[45],dret[46],dret[47],dret[48],
+        dret[49]);
+    return PyErr_Format(pyswe_Error, "heliacal_pheno_ut: %s", serr);
 }
 
 /* swisseph.heliacal_ut */
@@ -1268,261 +1148,36 @@ PyDoc_STRVAR(pyswe_heliacal_ut__doc__,
 static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
 {
     double jdstart, geopos[3], atmo[4], observ[6], dret[3];
-    char serr[255], *obj = 0; /* dummy assign */
+    char serr[256] = {0}, *obj;
     int i, evnt, flg;
-    PyObject *o1=0, *o2=0, *o3=0, *o4, *o5, *o6, *o7, *o8, *o9;
+    PyObject *o1, *o2, *o3;
     static char *kwlist[] = {"jd_start", "geopos", "atmo", "observer", "object",
         "eventtype", "helflag", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOOOsii", kwlist,
         &jdstart, &o1, &o2, &o3, &obj, &evnt, &flg))
         return NULL;
-    if (!PySequence_Check(o1) || PySequence_Length(o1) != 3) {
-        PyErr_SetString(pyswe_Error, "Invalid geopos sequence");
+    /* extract geopos sequence */
+    i = py_seq2d(o1, 3, geopos, serr);
+    if (i > 3)
         return NULL;
-    }
-    else {
-        o4 = PySequence_ITEM(o1, 0);
-        o5 = PySequence_ITEM(o1, 1);
-        o6 = PySequence_ITEM(o1, 2);
-        if (!PyNumber_Check(o4) || !PyNumber_Check(o5) || !PyNumber_Check(o6)) {
-            PyErr_SetString(pyswe_Error, "Invalid geopos value type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-            return NULL;
-        }
-        /* checking longitude */
-        if (PyFloat_Check(o4))
-            geopos[0] = PyFloat_AsDouble(o4);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-            geopos[0] = (double) PyInt_AsLong(o4);
-#endif
-        else if (PyLong_Check(o4))
-            geopos[0] = (double) PyLong_AsLong(o4);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid longitude type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-            return NULL;
-        }
-        /* checking latitude */
-        if (PyFloat_Check(o5))
-            geopos[1] = PyFloat_AsDouble(o5);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-            geopos[1] = (double) PyInt_AsLong(o5);
-#endif
-        else if (PyLong_Check(o5))
-            geopos[1] = (double) PyLong_AsLong(o5);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid latitude type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-            return NULL;
-        }
-        /* checking altitude */
-        if (PyFloat_Check(o6))
-            geopos[2] = PyFloat_AsDouble(o6);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-            geopos[2] = (double) PyInt_AsLong(o6);
-#endif
-        else if (PyLong_Check(o6))
-            geopos[2] = (double) PyLong_AsLong(o6);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid altitude type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-            return NULL;
-        }
-        Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-    }
-    if (!PySequence_Check(o2) || PySequence_Length(o2) != 4) {
-        PyErr_SetString(pyswe_Error, "Invalid atmospheric sequence");
+    if (i > 0)
+        return PyErr_Format(pyswe_Error, "heliacal_ut: geopos: %s", serr);
+    /* extract atmospheric sequence */
+    i = py_seq2d(o2, 4, atmo, serr);
+    if (i > 3)
         return NULL;
-    }
-    else {
-        o4 = PySequence_ITEM(o2, 0);
-        o5 = PySequence_ITEM(o2, 1);
-        o6 = PySequence_ITEM(o2, 2);
-        o7 = PySequence_ITEM(o2, 3);
-        if (!PyNumber_Check(o4) || !PyNumber_Check(o5) || !PyNumber_Check(o6)
-            || !PyNumber_Check(o7)) {
-            PyErr_SetString(pyswe_Error, "Invalid atmospheric value type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-        /* atmospheric pressure */
-        if (PyFloat_Check(o4))
-            atmo[0] = PyFloat_AsDouble(o4);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o4))
-            atmo[0] = (double) PyInt_AsLong(o4);
-#endif
-        else if (PyLong_Check(o4))
-            atmo[0] = (double) PyLong_AsLong(o4);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid atmospheric pressure");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-        /* atmospheric temperature */
-        if (PyFloat_Check(o5))
-            atmo[1] = PyFloat_AsDouble(o5);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-            atmo[1] = (double) PyInt_AsLong(o5);
-#endif
-        else if (PyLong_Check(o5))
-            atmo[1] = (double) PyLong_AsLong(o5);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid atmospheric temperature");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-        /* humidity */
-        if (PyFloat_Check(o6))
-            atmo[2] = PyFloat_AsDouble(o6);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o6))
-            atmo[2] = (double) PyInt_AsLong(o6);
-#endif
-        else if (PyLong_Check(o6))
-            atmo[2] = (double) PyLong_AsLong(o6);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid humidity");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-        /* meteorological range */
-        if (PyFloat_Check(o7))
-            atmo[3] = PyFloat_AsDouble(o7);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o7))
-            atmo[3] = (double) PyInt_AsLong(o7);
-#endif
-        else if (PyLong_Check(o7))
-            atmo[3] = (double) PyLong_AsLong(o7);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid meteorological range");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-        Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-    }
-
-    if (!PySequence_Check(o3) || PySequence_Length(o3) != 6) {
-        PyErr_SetString(pyswe_Error, "Invalid observer sequence");
+    if (i > 0)
+        return PyErr_Format(pyswe_Error, "heliacal_ut: atmo: %s", serr);
+    /* extract observer sequence */
+    i = py_seq2d(o3, 6, observ, serr);
+    if (i > 3)
         return NULL;
-    }
-    else {
-        o4 = PySequence_ITEM(o3, 0);
-        o5 = PySequence_ITEM(o3, 1);
-        o6 = PySequence_ITEM(o3, 2);
-        o7 = PySequence_ITEM(o3, 3);
-        o8 = PySequence_ITEM(o3, 4);
-        o9 = PySequence_ITEM(o3, 5);
-        if (!PyNumber_Check(o4) || !PyNumber_Check(o5) || !PyNumber_Check(o6)
-            || !PyNumber_Check(o7) || !PyNumber_Check(o8) || !PyNumber_Check(o9)) {
-            PyErr_SetString(pyswe_Error, "Invalid observer value type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* observer age */
-        if (PyFloat_Check(o4))
-            observ[0] = PyFloat_AsDouble(o4);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o4))
-            observ[0] = (double) PyInt_AsLong(o4);
-#endif
-        else if (PyLong_Check(o4))
-            observ[0] = (double) PyLong_AsLong(o4);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid observer age");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* snellen ratio */
-        if (PyFloat_Check(o5))
-            observ[1] = PyFloat_AsDouble(o5);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-            observ[1] = (double) PyInt_AsLong(o5);
-#endif
-        else if (PyLong_Check(o5))
-            observ[1] = (double) PyLong_AsLong(o5);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid snellen ratio");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* mono/binocular */
-        if (PyFloat_Check(o6))
-            observ[2] = PyFloat_AsDouble(o6);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o6))
-            observ[2] = (double) PyInt_AsLong(o6);
-#endif
-        else if (PyLong_Check(o6))
-            observ[2] = (double) PyLong_AsLong(o6);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid telescope");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* telescope magnification */
-        if (PyFloat_Check(o7))
-            observ[3] = PyFloat_AsDouble(o7);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o7))
-            observ[3] = (double) PyInt_AsLong(o7);
-#endif
-        else if (PyLong_Check(o7))
-            observ[3] = (double) PyLong_AsLong(o7);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid telescope magnification");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* optical aperture */
-        if (PyFloat_Check(o8))
-            observ[4] = PyFloat_AsDouble(o8);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o8))
-            observ[4] = (double) PyInt_AsLong(o8);
-#endif
-        else if (PyLong_Check(o8))
-            observ[4] = (double) PyLong_AsLong(o8);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid telescope aperture");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* optical transmission */
-        if (PyFloat_Check(o9))
-            observ[5] = PyFloat_AsDouble(o9);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o9))
-            observ[5] = (double) PyInt_AsLong(o9);
-#endif
-        else if (PyLong_Check(o9))
-            observ[5] = (double) PyLong_AsLong(o9);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid telescope aperture");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-        Py_DECREF(o8); Py_DECREF(o9);
-    }
+    if (i > 0)
+        return PyErr_Format(pyswe_Error, "heliacal_ut: observer: %s", serr);
     i = swe_heliacal_ut(jdstart, geopos, atmo, observ, obj, evnt, flg, dret, serr);
     if (i == 0)
         return Py_BuildValue("ddd", dret[0], dret[1], dret[2]);
-    PyErr_SetString(pyswe_Error, serr);
-    return NULL;
+    return PyErr_Format(pyswe_Error, "heliacal_ut: %s", serr);
 }
 
 /* swisseph.helio_cross */
@@ -2848,261 +2503,36 @@ PyDoc_STRVAR(pyswe_vis_limit_mag__doc__,
 static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
 {
     double jd, geopos[3], atmo[4], observ[6], dres, dret;
-    char serr[255], *obj = 0;
-    int flg;
-    PyObject *o1=0, *o2=0, *o3=0, *o4, *o5, *o6, *o7, *o8, *o9;
+    char serr[256] = {0}, *obj;
+    int flg, i;
+    PyObject *o1, *o2, *o3;
     static char *kwlist[] = {"jd", "geopos", "atmo", "observer", "object",
         "helflag", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOOOsi", kwlist,
         &jd, &o1, &o2, &o3, &obj, &flg))
         return NULL;
-
-    if (!PySequence_Check(o1) || PySequence_Length(o1) != 3) {
-        PyErr_SetString(pyswe_Error, "Invalid geopos sequence");
+    /* extract geopos sequence */
+    i = py_seq2d(o1, 3, geopos, serr);
+    if (i > 3)
         return NULL;
-    }
-    else {
-        o4 = PySequence_ITEM(o1, 0);
-        o5 = PySequence_ITEM(o1, 1);
-        o6 = PySequence_ITEM(o1, 2);
-        if (!PyNumber_Check(o4) || !PyNumber_Check(o5) || !PyNumber_Check(o6)) {
-            PyErr_SetString(pyswe_Error, "Invalid geopos value type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-            return NULL;
-        }
-        /* checking longitude */
-        if (PyFloat_Check(o4))
-            geopos[0] = PyFloat_AsDouble(o4);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-            geopos[0] = (double) PyInt_AsLong(o4);
-#endif
-        else if (PyLong_Check(o4))
-            geopos[0] = (double) PyLong_AsLong(o4);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid longitude type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-            return NULL;
-        }
-        /* checking latitude */
-        if (PyFloat_Check(o5))
-            geopos[1] = PyFloat_AsDouble(o5);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-            geopos[1] = (double) PyInt_AsLong(o5);
-#endif
-        else if (PyLong_Check(o5))
-            geopos[1] = (double) PyLong_AsLong(o5);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid latitude type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-            return NULL;
-        }
-        /* checking altitude */
-        if (PyFloat_Check(o6))
-            geopos[2] = PyFloat_AsDouble(o6);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-            geopos[2] = (double) PyInt_AsLong(o6);
-#endif
-        else if (PyLong_Check(o6))
-            geopos[2] = (double) PyLong_AsLong(o6);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid altitude type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-            return NULL;
-        }
-        Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6);
-    }
-    if (!PySequence_Check(o2) || PySequence_Length(o2) != 4) {
-        PyErr_SetString(pyswe_Error, "Invalid atmospheric sequence");
+    if (i > 0)
+        return PyErr_Format(pyswe_Error, "vis_limit_mag: geopos: %s", serr);
+    /* extract atmo sequence */
+    i = py_seq2d(o2, 4, atmo, serr);
+    if (i > 3)
         return NULL;
-    }
-    else {
-        o4 = PySequence_ITEM(o2, 0);
-        o5 = PySequence_ITEM(o2, 1);
-        o6 = PySequence_ITEM(o2, 2);
-        o7 = PySequence_ITEM(o2, 3);
-        if (!PyNumber_Check(o4) || !PyNumber_Check(o5) || !PyNumber_Check(o6)
-            || !PyNumber_Check(o7)) {
-            PyErr_SetString(pyswe_Error, "Invalid atmospheric value type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-        /* atmospheric pressure */
-        if (PyFloat_Check(o4))
-            atmo[0] = PyFloat_AsDouble(o4);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o4))
-            atmo[0] = (double) PyInt_AsLong(o4);
-#endif
-        else if (PyLong_Check(o4))
-            atmo[0] = (double) PyLong_AsLong(o4);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid atmospheric pressure");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-        /* atmospheric temperature */
-        if (PyFloat_Check(o5))
-            atmo[1] = PyFloat_AsDouble(o5);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-            atmo[1] = (double) PyInt_AsLong(o5);
-#endif
-        else if (PyLong_Check(o5))
-            atmo[1] = (double) PyLong_AsLong(o5);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid atmospheric temperature");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-        /* humidity */
-        if (PyFloat_Check(o6))
-            atmo[2] = PyFloat_AsDouble(o6);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o6))
-            atmo[2] = (double) PyInt_AsLong(o6);
-#endif
-        else if (PyLong_Check(o6))
-            atmo[2] = (double) PyLong_AsLong(o6);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid humidity");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-        /* meteorological range */
-        if (PyFloat_Check(o7))
-            atmo[3] = PyFloat_AsDouble(o7);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o7))
-            atmo[3] = (double) PyInt_AsLong(o7);
-#endif
-        else if (PyLong_Check(o7))
-            atmo[3] = (double) PyLong_AsLong(o7);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid meteorological range");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            return NULL;
-        }
-        Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-    }
-    if (!PySequence_Check(o3) || PySequence_Length(o3) != 6) {
-        PyErr_SetString(pyswe_Error, "Invalid observer sequence");
+    if (i > 0)
+        return PyErr_Format(pyswe_Error, "vis_limit_mag: atmo: %s", serr);
+    /* extract observer sequence */
+    i = py_seq2d(o3, 6, observ, serr);
+    if (i > 3)
         return NULL;
-    }
-    else {
-        o4 = PySequence_ITEM(o3, 0);
-        o5 = PySequence_ITEM(o3, 1);
-        o6 = PySequence_ITEM(o3, 2);
-        o7 = PySequence_ITEM(o3, 3);
-        o8 = PySequence_ITEM(o3, 4);
-        o9 = PySequence_ITEM(o3, 5);
-        if (!PyNumber_Check(o4) || !PyNumber_Check(o5) || !PyNumber_Check(o6)
-            || !PyNumber_Check(o7) || !PyNumber_Check(o8) || !PyNumber_Check(o9)) {
-            PyErr_SetString(pyswe_Error, "Invalid observer value type");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* observer age */
-        if (PyFloat_Check(o4))
-            observ[0] = PyFloat_AsDouble(o4);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o4))
-            observ[0] = (double) PyInt_AsLong(o4);
-#endif
-        else if (PyLong_Check(o4))
-            observ[0] = (double) PyLong_AsLong(o4);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid observer age");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* snellen ratio */
-        if (PyFloat_Check(o5))
-            observ[1] = PyFloat_AsDouble(o5);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o5))
-            observ[1] = (double) PyInt_AsLong(o5);
-#endif
-        else if (PyLong_Check(o5))
-            observ[1] = (double) PyLong_AsLong(o5);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid snellen ratio");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* mono/binocular */
-        if (PyFloat_Check(o6))
-            observ[2] = PyFloat_AsDouble(o6);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o6))
-            observ[2] = (double) PyInt_AsLong(o6);
-#endif
-        else if (PyLong_Check(o6))
-            observ[2] = (double) PyLong_AsLong(o6);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid telescope");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* telescope magnification */
-        if (PyFloat_Check(o7))
-            observ[3] = PyFloat_AsDouble(o7);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o7))
-            observ[3] = (double) PyInt_AsLong(o7);
-#endif
-        else if (PyLong_Check(o7))
-            observ[3] = (double) PyLong_AsLong(o7);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid telescope magnification");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* optical aperture */
-        if (PyFloat_Check(o8))
-            observ[4] = PyFloat_AsDouble(o8);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o8))
-            observ[4] = (double) PyInt_AsLong(o8);
-#endif
-        else if (PyLong_Check(o8))
-            observ[4] = (double) PyLong_AsLong(o8);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid telescope aperture");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        /* optical transmission */
-        if (PyFloat_Check(o9))
-            observ[5] = PyFloat_AsDouble(o9);
-#if PY_MAJOR_VERSION < 3
-        else if (PyInt_Check(o9))
-            observ[5] = (double) PyInt_AsLong(o9);
-#endif
-        else if (PyLong_Check(o9))
-            observ[5] = (double) PyLong_AsLong(o9);
-        else {
-            PyErr_SetString(pyswe_Error, "Invalid telescope aperture");
-            Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-            Py_DECREF(o8); Py_DECREF(o9);
-            return NULL;
-        }
-        Py_DECREF(o4); Py_DECREF(o5); Py_DECREF(o6); Py_DECREF(o7);
-        Py_DECREF(o8); Py_DECREF(o9);
-    }
+    if (i > 0)
+        return PyErr_Format(pyswe_Error, "vis_limit_mag: observer: %s", serr);
     dres = swe_vis_limit_mag(jd, geopos, atmo, observ, obj, flg, &dret, serr);
     if (dres != -1)
         return Py_BuildValue("dd", dres, dret);
-    PyErr_SetString(pyswe_Error, serr);
-    return NULL;
+    return PyErr_Format(pyswe_Error, "vis_limit_mag: %s", serr);
 }
 
 #if PYSWE_USE_SWEPHELP /* Pyswisseph contrib submodule */
