@@ -970,13 +970,23 @@ static PyObject * pyswe_gauquelin_sector FUNCARGS_KEYWDS
 /* swisseph.get_ayanamsa */
 PyDoc_STRVAR(pyswe_get_ayanamsa__doc__,
 "Calculate ayanamsa (ET).\n\n"
-"Args: float julday\n"
-"Return: float");
+"Args: float tjdet\n"
+"Return: float ayanamsa\n\n"
+" - tjdet: input time, Julian day number, Ephemeris Time\n"
+" - ayanamsa: ayanamsa value, without nutation\n\n"
+"Ayanamsha without nutation may be useful in historical research, where the"
+" focus usually is on the mere precessional component of the ayanamsha.\n"
+"You have to set the sidereal mode with set_sid_mode(), unless you want the"
+" default sidereal mode, which is the Fagan/Bradley ayanamsha.\n"
+"It is not recommended to use the ayanamsha functions for calculating sidereal"
+" planetary positions from tropical positions, since this could lead to"
+" complicated confusions. For sidereal planets, use calc_ut() or calc() with"
+" the flag FLG_SIDEREAL.");
 
 static PyObject * pyswe_get_ayanamsa FUNCARGS_KEYWDS
 {
     double jd, ret;
-    static char *kwlist[] = {"julday", NULL};
+    static char *kwlist[] = {"tjdet", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
         return NULL;
     ret = swe_get_ayanamsa(jd);
