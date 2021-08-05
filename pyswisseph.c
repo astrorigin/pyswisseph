@@ -997,7 +997,8 @@ static PyObject * pyswe_get_ayanamsa FUNCARGS_KEYWDS
 PyDoc_STRVAR(pyswe_get_ayanamsa_name__doc__,
 "Get ayanamsa name from sidereal mode constant.\n\n"
 "Args: int sidmode\n"
-"Return: str");
+"Return: str name\n\n"
+"If sidmode is not found (incorrect), returned string is empty.");
 
 static PyObject * pyswe_get_ayanamsa_name FUNCARGS_KEYWDS
 {
@@ -1007,7 +1008,7 @@ static PyObject * pyswe_get_ayanamsa_name FUNCARGS_KEYWDS
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &mode))
         return NULL;
     name = (char*) swe_get_ayanamsa_name(mode);
-    return Py_BuildValue("s", name);
+    return Py_BuildValue("s", name ? name : "");
 }
 
 /* swisseph.get_ayanamsa_ut */
