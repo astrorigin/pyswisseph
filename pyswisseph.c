@@ -911,20 +911,37 @@ static PyObject * pyswe_fixstar_ut FUNCARGS_KEYWDS
 /* swisseph.gauquelin_sector */
 PyDoc_STRVAR(pyswe_gauquelin_sector__doc__,
 "Calculate Gauquelin sector position of a body (UT).\n\n"
-"Args: float julday, int or str body, float lon, float lat, float alt,"
-" float press=0, float temp=0, int method=0, int flag=FLG_SWIEPH\n"
-"Return: float");
+"Args: float tjdut, int or str body, float lon, float lat, float alt,"
+" int method, float press=0, float temp=0, int flags=FLG_SWIEPH|FLG_TOPOCTR\n"
+"Return: float sector\n\n"
+" - tjdut: input time, Julian day number, Universal Time\n"
+" - body: planet number or fixed star name\n"
+" - lon: geographical longitude\n"
+" - lat: geographical latitude\n"
+" - alt: geographical altitude\n"
+" - method: number indicating which computation method is wanted:\n"
+"    - 0 with latitude\n"
+"    - 1 without latitude\n"
+"    - 2 from rising and setting times of the disc center of planet\n"
+"    - 3 from rising and setting times of disc center, incl. refraction\n"
+"    - 4 from rising and setting times of the disk edge of planet\n"
+"    - 5 from rising and setting times of disk edge, incl. refraction\n"
+" - press: atmospheric pressure (if 0, the default 1013.25 mbar is used)\n"
+" - temp: atmospheric temperature in degrees Celsius\n"
+" - flags: bit flags for ephemeris and FLG_TOPOCTR\n"
+" - sector: [1;37[. Gauquelin sectors are numbered in clockwise direction.\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_gauquelin_sector FUNCARGS_KEYWDS
 {
     double jd, geopos[3], res, ret, press = 0.0, temp = 0.0;
-    int plt = 0, flag = SEFLG_SWIEPH, method = 0;
-    char *star = "", err[256];
+    int plt = 0, flag = SEFLG_SWIEPH|SEFLG_TOPOCTR, method;
+    char *star = "", err[256] = {0};
     PyObject *body;
-    static char *kwlist[] = {"julday", "body", "lon", "lat", "alt", "press",
-        "temp", "method", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOddd|ddii", kwlist,
-        &jd, &body, &geopos[0], &geopos[1], &geopos[2], &press, &temp, &method,
+    static char *kwlist[] = {"tjdut", "body", "lon", "lat", "alt", "method",
+        "press", "temp", "flags", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOdddi|ddi", kwlist,
+        &jd, &body, &geopos[0], &geopos[1], &geopos[2], &method, &press, &temp,
         &flag))
         return NULL;
     if (PyLong_CheckExact(body)) /* long -> planet */
@@ -940,15 +957,13 @@ static PyObject * pyswe_gauquelin_sector FUNCARGS_KEYWDS
 #endif
     else {
         PyErr_SetString(pyswe_Error,
-            "swisseph.gauquelin_sector: Invalid body type");
+            "swisseph.gauquelin_sector: invalid body type");
         return NULL;
     }
     res = swe_gauquelin_sector(jd, plt, star, flag, method, geopos, press,
         temp, &ret, err);
-    if (res < 0) {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
+    if (res < 0)
+        return PyErr_Format(pyswe_Error, "swisseph.gauquelin_sector: %s", err);
     return Py_BuildValue("d", ret);
 }
 
