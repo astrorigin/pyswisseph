@@ -1034,7 +1034,23 @@ static PyObject * pyswe_get_ayanamsa_ut FUNCARGS_KEYWDS
 PyDoc_STRVAR(pyswe_get_current_file_data__doc__,
 "Find start and end date of an se1 ephemeris file after a function call.\n\n"
 "Args: int fno\n"
-"Return: str path or None, float start, float end, int denum");
+"Return: str path, float start, float end, int denum\n\n"
+" - fno: an integer indicating what type of file is searched:\n"
+"    - 0: planet file sepl_xxx, used for Sun etc, or jpl file\n"
+"    - 1: moon file semo_xxx\n"
+"    - 2: main asteroid file seas_xxx, if such an object was computed\n"
+"    - 3: other asteroid or planetary moon file, if such object was computed\n"
+"    - 4: star file\n"
+" - path: full file path, or empty string if no data\n"
+" - start: start date of file\n"
+" - end: end date of file\n"
+" - denum: jpl ephemeris number 406 or 431 from which file was derived\n\n"
+"This can be used to find out the start and end date of an *se1 ephemeris file"
+" after a call of swe_calc().\n"
+"The function returns data from internal file structures sweph.fidat used in"
+" the last call to swe_calc() or swe_fixstar(). Data returned are (currently)"
+" 0 with JPL files and fixed star files. Thus, the function is only useful for"
+" ephemerides of planets or asteroids that are based on *.se1 files.");
 
 static PyObject * pyswe_get_current_file_data FUNCARGS_KEYWDS
 {
@@ -1045,7 +1061,7 @@ static PyObject * pyswe_get_current_file_data FUNCARGS_KEYWDS
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &fno))
         return NULL;
     path = (char*) swe_get_current_file_data(fno, &start, &end, &denum);
-    return Py_BuildValue("sddi", path, start, end, denum);
+    return Py_BuildValue("sddi", path ? path : "", start, end, denum);
 }
 
 /* swisseph.get_library_path */
