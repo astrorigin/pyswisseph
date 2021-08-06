@@ -1014,13 +1014,16 @@ static PyObject * pyswe_get_ayanamsa_name FUNCARGS_KEYWDS
 /* swisseph.get_ayanamsa_ut */
 PyDoc_STRVAR(pyswe_get_ayanamsa_ut__doc__,
 "Calculate ayanamsa (UT).\n\n"
-"Args: float julday\n"
-"Return: float");
+"Args: float tjdut\n"
+"Return: float ayanamsa\n\n"
+" - tjdut: input time, Julian day number, Universal Time\n"
+" - ayanamsa: ayanamsa value, without nutation\n\n"
+"See get_ayanamsa() for more info.");
 
 static PyObject * pyswe_get_ayanamsa_ut FUNCARGS_KEYWDS
 {
     double jd, ret;
-    static char *kwlist[] = {"julday", NULL};
+    static char *kwlist[] = {"tjdut", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
         return NULL;
     ret = swe_get_ayanamsa_ut(jd);
