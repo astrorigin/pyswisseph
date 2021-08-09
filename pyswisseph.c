@@ -1079,19 +1079,40 @@ static PyObject * pyswe_get_library_path FUNCARGS_SELF
 
 /* swisseph.get_planet_name */
 PyDoc_STRVAR(pyswe_get_planet_name__doc__,
-"Get planet name.\n\n"
+"Get a planet or asteroid name.\n\n"
 "Args: int planet\n"
-"Return: str");
+"Return: str name\n\n"
+" - planet: identifier of planet or object\n"
+" - name: name found or empty string\n\n"
+"If an asteroid name is wanted, the function does the following:\n"
+"The name is first looked for in the asteroid ephemeris file.\n"
+"Because many asteroids, especially the ones with high catalogue numbers, have"
+" no names yet (or have only a preliminary designation like 1968 HB), and"
+" because the Minor Planet Center of the IAU add new names quite often, it"
+" happens that there is no name in the asteroid file although the asteroid"
+" has already been given a name. For this, we have the file seasnam.txt, a"
+" file that contains a list of all named asteroid and is usually more up to"
+" date. If swisseph.calc() finds a preliminary designation, it looks for a"
+" name in this file.\n"
+"The file seasnam.txt can be updated by the user. To do this, download the"
+" names list from the Minor Planet Center"
+" https://www.minorplanetcenter.net/iau/lists/MPNames.html,"
+" rename it as seasnam.txt and move it into your ephemeris directory.\n"
+"The file seasnam.txt need not be ordered in any way. There must be one"
+" asteroid per line, first its catalogue number, then its name. The asteroid"
+" number may or may not be in brackets.");
 
 static PyObject * pyswe_get_planet_name FUNCARGS_KEYWDS
 {
     int ipl;
-    char name[256];
+    char name[128], spl[128];
     static char *kwlist[] = {"planet", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &ipl))
         return NULL;
+    snprintf(spl, 128, "%d", ipl);
     swe_get_planet_name(ipl, name);
-    return Py_BuildValue("s", name);
+    return Py_BuildValue("s",
+            !strcmp(name, spl) || strstr(name, "not found") ? "" : name);
 }
 
 /* swisseph.get_orbital_elements */
