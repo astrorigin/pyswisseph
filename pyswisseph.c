@@ -1066,9 +1066,9 @@ static PyObject * pyswe_get_current_file_data FUNCARGS_KEYWDS
 
 /* swisseph.get_library_path */
 PyDoc_STRVAR(pyswe_get_library_path__doc__,
-"Find the path of the swisseph library (dll) actually in use.\n\n"
+"Find the path of the executable or swisseph library (dll) actually in use.\n\n"
 "Args: -\n"
-"Return: str");
+"Return: str path");
 
 static PyObject * pyswe_get_library_path FUNCARGS_SELF
 {
