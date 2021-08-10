@@ -4,13 +4,16 @@ PYTHON = python3
 
 .DEFAULT_GOAL := void
 
-.PHONY: build clean install sdist void
+.PHONY: build clean html install sdist void
 
 build:
 	$(PYTHON) setup.py build
 
 clean:
-	rm -rf MANIFEST build dist
+	rm -rf MANIFEST build dist docs/_build/*
+
+html:
+	cd docs && make html
 
 install:
 	$(PYTHON) setup.py install

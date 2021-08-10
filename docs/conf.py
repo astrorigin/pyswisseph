@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Pyswisseph'
-copyright = '2007-2020, Stanislas Marquis'
+copyright = '2007-2021, Pyswisseph authors'
 author = 'Stanislas Marquis'
 
 
@@ -44,7 +44,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'classic'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
