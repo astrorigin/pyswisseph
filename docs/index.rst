@@ -10,8 +10,8 @@ Python Extension to the Swiss Ephemeris
 .. toctree::
    :maxdepth: 3
 
-   installation/index
-   introduction/index
+   installation
+   introduction
    The ephemerides <ephemerides/index>
 
 Indices and tables
