@@ -1,12 +1,15 @@
-Planetary and lunar ephemerides
-===============================
+=================
+Three Ephemerides
+=================
 
 The Swiss Ephemeris package allows planetary and lunar computations from any of
 the following three astronomical ephemerides.
 
 .. toctree::
+    :maxdepth: 3
 
-    planetary_and_lunar/swiss_ephemeris
-
+    swiss_ephemeris
+    moshier_ephemeris
+    jpl_ephemeris
 
 ..

@@ -5,6 +5,7 @@ Description of the ephemerides
 .. toctree::
     :maxdepth: 3
 
-    three_ephemerides
+    planetary_and_lunar/index
+
 
 ..
