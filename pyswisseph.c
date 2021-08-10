@@ -1117,30 +1117,77 @@ static PyObject * pyswe_get_planet_name FUNCARGS_KEYWDS
 
 /* swisseph.get_orbital_elements */
 PyDoc_STRVAR(pyswe_get_orbital_elements__doc__,
-"Calculate osculating elements (Kepler elements) and orbital periods for a"
-" planet, the Earth-Moon barycenter, or an asteroid.\n\n"
-"Args: float jdet, int pl, int flag\n"
-"Return: ");
+"Calculate osculating elements (Kepler elements) and orbital periods.\n\n"
+"Args: float tjdet, int planet, int flags\n"
+"Return: (float elements)\n\n"
+" - tjdet: input time, Julian day, Ephemeris Time (TT)\n"
+" - planet: identifier of planet or object\n"
+" - flags: bit flags indicating what computation is wanted:\n"
+"    - ephemeris flag: FLG_JPLEPH, FLG_SWIEPH, FLG_MOSEPH\n"
+"    - center:\n"
+"       - Sun: FLG_HELCTR (assumed as default) or\n"
+"       - SS Barycentre: FLG_BARYCTR (rel. to solar system barycentre)\n"
+"         Only possible for planets beyond Jupiter. For elements of the Moon,\n"
+"         the calculation is geocentric.\n"
+"    - sum all masses inside the orbit to be computed (method of\n"
+"      Astronomical Almanac): FLG_ORBEL_AA\n"
+"    - reference ecliptic: FLG_J2000\n"
+" - elements: a tuple of 50 floating-point numbers, of which:\n"
+"    - 0: semimajor axis (a)\n"
+"    - 1: eccentricity (e)\n"
+"    - 2: inclination (in)\n"
+"    - 3: longitude of ascending node (upper-case omega OM)\n"
+"    - 4: argument of periapsis (lower-case omega om)\n"
+"    - 5: longitude of periapsis (peri)\n"
+"    - 6: mean anomaly at epoch (M0)\n"
+"    - 7: true anomaly at epoch (N0)\n"
+"    - 8: eccentric anomaly at epoch (E0)\n"
+"    - 9: mean longitude at epoch (LM)\n"
+"    - 10: sidereal orbital period in tropical years\n"
+"    - 11: mean daily motion\n"
+"    - 12: tropical period in years\n"
+"    - 13: synodic period in days, negative for inner planets or Moon\n"
+"    - 14: time of perihelion passage\n"
+"    - 15: perihelion distance\n"
+"    - 16: aphelion distance\n\n"
+"This function calculates osculating elements (Kepler elements) and orbital"
+" periods for a planet, the Earth-Moon barycenter, or an asteroid. The elements"
+" are calculated relative to the mean ecliptic J2000.\n"
+"The elements define the orbital ellipse under the premise that it is a"
+" two-body system and there are no perturbations from other celestial bodies.\n"
+"The elements are particularly bad for the Moon, which is strongly perturbed"
+" by the Sun. It is not recommended to calculate ephemerides using Kepler"
+" elements.\n"
+"Important: This function should not be used for ephemerides of the perihelion"
+" or aphelion of a planet. Note that when the position of a perihelion is"
+" calculated using get_orbital_elements(), this position is not measured on the"
+" ecliptic, but on the orbit of the planet itself, thus it is not an ecliptic"
+" position. Also note that the positions of the nodes are always calculated"
+" relative to the mean equinox 2000 and never precessed to the ecliptic or"
+" equator of date. For ecliptic positions of a perihelion or aphelion or a"
+" node, you should use the function nod_aps() or nod_aps_ut().\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_get_orbital_elements FUNCARGS_KEYWDS
 {
     int i, pl, flg;
     double jd, dret[50];
-    char err[256];
-    static char *kwlist[] = {"jdet", "pl", "flag", NULL};
+    char err[256] = {0};
+    static char *kwlist[] = {"tjdet", "planet", "flags", NULL};
     memset(dret, 0, sizeof(double) * 50);
     if(!PyArg_ParseTupleAndKeywords(args, keywds, "dii", kwlist, &jd, &pl, &flg))
         return NULL;
     i = swe_get_orbital_elements(jd, pl, flg, dret, err);
     if (i == 0)
         return Py_BuildValue("dddddddddddddddddddddddddddddddddddddddddddddddddd",
-            dret[0],dret[1],dret[2],dret[3],dret[4],dret[5],dret[6],dret[7],dret[8],dret[9],
-            dret[10],dret[11],dret[12],dret[13],dret[14],dret[15],dret[16],dret[17],dret[18],dret[19],
-            dret[20],dret[21],dret[22],dret[23],dret[24],dret[25],dret[26],dret[27],dret[28],dret[29],
-            dret[30],dret[31],dret[32],dret[33],dret[34],dret[35],dret[36],dret[37],dret[38],dret[39],
-            dret[40],dret[41],dret[42],dret[43],dret[44],dret[45],dret[46],dret[47],dret[48],dret[49]);
-    PyErr_SetString(pyswe_Error, err);
-    return NULL;
+            dret[0],dret[1],dret[2],dret[3],dret[4],dret[5],dret[6],dret[7],
+            dret[8],dret[9],dret[10],dret[11],dret[12],dret[13],dret[14],
+            dret[15],dret[16],dret[17],dret[18],dret[19],dret[20],dret[21],
+            dret[22],dret[23],dret[24],dret[25],dret[26],dret[27],dret[28],
+            dret[29],dret[30],dret[31],dret[32],dret[33],dret[34],dret[35],
+            dret[36],dret[37],dret[38],dret[39],dret[40],dret[41],dret[42],
+            dret[43],dret[44],dret[45],dret[46],dret[47],dret[48],dret[49]);
+    return PyErr_Format(pyswe_Error, "swisseph.get_orbital_elements: %s", err);
 }
 
 /* swisseph.get_tid_acc */
