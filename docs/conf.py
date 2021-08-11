@@ -19,8 +19,9 @@
 
 project = 'Pyswisseph'
 copyright = '2007-2021, Pyswisseph authors'
-author = 'Stanislas Marquis'
-
+author = ''
+version = '2.10.02.0-dev'
+release = '2.10.02.0-dev'
 
 # -- General configuration ---------------------------------------------------
 
