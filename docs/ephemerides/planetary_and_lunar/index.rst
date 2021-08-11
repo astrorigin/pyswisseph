@@ -7,5 +7,6 @@ Planetary and lunar ephemerides
 
     three_ephemerides/index
     comparisons_with_aa_and_jpl
+    details_of_coordinate_transformation
 
 ..
