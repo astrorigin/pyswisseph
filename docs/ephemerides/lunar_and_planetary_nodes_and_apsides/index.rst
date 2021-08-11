@@ -6,5 +6,7 @@ Lunar and Planetary Nodes and Apsides
     :maxdepth: 3
 
     mean_lunar_node_and_mean_lunar_apogee
+    true_node
+    osculating_apogee
 
 ..
