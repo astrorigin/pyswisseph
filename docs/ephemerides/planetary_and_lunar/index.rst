@@ -10,5 +10,6 @@ Planetary and lunar ephemerides
     details_of_coordinate_transformation
     compression_mechanism
     extension_of_de406_based_ephemerides
+    solar_ephemeris_in_the_remote_past
 
 ..
