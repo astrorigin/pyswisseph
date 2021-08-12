@@ -315,13 +315,13 @@ static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
 
 /* swisseph.close */
 PyDoc_STRVAR(pyswe_close__doc__,
-"Close swiss ephemeris.\n\n"
-"Args: -\n"
-"Return: None\n\n"
+"Close Swiss Ephemeris.\n\n"
+":Args: --\n"
+":Return: None\n\n"
 "At the end of your computations you can release all resources (open files and"
-" allocated memory) used by the swisseph library. After close(), no swisseph"
-" functions should be used unless you call set_ephe_path() again and, if"
-" required, set_jpl_file().");
+" allocated memory) used by the swisseph module.\n"
+"After ``close()``, no swisseph functions should be used unless you call"
+" ``set_ephe_path()`` again and, if required, ``set_jpl_file()``.");
 
 static PyObject * pyswe_close FUNCARGS_SELF
 {
@@ -1033,24 +1033,24 @@ static PyObject * pyswe_get_ayanamsa_ut FUNCARGS_KEYWDS
 /* swisseph.get_current_file_data */
 PyDoc_STRVAR(pyswe_get_current_file_data__doc__,
 "Find start and end date of an se1 ephemeris file after a function call.\n\n"
-"Args: int fno\n"
-"Return: str path, float start, float end, int denum\n\n"
+":Args: int fno\n\n"
 " - fno: an integer indicating what type of file is searched:\n"
 "    - 0: planet file sepl_xxx, used for Sun etc, or jpl file\n"
 "    - 1: moon file semo_xxx\n"
 "    - 2: main asteroid file seas_xxx, if such an object was computed\n"
 "    - 3: other asteroid or planetary moon file, if such object was computed\n"
-"    - 4: star file\n"
+"    - 4: star file\n\n"
+":Return: str path, float start, float end, int denum\n\n"
 " - path: full file path, or empty string if no data\n"
 " - start: start date of file\n"
 " - end: end date of file\n"
 " - denum: jpl ephemeris number 406 or 431 from which file was derived\n\n"
-"This can be used to find out the start and end date of an *se1 ephemeris file"
-" after a call of swe_calc().\n"
-"The function returns data from internal file structures sweph.fidat used in"
-" the last call to swe_calc() or swe_fixstar(). Data returned are (currently)"
-" 0 with JPL files and fixed star files. Thus, the function is only useful for"
-" ephemerides of planets or asteroids that are based on *.se1 files.");
+"This can be used to find out the start and end date of an se1 ephemeris file"
+" after a call of ``calc()``.\n\n"
+"The function returns data from internal file structures ``sweph.fidat`` used"
+" in the last call to ``calc()`` or ``fixstar()``. Data returned are"
+" (currently) 0 with JPL files and fixed star files. Thus, the function is only"
+" useful for ephemerides of planets or asteroids that are based on se1 files.");
 
 static PyObject * pyswe_get_current_file_data FUNCARGS_KEYWDS
 {
@@ -1067,8 +1067,9 @@ static PyObject * pyswe_get_current_file_data FUNCARGS_KEYWDS
 /* swisseph.get_library_path */
 PyDoc_STRVAR(pyswe_get_library_path__doc__,
 "Find the path of the executable or swisseph library (dll) actually in use.\n\n"
-"Args: -\n"
-"Return: str path");
+":Args: --\n"
+":Return: str path\n\n"
+".. note:: This function may fail on Windows, and return an empty string.");
 
 static PyObject * pyswe_get_library_path FUNCARGS_SELF
 {
@@ -2242,8 +2243,9 @@ static PyObject * pyswe_rise_trans FUNCARGS_KEYWDS
 /* swisseph.set_ephe_path */
 PyDoc_STRVAR(pyswe_set_ephe_path__doc__,
 "Set ephemeris files path.\n\n"
-"Args: str path=\"" PYSWE_DEFAULT_EPHE_PATH "\"\n"
-"Return: None");
+":Args: str path=\"" PYSWE_DEFAULT_EPHE_PATH "\"\n"
+":Return: None\n\n"
+"It is possible to pass None as path, which is equivalent to an empty string.");
 
 static PyObject * pyswe_set_ephe_path FUNCARGS_KEYWDS
 {
@@ -2257,17 +2259,25 @@ static PyObject * pyswe_set_ephe_path FUNCARGS_KEYWDS
 
 /* swisseph.set_jpl_file */
 PyDoc_STRVAR(pyswe_set_jpl_file__doc__,
-"Set JPL file path.\n\n"
-"Args: str path\n"
-"Return: None");
+"Set name of JPL ephemeris file.\n\n"
+":Args: str name\n"
+":Return: None\n\n"
+"If you work with the JPL ephemeris, SwissEph uses the default file name which"
+" is defined as ``FNAME_DFT``. Currently, it has the value ``de406.eph`` or"
+" ``de431.eph``.\n\n"
+"If a different JPL ephemeris file is required, call this function to make the"
+" file name known to the software, eg::\n\n"
+"    swe.set_jpl_file('de405.eph')\n\n"
+"This file must reside in the ephemeris path you are using for all your"
+" ephemeris files.");
 
 static PyObject * pyswe_set_jpl_file FUNCARGS_KEYWDS
 {
-    char *path;
-    static char *kwlist[] = {"path", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &path))
+    char *name;
+    static char *kwlist[] = {"name", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &name))
         return NULL;
-    swe_set_jpl_file(path);
+    swe_set_jpl_file(name);
     Py_RETURN_NONE;
 }
 

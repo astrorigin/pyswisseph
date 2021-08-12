@@ -6,5 +6,6 @@ Programmer's manual
     :maxdepth: 3
 
     steps_to_get_a_planets_position
+    ephemeris_related_functions
 
 ..
