@@ -218,11 +218,11 @@ static PyObject * pyswe_azalt_rev FUNCARGS_KEYWDS
 /* swisseph.calc */
 PyDoc_STRVAR(pyswe_calc__doc__,
 "Calculate planetary positions (ET).\n\n"
-"Args: float tjdet, int planet, int flags=FLG_SWIEPH|FLG_SPEED\n"
-"Return: ((float x1, x2, x3, x4, x5, x6), int retflags)\n\n"
+":Args: float tjdet, int planet, int flags=FLG_SWIEPH|FLG_SPEED\n\n"
 " - tjdet: julian day, ephemeris time, where tjdet == tjdut + deltat(tjdut)\n"
 " - planet: body number\n"
-" - flags: bit flags indicating what kind of computation is wanted\n"
+" - flags: bit flags indicating what kind of computation is wanted\n\n"
+":Return: (float x1, x2, x3, x4, x5, x6), int retflags\n\n"
 " - x1, x2, x3, x4, x5, x6: results\n"
 " - retflags: bit flags indicating what kind of computation was done\n\n"
 "This function can raise an exception (swisseph.Error) in case of fatal error.");
@@ -247,19 +247,14 @@ static PyObject * pyswe_calc FUNCARGS_KEYWDS
 /* swisseph.calc_pctr */
 PyDoc_STRVAR(pyswe_calc_pctr__doc__,
 "Calculate planetocentric positions of planets (terrestrial time).\n\n"
-"Args: float tjd, int planet, int center, int flags=FLG_SWIEPH|FLG_SPEED\n"
-"Return: ((float x1, x2, x3, x4, x5, x6), int retflags)\n\n"
+":Args: float tjd, int planet, int center, int flags=FLG_SWIEPH|FLG_SPEED\n\n"
 " - tjd: julian day in TT (ET)\n"
 " - planet: body number of target object\n"
 " - center: body number of center object\n"
-" - flags: bit flags indicating what kind of computation is wanted\n"
+" - flags: bit flags indicating what kind of computation is wanted\n\n"
+":Return: (float x1, x2, x3, x4, x5, x6), int retflags\n\n"
 " - x1, x2, x3, x4, x5, x6: results\n"
 " - retflags: bit flags indicating what kind of computation was done\n\n"
-"This function calculates planetocentric positions of planets, ie. positions as"
-" observed from some different planet, eg. Jupiter-centric ephemerides. The"
-" function can actually calculate any object as observed from any other object,"
-" eg. also the position of some asteroid as observed from another asteroid or"
-" from a planetary moon.\n"
 "This function can raise an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_calc_pctr FUNCARGS_KEYWDS
@@ -282,18 +277,13 @@ static PyObject * pyswe_calc_pctr FUNCARGS_KEYWDS
 /* swisseph.calc_ut */
 PyDoc_STRVAR(pyswe_calc_ut__doc__,
 "Calculate planetary positions (UT).\n\n"
-"Args: float tjdut, int planet, int flags=FLG_SWIEPH|FLG_SPEED\n"
-"Return: ((float x1, x2, x3, x4, x5, x6), int retflags)\n\n"
-" - tjdut: julian day number, universla time\n"
+":Args: float tjdut, int planet, int flags=FLG_SWIEPH|FLG_SPEED\n\n"
+" - tjdut: julian day number, universal time\n"
 " - planet: body number\n"
-" - flags: bit flags indicating what kind of computation is wanted\n"
+" - flags: bit flags indicating what kind of computation is wanted\n\n"
+":Return: (float x1, x2, x3, x4, x5, x6), int retflags\n\n"
 " - x1, x2, x3, x4, x5, x6: results\n"
 " - retflags: bit flags indicating what kind of computation was done\n\n"
-"Functions calc_ut() and calc() work exactly the same way except that calc()"
-" requires Ephemeris Time (more accurately Terrestrial Time) as a parameter"
-" whereas calc_ut() expects Universal Time (UT). For common astrological"
-" calculations, you will only need calc_ut() and will not have to think any"
-" more about the conversion between Universal Time and Ephemeris Time.\n"
 "This function can raise an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
