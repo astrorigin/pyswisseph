@@ -10,5 +10,6 @@ Programmer's manual
     planetary_positions/index
     find_crossings_of_planets_over_positions
     get_planet_name
+    fixed_stars/index
 
 ..

@@ -705,11 +705,11 @@ static PyObject * pyswe_difrad2n FUNCARGS_KEYWDS
 /* swisseph.fixstar */
 PyDoc_STRVAR(pyswe_fixstar__doc__,
 "Calculate fixed star positions (ET).\n\n"
-"Args: str star, float tjdet, int flags=FLG_SWIEPH\n"
-"Return: ((float x1, x2, x3, x4, x5, x6), str stnam, int retflags)\n\n"
+":Args: str star, float tjdet, int flags=FLG_SWIEPH\n\n"
 " - star: name of fixed star to search for\n"
 " - tjdet: Julian day in Ephemeris Time\n"
-" - flags: bit flags indicating what kind of computation is wanted\n"
+" - flags: bit flags indicating what kind of computation is wanted\n\n"
+":Return: (float x1, x2, x3, x4, x5, x6), str stnam, int retflags\n\n"
 " - x1, x2, x3, x4, x5, x6: results\n"
 " - stnam: returned star name\n"
 " - retflags: bit flags indicating what kind of computation was done\n\n"
@@ -737,11 +737,11 @@ static PyObject * pyswe_fixstar FUNCARGS_KEYWDS
 /* swisseph.fixstar2 */
 PyDoc_STRVAR(pyswe_fixstar2__doc__,
 "Calculate fixed star positions (faster version) (ET).\n\n"
-"Args: str star, float tjdet, int flags=FLG_SWIEPH\n"
-"Return: ((float x1, x2, x3, x4, x5, x6), str stnam, int retflags)\n\n"
+":Args: str star, float tjdet, int flags=FLG_SWIEPH\n\n"
 " - star: name of fixed star to search for\n"
 " - tjdet: Julian day in Ephemeris Time\n"
-" - flags: bit flags indicating what kind of computation is wanted\n"
+" - flags: bit flags indicating what kind of computation is wanted\n\n"
+":Return: (float x1, x2, x3, x4, x5, x6), str stnam, int retflags\n\n"
 " - x1, x2, x3, x4, x5, x6: results\n"
 " - stnam: returned star name\n"
 " - retflags: bit flags indicating what kind of computation was done\n\n"
@@ -769,17 +769,11 @@ static PyObject * pyswe_fixstar2 FUNCARGS_KEYWDS
 /* swisseph.fixstar2_mag */
 PyDoc_STRVAR(pyswe_fixstar2_mag__doc__,
 "Get fixed star magnitude (faster version).\n\n"
-"Args: str star\n"
-"Return: float mag, str stnam\n\n"
-" - star: name of fixed star\n"
+":Args: str star\n\n"
+" - star: name of fixed star\n\n"
+":Return: float mag, str stnam\n\n"
 " - mag: returned magnitude\n"
 " - stnam: returned star name\n\n"
-"Strictly speaking, the magnitudes returned by this function are valid for the"
-" year 2000 only. Variations in brightness due to the starÕs variability or"
-" due to the increase or decrease of the star's distance cannot be taken into"
-" account. With stars of constant absolute magnitude, the change in brightness"
-" can be ignored for the historical period. Eg. the current magnitude of"
-" Sirius is -1.46. In 3000 BCE it was -1.44.\n"
 "This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_fixstar2_mag FUNCARGS_KEYWDS
@@ -803,11 +797,11 @@ static PyObject * pyswe_fixstar2_mag FUNCARGS_KEYWDS
 /* swisseph.fixstar2_ut */
 PyDoc_STRVAR(pyswe_fixstar2_ut__doc__,
 "Calculate fixed star positions (faster version) (UT).\n\n"
-"Args: str star, float tjdut, int flags=FLG_SWIEPH\n"
-"Return: ((float x1, x2, x3, x4, x5, x6), str stnam, int retflags)\n\n"
+":Args: str star, float tjdut, int flags=FLG_SWIEPH\n\n"
 " - star: name of fixed star to search for\n"
 " - tjdut: Julian day in Universal Time\n"
-" - flags: bit flags indicating what kind of computation is wanted\n"
+" - flags: bit flags indicating what kind of computation is wanted\n\n"
+":Return: (float x1, x2, x3, x4, x5, x6), str stnam, int retflags\n\n"
 " - x1, x2, x3, x4, x5, x6: results\n"
 " - stnam: returned star name\n"
 " - retflags: bit flags indicating what kind of computation was done\n\n"
@@ -835,17 +829,11 @@ static PyObject * pyswe_fixstar2_ut FUNCARGS_KEYWDS
 /* swisseph.fixstar_mag */
 PyDoc_STRVAR(pyswe_fixstar_mag__doc__,
 "Get fixed star magnitude.\n\n"
-"Args: str star\n"
-"Return: float mag, str stnam\n\n"
-" - star: name of fixed star\n"
+":Args: str star\n\n"
+" - star: name of fixed star\n\n"
+":Return: float mag, str stnam\n\n"
 " - mag: returned magnitude\n"
 " - stnam: returned star name\n\n"
-"Strictly speaking, the magnitudes returned by this function are valid for the"
-" year 2000 only. Variations in brightness due to the starÕs variability or"
-" due to the increase or decrease of the star's distance cannot be taken into"
-" account. With stars of constant absolute magnitude, the change in brightness"
-" can be ignored for the historical period. Eg. the current magnitude of"
-" Sirius is -1.46. In 3000 BCE it was -1.44.\n"
 "This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_fixstar_mag FUNCARGS_KEYWDS
@@ -869,11 +857,11 @@ static PyObject * pyswe_fixstar_mag FUNCARGS_KEYWDS
 /* swisseph.fixstar_ut */
 PyDoc_STRVAR(pyswe_fixstar_ut__doc__,
 "Calculate fixed star positions (UT).\n\n"
-"Args: str star, float tjdut, int flags=FLG_SWIEPH\n"
-"Return: ((float x1, x2, x3, x4, x5, x6), str stnam, int retflags)\n\n"
+":Args: str star, float tjdut, int flags=FLG_SWIEPH\n\n"
 " - star: name of fixed star to search for\n"
 " - tjdut: Julian day in Universal Time\n"
-" - flags: bit flags indicating what kind of computation is wanted\n"
+" - flags: bit flags indicating what kind of computation is wanted\n\n"
+":Return: (float x1, x2, x3, x4, x5, x6), str stnam, int retflags\n\n"
 " - x1, x2, x3, x4, x5, x6: results\n"
 " - stnam: returned star name\n"
 " - retflags: bit flags indicating what kind of computation was done\n\n"
