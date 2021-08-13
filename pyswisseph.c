@@ -1287,14 +1287,14 @@ static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
 /* swisseph.helio_cross */
 PyDoc_STRVAR(pyswe_helio_cross__doc__,
 "Compute a planet heliocentric crossing over some longitude (ET).\n\n"
-"Args: int planet, float x2cross, float tjdet, int flags=FLG_SWIEPH,"
-" bool backwards=False\n"
-"Return: float jd_cross\n\n"
+":Args: int planet, float x2cross, float tjdet, int flags=FLG_SWIEPH,"
+" bool backwards=False\n\n"
 " - planet = planet number\n"
 " - x2cross = longitude to search\n"
 " - tjdet: start time of search, as Julian day number, Ephemeris Time\n"
 " - flags: bit flags indicating what computation is wanted\n"
-" - backwards: a boolean indicating if we search back in time\n"
+" - backwards: a boolean indicating if we search back in time\n\n"
+":Return: float jd_cross\n\n"
 " - jd_cross: Julian day found\n\n"
 "This function raises an exception (swisseph.Error) in case of fatal error.");
 
@@ -1317,14 +1317,14 @@ static PyObject * pyswe_helio_cross FUNCARGS_KEYWDS
 /* swisseph.helio_cross_ut */
 PyDoc_STRVAR(pyswe_helio_cross_ut__doc__,
 "Compute a planet heliocentric crossing over some longitude (UT).\n\n"
-"Args: int planet, float x2cross, float tjdut, int flags=FLG_SWIEPH,"
-" bool backwards=False\n"
-"Return: float jd_cross\n\n"
+":Args: int planet, float x2cross, float tjdut, int flags=FLG_SWIEPH,"
+" bool backwards=False\n\n"
 " - planet = planet number\n"
 " - x2cross = longitude to search\n"
 " - tjdut: start time of search, as Julian day number, Universal Time\n"
 " - flags: bit flags indicating what computation is wanted\n"
-" - backwards: a boolean indicating if we search back in time\n"
+" - backwards: a boolean indicating if we search back in time\n\n"
+":Return: float jd_cross\n\n"
 " - jd_cross: Julian day found\n\n"
 "This function raises an exception (swisseph.Error) in case of fatal error.");
 
@@ -1882,11 +1882,11 @@ static PyObject * pyswe_lun_occult_where FUNCARGS_KEYWDS
 /* swisseph.mooncross */
 PyDoc_STRVAR(pyswe_mooncross__doc__,
 "Compute Moon crossing over some longitude (ET).\n\n"
-"Args: float x2cross, float tjdet, int flags=FLG_SWIEPH\n"
-"Return: float jd_cross\n\n"
+":Args: float x2cross, float tjdet, int flags=FLG_SWIEPH\n\n"
 " - x2cross: longitude to search\n"
 " - tjdet: start time of search, Julian day number, Ephemeris Time\n"
-" - flags: bit flags indicating what computation is wanted\n"
+" - flags: bit flags indicating what computation is wanted\n\n"
+":Return: float jd_cross\n\n"
 " - jd_cross: Julian day number found\n\n"
 "This function raises an exception (swisseph.Error) in case of fatal error.");
 
@@ -1907,10 +1907,10 @@ static PyObject * pyswe_mooncross FUNCARGS_KEYWDS
 /* swisseph.mooncross_node */
 PyDoc_STRVAR(pyswe_mooncross_node__doc__,
 "Compute next Moon crossing over node, by finding zero latitude crossing (ET).\n\n"
-"Args: float tjdet, int flags=FLG_SWIEPH\n"
-"Return: (float jd_cross, xlon, xlat)\n\n"
+":Args: float tjdet, int flags=FLG_SWIEPH\n\n"
 " - tjdet: start time of search, Julian day number, Ephemeris Time\n"
-" - flags: bit flags indicating what computation is wanted\n"
+" - flags: bit flags indicating what computation is wanted\n\n"
+":Return: float jd_cross, xlon, xlat\n\n"
 " - jd_cross: Julian day number found\n"
 " - xlon: Moon longitude found\n"
 " - xlat: Moon latitude found\n\n"
@@ -1932,10 +1932,10 @@ static PyObject * pyswe_mooncross_node FUNCARGS_KEYWDS
 /* swisseph.mooncross_node_ut */
 PyDoc_STRVAR(pyswe_mooncross_node_ut__doc__,
 "Compute next Moon crossing over node, by finding zero latitude crossing (UT).\n\n"
-"Args: float tjdut, int flags=FLG_SWIEPH\n"
-"Return: (float jd_cross, xlon, xlat)\n\n"
+":Args: float tjdut, int flags=FLG_SWIEPH\n\n"
 " - tjdut: start time of search, Julian day number, Universal Time\n"
-" - flags: bit flags indicating what computation is wanted\n"
+" - flags: bit flags indicating what computation is wanted\n\n"
+":Return: float jd_cross, xlon, xlat\n\n"
 " - jd_cross: Julian day number found\n"
 " - xlon: Moon longitude found\n"
 " - xlat: Moon latitude found\n\n"
@@ -1957,11 +1957,11 @@ static PyObject * pyswe_mooncross_node_ut FUNCARGS_KEYWDS
 /* swisseph.mooncross_ut */
 PyDoc_STRVAR(pyswe_mooncross_ut__doc__,
 "Compute Moon crossing over some longitude (UT).\n\n"
-"Args: float x2cross, float tjdut, int flags=FLG_SWIEPH\n"
-"Return: float jd_cross\n\n"
+":Args: float x2cross, float tjdut, int flags=FLG_SWIEPH\n\n"
 " - x2cross: longitude to search\n"
 " - tjdut: start time of search, Julian day number, Universal Time\n"
-" - flags: bit flags indicating what computation is wanted\n"
+" - flags: bit flags indicating what computation is wanted\n\n"
+":Return: float jd_cross\n\n"
 " - jd_cross: Julian day number found\n\n"
 "This function raises an exception (swisseph.Error) in case of fatal error.");
 
@@ -2480,11 +2480,11 @@ static PyObject * pyswe_sol_eclipse_where FUNCARGS_KEYWDS
 /* swisseph.solcross */
 PyDoc_STRVAR(pyswe_solcross__doc__,
 "Compute next Sun crossing over some longitude (ET).\n\n"
-"Args: float x2cross, float tjdet, int flags=FLG_SWIEPH\n"
-"Return: float jd_cross\n\n"
+":Args: float x2cross, float tjdet, int flags=FLG_SWIEPH\n\n"
 " - x2cross: longitude to search\n"
 " - tjdet: start time of search, Julian day number, Ephemeris Time\n"
-" - flags: bit flags indicating what computation is wanted\n"
+" - flags: bit flags indicating what computation is wanted\n\n"
+":Return: float jd_cross\n\n"
 " - jd_cross: Julian day number found\n\n"
 "This function raises an exception (swisseph.Error) in case of fatal error.");
 
@@ -2505,11 +2505,11 @@ static PyObject * pyswe_solcross FUNCARGS_KEYWDS
 /* swisseph.solcross_ut */
 PyDoc_STRVAR(pyswe_solcross_ut__doc__,
 "Compute next Sun crossing over some longitude (UT).\n\n"
-"Args: float x2cross, float tjdut, int flags=FLG_SWIEPH\n"
-"Return: float jd_cross\n\n"
+":Args: float x2cross, float tjdut, int flags=FLG_SWIEPH\n\n"
 " - x2cross: longitude to search\n"
-" - tjdut: start time of search, Julian day number, Ephemeris Time\n"
-" - flags: bit flags indicating what computation is wanted\n"
+" - tjdut: start time of search, Julian day number, Universal Time\n"
+" - flags: bit flags indicating what computation is wanted\n\n"
+":Return: float jd_cross\n\n"
 " - jd_cross: Julian day number found\n\n"
 "This function raises an exception (swisseph.Error) in case of fatal error.");
 

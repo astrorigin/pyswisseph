@@ -8,5 +8,6 @@ Programmer's manual
     steps_to_get_a_planets_position
     ephemeris_related_functions
     planetary_positions/index
+    find_crossings_of_planets_over_positions
 
 ..
