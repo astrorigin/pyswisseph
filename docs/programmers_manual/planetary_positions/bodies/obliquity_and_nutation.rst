@@ -2,9 +2,9 @@
 Obliquity and nutation
 ======================
 
-A special body number ``swisseph.ECL_NUT`` is provided to compute the obliquity
-of the ecliptic and the nutation. Of course nutation is already added
-internally to the planetary coordinates by ``calc()`` but sometimes it will be
+A special body number ``swe.ECL_NUT`` is provided to compute the obliquity of
+the ecliptic and the nutation. Of course nutation is already added internally
+to the planetary coordinates by ``calc()`` but sometimes it will be
 needed as a separate value.
 
 .. code-block:: python

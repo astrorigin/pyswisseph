@@ -38,4 +38,10 @@ Here is a miniature sample script.
 .. literalinclude:: swemini.py
     :language: python
 
+.. note::
+
+    Throughout this manual, expect to see the module name ``swisseph``
+    imported as ``swe``, which is shorter and reminds of the ``swe_`` prefix
+    of the C API.
+
 ..

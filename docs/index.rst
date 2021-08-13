@@ -1,6 +1,6 @@
-=====
-Index
-=====
+========
+Contents
+========
 
 **Python Extension to the Swiss Ephemeris**
 

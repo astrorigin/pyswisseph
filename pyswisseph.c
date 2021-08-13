@@ -2323,8 +2323,11 @@ static PyObject * pyswe_set_tid_acc FUNCARGS_KEYWDS
 /* swisseph.set_topo */
 PyDoc_STRVAR(pyswe_set_topo__doc__,
 "Set topocentric parameters.\n\n"
-"Args: float lon, float lat, float alt=0.0\n"
-"Return: None");
+":Args: float lon, float lat, float alt=0.0\n\n"
+" - lon: geographical longitude in degrees\n"
+" - lat: geographical latitude in degrees\n"
+" - alt: altitude in meters above sea level\n\n"
+":Return: None");
 
 static PyObject * pyswe_set_topo FUNCARGS_KEYWDS
 {

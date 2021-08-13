@@ -37,6 +37,8 @@ Detailed instructions how to compare planetary positions as given by the Swiss
 Ephemeris with those of Astronomical Almanac are given in Appendix D at the end
 of this documentation. (TODO)
 
+.. _Swiss Ephemeris and JPL Horizons System of NASA:
+
 Swiss Ephemeris and JPL Horizons System of NASA
 ===============================================
 
