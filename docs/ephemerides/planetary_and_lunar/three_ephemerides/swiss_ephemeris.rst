@@ -5,7 +5,7 @@ The core part of Swiss Ephemeris is a compression of the JPL-Ephemeris DE431,
 which covers roughly the time range 13.000 BCE to 17.000 CE. Using a
 sophisticated mechanism, we succeeded in reducing JPL's 2.8 GB storage to only
 99 MB. The compressed version agrees with the JPL Ephemeris to 1
-milli-arcsecond (0.001”). Since the inherent uncertainty of the JPL ephemeris
+milli-arcsecond (0.001"). Since the inherent uncertainty of the JPL ephemeris
 for most of its time range is a lot greater, the Swiss Ephemeris should be
 completely satisfying even for computations demanding very high accuracy.
 
@@ -81,7 +81,7 @@ All Swiss Ephemeris files have the file suffix ``.se1``. A planetary file is
 about 500 kb, a lunar file 1300 kb. Swiss Ephemeris files are available for
 download from `Astrodienst's web server`_.
 
-.. _Astrodienst's web server: https://www.astro.com/swisseph
+.. _Astrodienst's web server: https://www.astro.com/ftp/swisseph/ephe/
 
 The time range of the Swiss Ephemeris
 +++++++++++++++++++++++++++++++++++++

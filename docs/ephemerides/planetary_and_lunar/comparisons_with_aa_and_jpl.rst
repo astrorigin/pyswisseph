@@ -9,7 +9,7 @@ The original JPL ephemeris provides barycentric equatorial Cartesian positions
 relative to the equinox 2000/ICRS. Moshier provides heliocentric positions.
 The conversions to apparent geocentric ecliptical positions were done using the
 algorithms and constants of the Astronomical Almanac as described in the
-“Explanatory Supplement to the Astronomical Almanac”. Using the DE200 data
+"Explanatory Supplement to the Astronomical Almanac". Using the DE200 data
 file, it is possible to reproduce the positions given by the Astronomical
 Almanac 1984, 1995, 1996, and 1997 (on p. B37-38 in all editions) to the last
 digit. Editions of other years have not been checked. DE200 was used by
@@ -84,7 +84,7 @@ calculations in the future, it uses the last values of the existing data. The
 resulting positions before 1962 thus do not have the same precision, but the
 ephemeris is at least continuous.
 
-More information on this and technical details are found in the programmer’s
+More information on this and technical details are found in the programmer's
 documentation and in the source code, file swephlib.h.
 
 IERS Conventions 1996, 2003, and 2010 can be read or downloaded from here:

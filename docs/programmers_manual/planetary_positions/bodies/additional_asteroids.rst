@@ -69,7 +69,7 @@ long one and a short one, e.g:
 
 The larger file is about 10 times the size of the short ephemeris. If the user
 does not want an ephemeris for the time before 1500 he might prefer to work
-with the short files. If so, just copy the files ending with ”s.se1” to your
+with the short files. If so, just copy the files ending with "s.se1" to your
 hard disk. ``calc()`` tries the long one and on failure automatically takes the
 short one.
 

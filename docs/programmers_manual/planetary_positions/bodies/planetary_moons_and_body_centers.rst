@@ -19,7 +19,7 @@ E.g., Jupiter moon Io:
     ipl = swe.PLMOON_OFFSET + swe.JUPITER * 100 + 1 # 9000 + 5 * 100 + 1 = 9501
 
 Centers of body (COB) are calculated the same way, i.e. like a planetary moon
-but with the “moon number” 99 e.g. Jupiter center of body:
+but with the "moon number" 99 e.g. Jupiter center of body:
 
 .. code-block:: python
 

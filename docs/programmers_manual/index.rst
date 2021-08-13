@@ -9,5 +9,6 @@ Programmer's manual
     ephemeris_related_functions
     planetary_positions/index
     find_crossings_of_planets_over_positions
+    get_planet_name
 
 ..

@@ -27,7 +27,7 @@ The file ``seorbel.txt`` has the following structure:
 All orbital elements except epoch and equinox may have T terms, where
 ``T = (tjd – epoch) / 36525``
 
-(See, e.g., Vulcan, the second last elements set (not the ”Uranian” Vulcanus
+(See, e.g., Vulcan, the second last elements set (not the "Uranian" Vulcanus
 but the intramercurian hypothetical planet Vulcan).)
 ``T * T``, ``T2``, ``T3`` are also allowed.
 
