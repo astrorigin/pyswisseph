@@ -12,5 +12,6 @@ Programmer's manual
     get_planet_name
     fixed_stars/index
     apsides_nodes_kepler_elements_orbital_periods/index
+    planetary_phenomena/index
 
 ..
