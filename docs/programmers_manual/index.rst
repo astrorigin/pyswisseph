@@ -11,5 +11,6 @@ Programmer's manual
     find_crossings_of_planets_over_positions
     get_planet_name
     fixed_stars/index
+    apsides_nodes_kepler_elements_orbital_periods/index
 
 ..

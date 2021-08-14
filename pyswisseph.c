@@ -1097,9 +1097,8 @@ static PyObject * pyswe_get_planet_name FUNCARGS_KEYWDS
 /* swisseph.get_orbital_elements */
 PyDoc_STRVAR(pyswe_get_orbital_elements__doc__,
 "Calculate osculating elements (Kepler elements) and orbital periods.\n\n"
-"Args: float tjdet, int planet, int flags\n"
-"Return: (float elements)\n\n"
-" - tjdet: input time, Julian day, Ephemeris Time (TT)\n"
+":Args: float tjdet, int planet, int flags\n\n"
+" - tjdet: input time, Julian day number, Ephemeris Time (TT)\n"
 " - planet: identifier of planet or object\n"
 " - flags: bit flags indicating what computation is wanted:\n"
 "    - ephemeris flag: FLG_JPLEPH, FLG_SWIEPH, FLG_MOSEPH\n"
@@ -1110,7 +1109,8 @@ PyDoc_STRVAR(pyswe_get_orbital_elements__doc__,
 "         the calculation is geocentric.\n"
 "    - sum all masses inside the orbit to be computed (method of\n"
 "      Astronomical Almanac): FLG_ORBEL_AA\n"
-"    - reference ecliptic: FLG_J2000\n"
+"    - reference ecliptic: FLG_J2000\n\n"
+":Return: (elements)\n\n"
 " - elements: a tuple of 50 floating-point numbers, of which:\n"
 "    - 0: semimajor axis (a)\n"
 "    - 1: eccentricity (e)\n"
@@ -1129,22 +1129,6 @@ PyDoc_STRVAR(pyswe_get_orbital_elements__doc__,
 "    - 14: time of perihelion passage\n"
 "    - 15: perihelion distance\n"
 "    - 16: aphelion distance\n\n"
-"This function calculates osculating elements (Kepler elements) and orbital"
-" periods for a planet, the Earth-Moon barycenter, or an asteroid. The elements"
-" are calculated relative to the mean ecliptic J2000.\n"
-"The elements define the orbital ellipse under the premise that it is a"
-" two-body system and there are no perturbations from other celestial bodies.\n"
-"The elements are particularly bad for the Moon, which is strongly perturbed"
-" by the Sun. It is not recommended to calculate ephemerides using Kepler"
-" elements.\n"
-"Important: This function should not be used for ephemerides of the perihelion"
-" or aphelion of a planet. Note that when the position of a perihelion is"
-" calculated using get_orbital_elements(), this position is not measured on the"
-" ecliptic, but on the orbit of the planet itself, thus it is not an ecliptic"
-" position. Also note that the positions of the nodes are always calculated"
-" relative to the mean equinox 2000 and never precessed to the ecliptic or"
-" equator of date. For ecliptic positions of a perihelion or aphelion or a"
-" node, you should use the function nod_aps() or nod_aps_ut().\n"
 "This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_get_orbital_elements FUNCARGS_KEYWDS
@@ -1970,23 +1954,30 @@ static PyObject * pyswe_mooncross_ut FUNCARGS_KEYWDS
 /* swisseph.nod_aps */
 PyDoc_STRVAR(pyswe_nod_aps__doc__,
 "Calculate planetary nodes and apsides (ET).\n\n"
-"Args: float julday, int planet, int method=NODBIT_MEAN, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: 4 tuples of 6 float (asc, des, per, aph)");
+":Args: float tjdet, int planet, int method=NODBIT_MEAN, int flags=FLG_SWIEPH|FLG_SPEED\n\n"
+" - tjdet: input time, Julian day number, Ephemeris Time\n"
+" - planet: identifer of planet or object\n"
+" - method: bit flags NODBIT_MEAN, NODBIT_OSCU, NODBIT_OSCU_BAR, NODBIT_FOPOINT\n"
+" - flags: bit flags indicating what type of computation is wanted\n\n"
+":Return: (xnasc)(xndsc)(xperi)(xaphe)\n\n"
+" - xnasc: tuple of 6 float for ascending node\n"
+" - xndsc: tuple of 6 float for descending node\n"
+" - xperi: tuple of 6 float for perihelion\n"
+" - xaphe: tuple of 6 float for aphelion\n\n"
+"This function can raise an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_nod_aps FUNCARGS_KEYWDS
 {
-    char err[256];
+    char err[256] = {0};
     double jd, xasc[6], xdsc[6], xper[6], xaph[6];
-    int ret, planet, method = SE_NODBIT_MEAN, flag = SEFLG_SWIEPH + SEFLG_SPEED;
-    static char *kwlist[] = {"julday", "planet", "method", "flag", NULL};
+    int ret, planet, method = SE_NODBIT_MEAN, flags = SEFLG_SWIEPH|SEFLG_SPEED;
+    static char *kwlist[] = {"tjdet", "planet", "method", "flags", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|ii", kwlist,
-        &jd, &planet, &method, &flag))
+        &jd, &planet, &method, &flags))
         return NULL;
-    ret = swe_nod_aps(jd, planet, flag, method, xasc, xdsc, xper, xaph, err);
-    if (ret < 0) {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
+    ret = swe_nod_aps(jd, planet, flags, method, xasc, xdsc, xper, xaph, err);
+    if (ret < 0)
+        return PyErr_Format(pyswe_Error, "swisseph.nod_aps: %s", err);
     return Py_BuildValue("(dddddd)(dddddd)(dddddd)(dddddd)", xasc[0],xasc[1],
         xasc[2],xasc[3],xasc[4],xasc[5],xdsc[0],xdsc[1],xdsc[2],xdsc[3],xdsc[4],
         xdsc[5],xper[0],xper[1],xper[2],xper[3],xper[4],xper[5],xaph[0],xaph[1],
@@ -1996,23 +1987,30 @@ static PyObject * pyswe_nod_aps FUNCARGS_KEYWDS
 /* swisseph.nod_aps_ut */
 PyDoc_STRVAR(pyswe_nod_aps_ut__doc__,
 "Calculate planetary nodes and apsides (UT).\n\n"
-"Args: float julday, int planet, int method=NODBIT_MEAN, int flag=FLG_SWIEPH+FLG_SPEED\n"
-"Return: 4 tuples of 6 float (asc, des, per, aph)");
+":Args: float tjdut, int planet, int method=NODBIT_MEAN, int flags=FLG_SWIEPH|FLG_SPEED\n\n"
+" - tjdut: input time, Julian day number, Universal Time\n"
+" - planet: identifer of planet or object\n"
+" - method: bit flags NODBIT_MEAN, NODBIT_OSCU, NODBIT_OSCU_BAR, NODBIT_FOPOINT\n"
+" - flags: bit flags indicating what type of computation is wanted\n\n"
+":Return: (xnasc)(xndsc)(xperi)(xaphe)\n\n"
+" - xnasc: tuple of 6 float for ascending node\n"
+" - xndsc: tuple of 6 float for descending node\n"
+" - xperi: tuple of 6 float for perihelion\n"
+" - xaphe: tuple of 6 float for aphelion\n\n"
+"This function can raise an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_nod_aps_ut FUNCARGS_KEYWDS
 {
-    char err[256];
+    char err[256] = {0};
     double jd, xasc[6], xdsc[6], xper[6], xaph[6];
-    int ret, planet, method = SE_NODBIT_MEAN, flag = SEFLG_SWIEPH + SEFLG_SPEED;
-    static char *kwlist[] = {"julday", "planet", "method", "flag", NULL};
+    int ret, planet, method = SE_NODBIT_MEAN, flags = SEFLG_SWIEPH|SEFLG_SPEED;
+    static char *kwlist[] = {"tjdut", "planet", "method", "flags", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|ii", kwlist,
-        &jd, &planet, &method, &flag))
+        &jd, &planet, &method, &flags))
         return NULL;
-    ret = swe_nod_aps_ut(jd, planet, flag, method, xasc, xdsc, xper, xaph, err);
-    if (ret < 0) {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
+    ret = swe_nod_aps_ut(jd, planet, flags, method, xasc, xdsc, xper, xaph, err);
+    if (ret < 0)
+        return PyErr_Format(pyswe_Error, "swisseph.nod_aps_ut: %s", err);
     return Py_BuildValue("(dddddd)(dddddd)(dddddd)(dddddd)", xasc[0],xasc[1],
         xasc[2],xasc[3],xasc[4],xasc[5],xdsc[0],xdsc[1],xdsc[2],xdsc[3],xdsc[4],
         xdsc[5],xper[0],xper[1],xper[2],xper[3],xper[4],xper[5],xaph[0],xaph[1],
@@ -2023,24 +2021,31 @@ static PyObject * pyswe_nod_aps_ut FUNCARGS_KEYWDS
 PyDoc_STRVAR(pyswe_orbit_max_min_true_distance__doc__,
 "Calculate the maximum possible distance, the minimum possible distance, and"
 " the current true distance of planet, the EMB, or an asteroid.\n\n"
-"Args: float jdet, int pl, int flag\n"
-"Return: tuple (max, min, true)");
+":Args: float tjdet, int planet, int flags\n\n"
+" - tjdet: input time, Julian day number, Ephemeris Time\n"
+" - planet: identifier of planet or object\n"
+" - flags: bit flags indicating what computation is wanted:\n"
+"    - ephemeris flag\n"
+"    - optional heliocentric flag FLG_HELIOCTR\n\n"
+":Return: float max_dist, float min_dist, float true_dist\n\n"
+" - max_dist: maximum distance\n"
+" - min_dist: minimum_distance\n"
+" - true_dist: true distance");
 
 static PyObject * pyswe_orbit_max_min_true_distance FUNCARGS_KEYWDS
 {
     int pl, flg, i;
     double jd, dmax, dmin, dtrue;
-    char err[256];
-    static char *kwlist[] = {"jdet", "pl", "flag", NULL};
+    char err[256] = {0};
+    static char *kwlist[] = {"tjdet", "planet", "flags", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dii", kwlist,
         &jd, &pl, &flg))
         return NULL;
     i = swe_orbit_max_min_true_distance(jd, pl, flg, &dmax, &dmin, &dtrue, err);
-    if (i == 0) {
-        return Py_BuildValue("(ddd)", dmax, dmin, dtrue);
-    }
-    PyErr_SetString(pyswe_Error, err);
-    return NULL;
+    if (i == 0)
+        return Py_BuildValue("ddd", dmax, dmin, dtrue);
+    return PyErr_Format(pyswe_Error,
+                        "swisseph.orbit_max_min_true_distance: %s", err);
 }
 
 /* swisseph.pheno */
