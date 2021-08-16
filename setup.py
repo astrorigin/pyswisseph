@@ -263,7 +263,8 @@ setup(
     keywords = 'Astrology Ephemeris Swisseph',
     ext_modules = [swemodule],
     setup_requires = ['wheel'],
-    python_requires = '>=3.5'
+    python_requires = '>=3.5',
+    test_suite = 'tests'
     )
 
 # vi: set fenc=utf-8 ff=unix et sw=4 ts=4 sts=4 :
