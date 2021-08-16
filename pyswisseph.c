@@ -1650,80 +1650,151 @@ static PyObject * pyswe_lmt_to_lat FUNCARGS_KEYWDS
 /* swisseph.lun_eclipse_how */
 PyDoc_STRVAR(pyswe_lun_eclipse_how__doc__,
 "Calculate attributes of a lunar eclipse (UTC).\n\n"
-"Args: float julday, float lon, float lat, float alt=0.0, int flag=FLG_SWIEPH\n"
-"Return: int retflag, (float attr)");
+":Args: float tjdut, int flags=FLG_SWIEPH, float lon=0.0, float lat=0.0,"
+" float alt=0.0\n\n"
+" - tjdut: input time, Julian day number, Universal Time\n"
+" - flags: ephemeris flag\n"
+" - lon: geographic longitude (eastern positive)\n"
+" - lat: geographic latitude (northern positive)\n"
+" - alt: geographic altitude above sea level, in meters\n\n"
+":Return: int retflag, (attr)\n\n"
+" - retflag: returned bit flags:\n"
+"    - 0 if there is no eclipse\n"
+"    - SE_ECL_TOTAL or ECL_PENUMBRAL or ECL_PARTIAL\n"
+" - attr: tuple of 20 float, of which:\n"
+"    - 0: umbral magnitude at tjd\n"
+"    - 1: penumbral magnitude\n"
+"    - 2: ?\n"
+"    - 3: ?\n"
+"    - 4: azimuth of moon at tjd\n"
+"    - 5: true altitude of moon above horizon at tjd\n"
+"    - 6: apparent altitude of moon above horizon at tjd\n"
+"    - 7: distance of moon from opposition in degrees\n"
+"    - 8: eclipse magnitude (equals attr[0])\n"
+"    - 9: saros series number (if available, otherwise -99999999)\n"
+"    - 10: saros series member number (if available, otherwise -99999999)\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_lun_eclipse_how FUNCARGS_KEYWDS
 {
     double jd, geopos[3] = {0, 0, 0};
     double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     int res, flag = SEFLG_SWIEPH;
-    char err[256];
-    static char *kwlist[] = {"julday", "lon", "lat", "alt", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|di", kwlist,
-        &jd, &geopos[0], &geopos[1], &geopos[2], &flag))
+    char err[256] = {0};
+    static char *kwlist[] = {"tjdut", "flags", "lon", "lat", "alt", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|iddd", kwlist,
+                &jd, &flag, &geopos[0], &geopos[1], &geopos[2]))
         return NULL;
+    /* setting topo params */
+    swe_set_topo(geopos[0], geopos[1], geopos[2]);
     res = swe_lun_eclipse_how(jd, flag, geopos, attr, err);
-    if (res < 0) {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("i(ddddddddddd)", res,attr[0],attr[1],attr[2],attr[3],
-        attr[4],attr[5],attr[6],attr[7],attr[8],attr[9],attr[10]);
+    if (res < 0)
+        return PyErr_Format(pyswe_Error, "swisseph.lun_eclipse_how: %s", err);
+    return Py_BuildValue("i(dddddddddddddddddddd)", res,attr[0],attr[1],
+        attr[2],attr[3],attr[4],attr[5],attr[6],attr[7],attr[8],attr[9],
+        attr[10],attr[11],attr[12],attr[13],attr[14],attr[15],attr[16],
+        attr[17],attr[18],attr[19]);
 }
 
 /* swisseph.lun_eclipse_when */
 PyDoc_STRVAR(pyswe_lun_eclipse_when__doc__,
-"Find the next lunar eclipse (UTC).\n\n"
-"Args: float jd_start, int ecl_type=0, bool backward=False, int flag=FLG_SWIEPH\n"
-"Return: int retflag, (float tret)");
+"Find the next lunar eclipse globally (UT).\n\n"
+":Args: float tjdut, int flags=FLG_SWIEPH, int ecltype=0, bool backwards=False\n\n"
+" - tjdut: input time, Julian day number, Universal Time\n"
+" - flags: ephemeris flag\n"
+" - ecltype: bit flags for eclipse type wanted:\n"
+"    - ECL_TOTAL ECL_PARTIAL ECL_PENUMBRAL\n"
+"    - ECL_ALLTYPES_LUNAR or 0 for any type\n"
+" - backwards: boolean, set to True to search back in time\n"
+":Return: int retflag, (tret)\n\n"
+" - retflag: returned bit flag:\n"
+"    - ECL_TOTAL ECL_PARTIAL ECL_PENUMBRAL\n"
+" - tret: tuple of 10 float, of which:\n"
+"    - 0: time of maximum eclipse\n"
+"    - 1: ?\n"
+"    - 2: time of partial phase begin (indices consistent with solar eclipses)\n"
+"    - 3: time of partial phase end\n"
+"    - 4: time of totality begin\n"
+"    - 5: time of totality end\n"
+"    - 6: time of penumbral phase begin\n"
+"    - 7: time of penumbral phase end\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_lun_eclipse_when FUNCARGS_KEYWDS
 {
     double jd, tret[10] = {0,0,0,0,0,0,0,0,0,0};
-    int res, ecltype = 0, backward = 0, flag = SEFLG_SWIEPH;
-    char err[256];
-    static char *kwlist[] = {"jd_start", "ecl_type", "backward", "flag", NULL};
+    int res, ecltype = 0, backw = 0, flag = SEFLG_SWIEPH;
+    char err[256] = {0};
+    static char *kwlist[] = {"tjdut", "flags", "ecltype", "backwards", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|iii", kwlist,
-        &jd, &ecltype, &backward, &flag))
+                &jd, &flag, &ecltype, &backw))
         return NULL;
-    res = swe_lun_eclipse_when(jd, flag, ecltype, tret, backward, err);
-    if (res < 0) {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("i(dddddddd)", res,tret[0],tret[1],tret[2],tret[3],
-        tret[4],tret[5],tret[6],tret[7]);
+    res = swe_lun_eclipse_when(jd, flag, ecltype, tret, backw, err);
+    if (res < 0)
+        return PyErr_Format(pyswe_Error, "swisseph.lun_eclipse_when: %s", err);
+    return Py_BuildValue("i(dddddddddd)", res,tret[0],tret[1],tret[2],tret[3],
+        tret[4],tret[5],tret[6],tret[7],tret[8],tret[9]);
 }
 
 /* swisseph.lun_eclipse_when_loc */
 PyDoc_STRVAR(pyswe_lun_eclipse_when_loc__doc__,
-"Find the next lunar eclipse observable from a given geographic position.\n\n"
-"Args: float jd_start, float lon, float lat, float alt=0.0, bool backward=False,"
-" int flag=FLG_SWIEPH\n"
-"Return: int retflag, (float tret), (float attr)");
+"Find the next lunar eclipse observable from a given geographic position (UT).\n\n"
+":Args: float tjdut, int flags=FLG_SWIEPH, float lon=0.0, float lat=0.0,"
+" float alt=0.0, bool backwards=False\n\n"
+" - tjdut: input time, Julian day number, Universal Time\n"
+" - flags: ephemeris flag\n"
+" - lon: geographic longitude (eastern positive)\n"
+" - lat: geographic latitude (northern positive)\n"
+" - alt: altitude above sea level, in meters\n"
+" - backwards: boolean, set to True to search back in time\n\n"
+":Return: int retflag, (tret), (attr)\n\n"
+" - retflag: returned bit flags:\n"
+"    - ECL_TOTAL or ECL_PENUMBRAL or ECL_PARTIAL\n"
+" - tret: tuple of 10 float, of which:\n"
+"    - 0: time of maximum eclipse\n"
+"    - 1: ?\n"
+"    - 2: time of partial phase begin (indices consistent with solar eclipses)\n"
+"    - 3: time of partial phase end\n"
+"    - 4: time of totality begin\n"
+"    - 5: time of totality end\n"
+"    - 6: time of penumbral phase begin (eclipse begin)\n"
+"    - 7: time of penumbral phase end (eclipse end)\n"
+"    - 8: time of moonrise, if it occurs during the eclipse\n"
+"    - 9: time of moonset, if it occurs during the eclipse\n"
+" - attr: tuple of 20 float, of which:\n"
+"    - 0: umbral magnitude at tjd\n"
+"    - 1: penumbral magnitude\n"
+"    - 2: ?\n"
+"    - 3: ?\n"
+"    - 4: azimuth of moon at tjd\n"
+"    - 5: true altitude of moon above horizon at tjd\n"
+"    - 6: apparent altitude of moon above horizon at tjd\n"
+"    - 7: distance of moon from opposition in degrees (separation angle)\n"
+"    - 8: umbral magnitude at tjd (equals attr[0])\n"
+"    - 9: saros series number (if available; otherwise -99999999)\n"
+"    - 10: saros series member number (if available; otherwise -99999999)\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_lun_eclipse_when_loc FUNCARGS_KEYWDS
 {
-    double jd, geopos[3] = { 0, 0, 0 };
-    double tret[10] = {0,0,0,0,0,0,0,0,0,0};
+    double jd, geopos[3] = {0, 0, 0}, tret[10] = {0,0,0,0,0,0,0,0,0,0};
     double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    int res, backward = 0, flag = SEFLG_SWIEPH;
-    char err[256];
-    static char *kwlist[] = {"jd_start", "lon", "lat", "alt", "backward",
-        "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|dii", kwlist, &jd,
-        &geopos[0], &geopos[1], &geopos[2], &backward, &flag))
+    int res, backw = 0, flag = SEFLG_SWIEPH;
+    char err[256] = {0};
+    static char *kwlist[] = {"tjdut", "flags", "lon", "lat",
+                             "alt", "backwards", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|idddi", kwlist,
+                &jd, &flag, &geopos[0], &geopos[1], &geopos[2], &backw))
         return NULL;
-    res = swe_lun_eclipse_when_loc(jd, flag, geopos, tret, attr, backward, err);
-    if ( res < 0 ) {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
-    return Py_BuildValue("i(dddddddddd)(dddddddddd)", res,tret[0],tret[1],
-        tret[2],tret[3],tret[4],tret[5],tret[6],tret[7],tret[8],tret[9],
+    res = swe_lun_eclipse_when_loc(jd, flag, geopos, tret, attr, backw, err);
+    if (res < 0)
+        return PyErr_Format(pyswe_Error,
+                            "swisseph.lun_eclipse_when_loc: %s", err);
+    return Py_BuildValue("i(dddddddddd)(dddddddddddddddddddd)", res,tret[0],
+        tret[1],tret[2],tret[3],tret[4],tret[5],tret[6],tret[7],tret[8],tret[9],
         attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],attr[7],
-        attr[8],attr[9]);
+        attr[8],attr[9],attr[10],attr[10],attr[10],attr[10],attr[10],attr[10],
+        attr[10],attr[10],attr[10],attr[10]);
 }
 
 /* swisseph.lun_occult_when_glob */
@@ -1769,7 +1840,7 @@ static PyObject * pyswe_lun_occult_when_glob FUNCARGS_KEYWDS
     int res, pl = 0, ecltype = 0, backw = 0, flag = SEFLG_SWIEPH;
     char *star = NULL, st[(SE_MAX_STNAME*2)+1] = {0}, err[256] = {0};
     PyObject *body;
-    static char *kwlist[] = {"tjdut", "body", "flag", "ecltype",
+    static char *kwlist[] = {"tjdut", "body", "flags", "ecltype",
                              "backwards", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dO|iii", kwlist,
             &jd, &body, &flag, &ecltype, &backw))
@@ -1796,7 +1867,8 @@ static PyObject * pyswe_lun_occult_when_glob FUNCARGS_KEYWDS
     }
     res = swe_lun_occult_when_glob(jd, pl, st, flag, ecltype, tret, backw, err);
     if (res < 0)
-        return PyErr_Format(pyswe_Error, "swisseph.lun_occult_when_glob: %s", err);
+        return PyErr_Format(pyswe_Error,
+                            "swisseph.lun_occult_when_glob: %s", err);
     return Py_BuildValue("i(dddddddddd)", res,tret[0],tret[1],tret[2],
         tret[3],tret[4],tret[5],tret[6],tret[7],tret[8],tret[9]);
 }
@@ -1893,44 +1965,82 @@ static PyObject * pyswe_lun_occult_when_loc FUNCARGS_KEYWDS
 
 /* swisseph.lun_occult_where */
 PyDoc_STRVAR(pyswe_lun_occult_where__doc__,
-"Find where a lunar occultation is central or maximal (UTC).\n\n"
-"Args: float julday, int or str body, int flag=FLG_SWIEPH\n"
-"Return: int retval, (float geopos), (float attr)");
+"Find where a lunar occultation is central or maximal (UT).\n\n"
+":Args: float tjdut, int or str body, int flags=FLG_SWIEPH\n\n"
+" - tjdut: input time, Julian day number, Universal Time\n"
+" - body: planet identifier (int) or star name (str)\n"
+" - flags: ephemeris flag\n\n"
+":Return: int retflags, (geopos), (attr)\n\n"
+" - retflags: returned bit flags:\n"
+"    - 0 if there is no occultation at tjd\n"
+"    - ECL_TOTAL\n"
+"    - ECL_ANNULAR\n"
+"    - ECL_TOTAL | ECL_CENTRAL\n"
+"    - ECL_TOTAL | ECL_NONCENTRAL\n"
+"    - ECL_ANNULAR | ECL_CENTRAL\n"
+"    - ECL_ANNULAR | ECL_NONCENTRAL\n"
+"    - ECL_PARTIAL\n"
+" - geopos: tuple of 10 float, of which:\n"
+"    - 0: geographic longitude of central line\n"
+"    - 1: geographic latitude of central line\n"
+"    - 2: geographic longitude of northern limit of umbra\n"
+"    - 3: geographic latitude of northern limit of umbra\n"
+"    - 4: geographic longitude of southern limit of umbra\n"
+"    - 5: geographic latitude of southern limit of umbra\n"
+"    - 6: geographic longitude of northern limit of penumbra\n"
+"    - 7: geographic latitude of northern limit of penumbra\n"
+"    - 8: geographic longitude of southern limit of penumbra\n"
+"    - 9: geographic latitude of southern limit of penumbra\n"
+" - attr: tuple of 20 float, of which:\n"
+"    - 0: fraction of object's diameter covered by moon (magnitude)\n"
+"    - 1: ratio of lunar diameter to object's diameter\n"
+"    - 2: fraction of object's disc covered by moon (obscuration)\n"
+"    - 3: diameter of core shadow in km\n"
+"    - 4: azimuth of object at tjd\n"
+"    - 5: true altitude of object above horizon at tjd\n"
+"    - 6: apparent altitude of object above horizon at tjd\n"
+"    - 7: angular distance of moon from object in degrees\n\n"
+"This function raises an exception (swisseph.Error) in case of fatal error.");
 
 static PyObject * pyswe_lun_occult_where FUNCARGS_KEYWDS
 {
     double jd, geopos[10] = {0,0,0,0,0,0,0,0,0,0};
     double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    int res, plt = 0, flag = SEFLG_SWIEPH;
-    char *star = "", err[256];
+    int res, pl = 0, flag = SEFLG_SWIEPH;
+    char *star = NULL, st[(SE_MAX_STNAME*2)+1] = {0}, err[256] = {0};
     PyObject *body;
-    static char *kwlist[] = {"julday", "body", "flag", NULL};
+    static char *kwlist[] = {"tjdut", "body", "flags", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dO|i", kwlist,
-        &jd, &body, &flag))
+                                     &jd, &body, &flag))
         return NULL;
     if (PyLong_CheckExact(body)) /* long -> planet */
-        plt = (int) PyLong_AsLong(body);
+        pl = (int) PyLong_AsLong(body);
 #if PY_MAJOR_VERSION >= 3
     else if (PyUnicode_CheckExact(body)) /* unicode -> fixed star */
         star = (char*) PyUnicode_AsUTF8(body);
 #elif PY_MAJOR_VERSION < 3
     else if (PyInt_CheckExact(body)) /* int -> planet */
-        plt = (int) PyInt_AsLong(body);
+        pl = (int) PyInt_AsLong(body);
     else if (PyString_CheckExact(body)) /* str -> fixed star */
         star = PyString_AsString(body);
 #endif
     else {
-        PyErr_SetString(pyswe_Error, "swisseph.lun_occult_where: Invalid body type");
+        PyErr_SetString(pyswe_Error,
+                        "swisseph.lun_occult_where: invalid body type");
         return NULL;
     }
-    res = swe_lun_occult_where(jd, plt, star, flag, geopos, attr, err);
-    if (res < 0) {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
+    if (star) {
+        memset(st, 0, (SE_MAX_STNAME*2)+1);
+        strncpy(st, star, SE_MAX_STNAME*2);
     }
-    return Py_BuildValue("i(dddddddddd)(dddddddd)", res,geopos[0],geopos[1],
-        geopos[2],geopos[3],geopos[4],geopos[5],geopos[6],geopos[7],geopos[8],
-        geopos[9],attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],attr[6],attr[7]);
+    res = swe_lun_occult_where(jd, pl, st, flag, geopos, attr, err);
+    if (res < 0)
+        return PyErr_Format(pyswe_Error, "swisseph.lun_occult_where: %s", err);
+    return Py_BuildValue("i(dddddddddd)(dddddddddddddddddddd)", res,geopos[0],
+        geopos[1],geopos[2],geopos[3],geopos[4],geopos[5],geopos[6],geopos[7],
+        geopos[8],geopos[9],attr[0],attr[1],attr[2],attr[3],attr[4],attr[5],
+        attr[6],attr[7],attr[8],attr[9],attr[10],attr[11],attr[12],attr[13],
+        attr[14],attr[15],attr[16],attr[17],attr[18],attr[19]);
 }
 
 /* swisseph.mooncross */
@@ -2452,10 +2562,10 @@ static PyObject * pyswe_sidtime0 FUNCARGS_KEYWDS
 PyDoc_STRVAR(pyswe_sol_eclipse_how__doc__,
 "Calculate attributes of a solar eclipse for a given geographic position and"
 " time.\n\n"
-":Args: float tjdut, int flag=FLG_SWIEPH, float lon=0.0, float lat=0.0, float"
+":Args: float tjdut, int flags=FLG_SWIEPH, float lon=0.0, float lat=0.0, float"
 " alt=0.0\n\n"
 " - tjdut: input time, Julian day number, Universal Time\n"
-" - flag: ephemeris flag\n"
+" - flags: ephemeris flag\n"
 " - lon: geographic longitude (eastern positive)\n"
 " - lat: geographic latitude (northern positive)\n"
 " - alt: geographic altitude above sea level, in meters\n\n"
@@ -2484,7 +2594,7 @@ static PyObject * pyswe_sol_eclipse_how FUNCARGS_KEYWDS
     double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     int res, flag = SEFLG_SWIEPH;
     char err[256] = {0};
-    static char *kwlist[] = {"tjdut", "flag", "lon", "lat", "alt", NULL};
+    static char *kwlist[] = {"tjdut", "flags", "lon", "lat", "alt", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|iddd", kwlist,
             &jd, &flag, &geopos[0], &geopos[1], &geopos[2]))
         return NULL;
@@ -2502,10 +2612,10 @@ static PyObject * pyswe_sol_eclipse_how FUNCARGS_KEYWDS
 /* swisseph.sol_eclipse_when_glob */
 PyDoc_STRVAR(pyswe_sol_eclipse_when_glob__doc__,
 "Find the next solar eclipse globally (UT).\n\n"
-":Args: float tjdut, int flag=FLG_SWIEPH, int ecltype=ECL_ALLTYPES_SOLAR, bool"
+":Args: float tjdut, int flags=FLG_SWIEPH, int ecltype=0, bool"
 " backwards=False\n\n"
 " - tjdut: input time, Julian day number, Universal Time\n"
-" - flag: ephemeris flag\n"
+" - flags: ephemeris flag\n"
 " - ecltype: bit flags for eclipse type wanted:\n"
 "    - ECL_CENTRAL ECL_NONCENTRAL ECL_TOTAL ECL_ANNULAR ECL_PARTIAL\n"
 "    - ECL_ANNULAR_TOTAL (equals ECL_HYBRID)\n"
@@ -2532,9 +2642,9 @@ PyDoc_STRVAR(pyswe_sol_eclipse_when_glob__doc__,
 static PyObject * pyswe_sol_eclipse_when_glob FUNCARGS_KEYWDS
 {
     double jd, tret[10] = {0,0,0,0,0,0,0,0,0,0};
-    int res, ecltype = SE_ECL_ALLTYPES_SOLAR, backw = 0, flag = SEFLG_SWIEPH;
+    int res, ecltype = 0, backw = 0, flag = SEFLG_SWIEPH;
     char err[256] = {0};
-    static char *kwlist[] = {"tjdut", "flag", "ecltype", "backwards", NULL};
+    static char *kwlist[] = {"tjdut", "flags", "ecltype", "backwards", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|iii", kwlist,
             &jd, &flag, &ecltype, &backw))
         return NULL;
@@ -2549,10 +2659,10 @@ static PyObject * pyswe_sol_eclipse_when_glob FUNCARGS_KEYWDS
 /* swisseph.sol_eclipse_when_loc */
 PyDoc_STRVAR(pyswe_sol_eclipse_when_loc__doc__,
 "Find the next solar eclipse for a given geographic position (UT).\n\n"
-":Args: float tjdut, int flag=FLG_SWIEPH, float lon=0.0, float lat=0.0, float"
+":Args: float tjdut, int flags=FLG_SWIEPH, float lon=0.0, float lat=0.0, float"
 " alt=0.0, bool backwards=False\n\n"
 " - tjdut: input time, Julian day number, Universal Time\n"
-" - flag: ephemeris flag\n"
+" - flags: ephemeris flag\n"
 " - lon: geographic longitude (eastern positive)\n"
 " - lat: geographic latitude (northern positive)\n"
 " - alt: geographic altitude above sea level, in meters\n"
@@ -2592,7 +2702,7 @@ static PyObject * pyswe_sol_eclipse_when_loc FUNCARGS_KEYWDS
     double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     int res, backw = 0, flag = SEFLG_SWIEPH;
     char err[256] = {0};
-    static char *kwlist[] = {"tjdut", "flag", "lon", "lat", "alt",
+    static char *kwlist[] = {"tjdut", "flags", "lon", "lat", "alt",
                              "backwards", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|idddi", kwlist,
             &jd, &flag, &geopos[0], &geopos[1], &geopos[2], &backw))
@@ -2613,9 +2723,9 @@ static PyObject * pyswe_sol_eclipse_when_loc FUNCARGS_KEYWDS
 /* swisseph.sol_eclipse_where */
 PyDoc_STRVAR(pyswe_sol_eclipse_where__doc__,
 "Find where a solar eclipse is central or maximal (UT).\n\n"
-":Args: float tjdut, int flag=FLG_SWIEPH\n\n"
+":Args: float tjdut, int flags=FLG_SWIEPH\n\n"
 " - tjdut: input time, Julian day number, Universal Time\n"
-" - flag: ephemeris flag\n\n"
+" - flags: ephemeris flag\n\n"
 ":Return: int retflags, (geopos), (attr)\n\n"
 " - retflags: returned bit flags:\n"
 "    - ECL_TOTAL\n"
@@ -2658,7 +2768,7 @@ static PyObject * pyswe_sol_eclipse_where FUNCARGS_KEYWDS
     double attr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     int res, flag = SEFLG_SWIEPH;
     char err[256] = {0};
-    static char *kwlist[] = {"tjdut", "flag", NULL};
+    static char *kwlist[] = {"tjdut", "flags", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist, &jd, &flag))
         return NULL;
     res = swe_sol_eclipse_where(jd, flag, geopos, attr, err);
