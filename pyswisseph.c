@@ -322,15 +322,15 @@ static PyObject * pyswe_close FUNCARGS_SELF
 /* swisseph.cotrans */
 PyDoc_STRVAR(pyswe_cotrans__doc__,
 "Coordinate transformation from ecliptic to equator or vice-versa.\n\n"
-"Args: float lon, float lat, float dist, float obliquity\n"
-"Return: (float longitude, latitude, distance)\n\n"
+":Args: float lon, float lat, float dist, float obliquity\n\n"
 " - lon: longitude to convert\n"
 " - lat: latitude to convert\n"
 " - dist: distance to convert (unchanged, can be set to 1)\n"
-" - obliquity: obliquity of ecliptic, in degrees\n"
-" - longitude: converted longitude\n"
-" - latitude: converted latitude\n"
-" - distance: converted distance\n\n"
+" - obliquity: obliquity of ecliptic, in degrees\n\n"
+":Return: float retlon, retlat, retdist\n\n"
+" - retlon: converted longitude\n"
+" - retlat: converted latitude\n"
+" - retdist: converted distance\n\n"
 "For equatorial to ecliptical, obliquity must be positive. From ecliptical to"
 " equatorial, obliquity must be negative. lon, lat and obliquity are in"
 " positive degrees.");
@@ -340,27 +340,26 @@ static PyObject * pyswe_cotrans FUNCARGS_KEYWDS
     double xpo[3], xpn[3], eps;
     static char *kwlist[] = {"lon", "lat", "dist", "obliquity", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddd", kwlist,
-        &xpo[0], &xpo[1], &xpo[2], &eps))
+                                     &xpo[0], &xpo[1], &xpo[2], &eps))
         return NULL;
     swe_cotrans(xpo, xpn, eps);
-    return Py_BuildValue("(ddd)", xpn[0], xpn[1], xpn[2]);
+    return Py_BuildValue("ddd", xpn[0], xpn[1], xpn[2]);
 }
 
 /* swisseph.cotrans_sp */
 PyDoc_STRVAR(pyswe_cotrans_sp__doc__,
 "Coordinate transformation of position and speed, from ecliptic to equator"
 " or vice-versa.\n\n"
-"Args: float lon, float lat, float dist, float lonspeed, float latspeed,"
-" float distspeed, float obliquity\n"
-"Return: (float longitude, latitude, distance, longitude_speed, latitude_speed,"
-" distance_speed)\n\n"
+":Args: float lon, float lat, float dist, float lonspeed, float latspeed,"
+" float distspeed, float obliquity\n\n"
 " - lon, lonspeed: longitude and its speed to convert\n"
 " - lat, latspeed: latitude and its speed to convert\n"
 " - dist, distspeed: distance and its speed to convert\n"
-" - obliquity: obliquity of ecliptic, in degrees.\n"
-" - longitude, longitude_speed: converted longitude and its speed\n"
-" - latitude, latitude_speed: converted latitude and its speed\n"
-" - distance, distance_speed: converted distance and its speed\n\n"
+" - obliquity: obliquity of ecliptic, in degrees\n\n"
+":Return: float retlon, retlat, retdist, retlonsp, retlatsp, retdistsp\n\n"
+" - retlon, retlonsp: converted longitude and its speed\n"
+" - retlat, retlatsp: converted latitude and its speed\n"
+" - retdist, retdistsp: converted distance and its speed\n\n"
 "For equatorial to ecliptical, obliquity must be positive. From ecliptical to"
 " equatorial, obliquity must be negative. lon, lat, their speeds and obliquity"
 " are in positive degrees.");
@@ -369,12 +368,12 @@ static PyObject * pyswe_cotrans_sp FUNCARGS_KEYWDS
 {
     double xpo[6], xpn[6], eps;
     static char *kwlist[] = {"lon", "lat", "dist", "lonspeed",
-        "latspeed", "distspeed", "obliquity", NULL};
+                             "latspeed", "distspeed", "obliquity", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddddddd", kwlist,
-        &xpo[0], &xpo[1], &xpo[2], &xpo[3], &xpo[4], &xpo[5], &eps))
+                &xpo[0], &xpo[1], &xpo[2], &xpo[3], &xpo[4], &xpo[5], &eps))
         return NULL;
-    swe_cotrans(xpo, xpn, eps);
-    return Py_BuildValue("(dddddd)", xpn[0],xpn[1],xpn[2],xpn[3],xpn[4],xpn[5]);
+    swe_cotrans_sp(xpo, xpn, eps);
+    return Py_BuildValue("dddddd", xpn[0],xpn[1],xpn[2],xpn[3],xpn[4],xpn[5]);
 }
 
 /* swisseph.cs2degstr */
