@@ -20,10 +20,10 @@ position:
 
     These flag bits in ``flags`` can be useful:
 
-     - ``swe.FLG_TRUEPOS``
-     - ``swe.FLG_NONUT``
-     - ``swe.FLG_EQUATORIAL`` (``x2cross`` is a rectascension value, a point on
-       the equator, and not on the ecliptic)
+    - ``swe.FLG_TRUEPOS``
+    - ``swe.FLG_NONUT``
+    - ``swe.FLG_EQUATORIAL`` (``x2cross`` is a rectascension value, a point on
+      the equator, and not on the ecliptic)
 
     The precision is 1 milliarcsecond, i.e. at the returned time the Sun
     (or Moon) is closer than 0.001 arcsec to ``x2cross``.

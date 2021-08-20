@@ -2,13 +2,24 @@
 Contents
 ========
 
-**Python Extension to the Swiss Ephemeris**
+**Python Extension to the Swiss Ephemeris** -- *Ephemeris for developers of
+astrological softwares*
 
-*Ephemeris for developers of astrological softwares in Python*
+.. image:: image001.png
+    :align: center
+
+Original documentation is Copyright Astrodienst AG 1997-2021
+
+:Authors: Dieter Koch and Dr. Alois Treindl
+:Website: https://www.astro.com/swisseph
+:Mailing-list: https://groups.io/g/swisseph/
 
 .. note::
-    This document is a work in progress.
-    Head to https://github.com/astrorigin/pyswisseph if you want to contribute.
+
+    This version of the documention, adapted for the Python programming
+    language, is a work in progress.
+    Head to https://github.com/astrorigin/pyswisseph if you want to
+    participate.
 
 .. toctree::
     :maxdepth: 3
@@ -16,13 +27,14 @@ Contents
     installation
     introduction
     The ephemerides <ephemerides/index>
-    Programmer's manual <programmers_manual/index>
+    programmers_manual/index
 
 
-.. Indices and tables
-.. ==================
+Indices and tables
+==================
 
-.. * :ref:`genindex`
+* :ref:`Index of functions <genindex>`
+
 .. * :ref:`modindex`
 .. * :ref:`search`
 

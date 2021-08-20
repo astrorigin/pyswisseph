@@ -21,19 +21,19 @@ topocentric, speed, nutation flags etc. See chapter
 The parameter ``method`` tells the function what kind of nodes or apsides are
 required:
 
- - ``swe.NODBIT_MEAN``: Mean nodes and apsides are calculated for the bodies
-   that have them, i.e. for the Moon and the planets Mercury through Neptune,
-   osculating ones for Pluto and the asteroids. This is the default method.
- - ``swe.NODBIT_OSCU``: Osculating nodes and apsides are calculated for all
-   bodies.
- - ``swe.NODBIT_OSCU_BAR``: Osculating nodes and apsides are calculated for all
-   bodies. With planets beyond Jupiter, the nodes and apsides are calculated
-   from barycentric positions and speed. See chapter TODO.
+- ``NODBIT_MEAN``: Mean nodes and apsides are calculated for the bodies
+  that have them, i.e. for the Moon and the planets Mercury through Neptune,
+  osculating ones for Pluto and the asteroids. This is the default method.
+- ``NODBIT_OSCU``: Osculating nodes and apsides are calculated for all
+  bodies.
+- ``NODBIT_OSCU_BAR``: Osculating nodes and apsides are calculated for all
+  bodies. With planets beyond Jupiter, the nodes and apsides are calculated
+  from barycentric positions and speed. See chapter TODO.
 
-   If this bit is combined with ``swe.NODBIT_MEAN``, mean values are given for
-   the planets Mercury - Neptune.
- - ``swe.NODBIT_FOPOINT``: The second focal point of the orbital ellipse is
-   computed and returned in the array of the aphelion. This bit can be combined
-   with any other bit.
+  If this bit is combined with ``NODBIT_MEAN``, mean values are given for
+  the planets Mercury - Neptune.
+- ``NODBIT_FOPOINT``: The second focal point of the orbital ellipse is
+  computed and returned in the array of the aphelion. This bit can be combined
+  with any other bit.
 
 ..

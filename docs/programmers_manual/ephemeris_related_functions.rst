@@ -2,8 +2,8 @@
 The Ephemeris file related functions
 ====================================
 
-swisseph.set_ephe_path
-======================
+The ephemeris path
+==================
 
 This is the first function that should be called before any other function of
 the Swiss Ephemeris. Even if you don't want to set an ephemeris path and use
@@ -40,13 +40,13 @@ string.
 If the path is longer than 256 bytes, ``set_ephe_path()`` sets the path to a
 predefined default value instead:
 
-=========== ==============================
+=========== ==================================
 Platform    Default SE_EPHE_PATH
-=========== ==============================
-Windows     "\\sweph\\ephe"
-Mac         ":ephe:"
-Unixes      ".:/users/ephe2/:/users/ephe/"
-=========== ==============================
+=========== ==================================
+Windows     ``"\\sweph\\ephe"``
+Mac         ``":ephe:"``
+Unixes      ``".:/users/ephe2/:/users/ephe/"``
+=========== ==================================
 
 If no environment variable exists and ``set_ephe_path()`` is never called, the
 built-in ephemeris path is used.
@@ -65,13 +65,13 @@ directory. This allows him to use only one set of installed ephemeris files for
 all different applications. A developer should accept this override feature and
 allow the sophisticated users to exploit it.
 
-swisseph.close
+Release memory
 ==============
 
 .. autofunction:: swisseph.close
 
-swisseph.set_jpl_file
-=====================
+The JPL files
+=============
 
 .. autofunction:: swisseph.set_jpl_file
 
@@ -81,8 +81,8 @@ swisseph.set_jpl_file
     name to a length of 256 bytes. The error will become visible after the
     first call of ``calc()``, when it will raise an exception.
 
-swisseph.version
-================
+Library version
+===============
 
 This string constant is the version number of the Swiss Ephemeris library being
 used.
@@ -91,13 +91,13 @@ used.
 
    se_version_major, se_version_minor, se_version_patch = swe.version.split('.')
 
-swisseph.get_library_path
-=========================
+Library path
+============
 
 .. autofunction:: swisseph.get_library_path
 
-swisseph.get_current_file_data
-==============================
+Inspect ephemeris files
+=======================
 
 .. autofunction:: swisseph.get_current_file_data
 

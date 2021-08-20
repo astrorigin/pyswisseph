@@ -7,7 +7,8 @@ import unittest
 class TestSweCotransSp(unittest.TestCase):
 
     def test_01(self):
-        xx = swe.cotrans_sp(121.34, 43.57, 1.0, 1.1, 5.5, 1.0, 23.4)
+        coord = (121.34, 43.57, 1.0, 1.1, 5.5, 1.0)
+        xx = swe.cotrans_sp(coord, 23.4)
         self.assertIsInstance(xx, tuple)
         self.assertEqual(len(xx), 6)
         self.assertAlmostEqual(xx[0], 114.11984833491826)

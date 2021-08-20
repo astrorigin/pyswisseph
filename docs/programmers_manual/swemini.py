@@ -8,7 +8,7 @@ swe.set_ephe_path(None)
 flag = swe.FLG_SPEED
 
 while True:
-    date = input('Date (d.m.y) ?')
+    date = input('Date (d.m.y) ? (type . to exit) : ')
     # stop if a period . is entered
     if date == '.':
         break
@@ -23,8 +23,9 @@ while True:
     except ValueError:
         continue
     # we have day, month, year and convert to julian day
-    res, tjd_ut = swe.date_conversion(jyear, jmon, jday, 0.0)
-    print("date: %02d.%02d.%d at 0:00 Universal time" % (jday, jmon, jyear))
+    isvalid, tjd_ut, dt = swe.date_conversion(jyear, jmon, jday, 0.0)
+    print("date: %02d.%02d.%02d at 0:00 Universal time" % (dt[2], dt[1], dt[0]))
+    print("julian day: %d" % tjd_ut)
     print("planet\tlongitude\tlatitude\tdistance\tspeed long.")
     # loop over all planets
     for p in range(swe.SUN, swe.CHIRON+1):

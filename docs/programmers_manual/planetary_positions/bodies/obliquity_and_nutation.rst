@@ -13,13 +13,13 @@ needed as a separate value.
 
 ``xx`` is a tuple of 6 floats as usual. It will be filled as follows:
 
-======= ==================================================
-xx[0]   true obliquity of the Ecliptic (includes nutation)
-xx[1]   mean obliquity of the Ecliptic
-xx[2]   nutation in longitude
-xx[3]   nutation in obliquity
-xx[4]   0
-xx[5]   0
-======= ==================================================
+=========== ==================================================
+``xx[0]``   true obliquity of the Ecliptic (includes nutation)
+``xx[1]``   mean obliquity of the Ecliptic
+``xx[2]``   nutation in longitude
+``xx[3]``   nutation in obliquity
+``xx[4]``   0
+``xx[5]``   0
+=========== ==================================================
 
 ..

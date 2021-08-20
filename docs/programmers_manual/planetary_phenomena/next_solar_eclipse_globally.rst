@@ -23,23 +23,23 @@ the function ``deltat()``. TODO
 The parameter ``ecltype`` specifies the eclipse type wanted. It can be a
 combination of the following bits:
 
- - ``swe.ECL_CENTRAL``
- - ``swe.ECL_NONCENTRAL``
- - ``swe.ECL_TOTAL``
- - ``swe.ECL_ANNULAR``
- - ``swe.ECL_PARTIAL``
- - ``swe.ECL_ANNULAR_TOTAL`` (equals ``swe.ECL_HYBRID``)
- - ``swe.ECL_ALLTYPES_SOLAR`` (or ``0`` for any type)
+- ``ECL_CENTRAL``
+- ``ECL_NONCENTRAL``
+- ``ECL_TOTAL``
+- ``ECL_ANNULAR``
+- ``ECL_PARTIAL``
+- ``ECL_ANNULAR_TOTAL`` (equals ``ECL_HYBRID``)
+- ``ECL_ALLTYPES_SOLAR`` (or ``0`` for any type)
 
 Recommended values for ``ecltype``:
 
- - Search for any eclipse, no matter which: ``ecltype = 0``
- - Search a total eclipse (nb: non-central total eclipses are very rare):
-   ``ecltype = swe.ECL_TOTAL | swe.ECL_CENTRAL | swe.ECL_NONCENTRAL``
- - Search an annular eclipse: ``ecltype = swe.ECL_ANNULAR | swe.ECL_CENTRAL |
-   swe.ECL_NONCENTRAL``
- - Search an annular-total (hybrid) eclipse: ``ecltype = swe.ECL_ANNULAR_TOTAL
-   | swe.ECL_CENTRAL | swe.ECL_NONCENTRAL``
- - Search a partial eclipse: ``ecltype = swe.ECL_PARTIAL``
+- Search for any eclipse, no matter which: ``ecltype = 0``
+- Search a total eclipse (nb: non-central total eclipses are very rare):
+  ``ecltype = ECL_TOTAL | ECL_CENTRAL | ECL_NONCENTRAL``
+- Search an annular eclipse: ``ecltype = ECL_ANNULAR | ECL_CENTRAL |
+  ECL_NONCENTRAL``
+- Search an annular-total (hybrid) eclipse: ``ecltype = ECL_ANNULAR_TOTAL
+  | ECL_CENTRAL | ECL_NONCENTRAL``
+- Search a partial eclipse: ``ecltype = ECL_PARTIAL``
 
 ..

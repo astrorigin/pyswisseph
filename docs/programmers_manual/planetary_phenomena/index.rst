@@ -33,7 +33,20 @@ Lunar eclipses:
 
 Risings, settings, and meridian transits of planets and stars:
 
+.. toctree::
+
+    risings_settings_meridian_transits
+
 Other planetary phenomena:
 
+.. toctree::
+
+    phase_elongation_diameter_magnitude
+    horizontal_coordinates
+    ecliptical_or_equatorial_coordinates
+    refraction
+    heliacal_risings_and_settings
+    magnitude_limit_for_visibility
+    heliacal_details
 
 ..

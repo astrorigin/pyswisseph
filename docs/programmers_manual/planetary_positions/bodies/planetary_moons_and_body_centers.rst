@@ -99,8 +99,8 @@ Pluto       0.088  arcsec (jd 2437372.5)
 
 If you prefer using COB rather than barycenters, you should understand that:
 
- - The performance is not as good for COB as for barycenters. With transit
-   calculations you could run into troubles.
- - The ephemerides are limited to the time range 1900 to 2047.
+- The performance is not as good for COB as for barycenters. With transit
+  calculations you could run into troubles.
+- The ephemerides are limited to the time range 1900 to 2047.
 
 ..

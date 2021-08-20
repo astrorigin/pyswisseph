@@ -1,0 +1,11 @@
+# This file allows make new Delta T known to the Swiss Ephemeris.
+# Note, these values override the values given in the internal Delta T
+# table of the Swiss Ephemeris.
+# Format: year and seconds (decimal)
+2003 64.47
+2004 65.80
+2005 66.00
+2006 67.00
+2007 68.00
+2008 68.00
+2009 69.00
