@@ -1,11 +1,14 @@
 include LICENSE.txt
 include README.rst
+include docs/*
 include libswe/LICENSE
 include libswe/*.c
 include libswe/*.h
 include swephelp/*.c
+include swephelp/*.cpp
 include swephelp/*.h
+include swephelp/*.hpp
 include swephelp/*.txt
 include swephelp/sqlite3/sqlite3.c
 include swephelp/sqlite3/*.h
-
+include tests/*.py
