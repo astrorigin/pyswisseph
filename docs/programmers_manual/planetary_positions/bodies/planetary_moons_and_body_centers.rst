@@ -10,20 +10,20 @@ Their Swiss Ephemeris body numbers are between ``PLMOON_OFFSET`` (= 9000) and
 
 .. code-block:: python
 
-    ipl = swe.PLMOON_OFFSET + planet_number * 100 + moon_number_in_JPL_Horizons
+    pl = swe.PLMOON_OFFSET + planet_number * 100 + moon_number_in_JPL_Horizons
 
 E.g., Jupiter moon Io:
 
 .. code-block:: python
 
-    ipl = swe.PLMOON_OFFSET + swe.JUPITER * 100 + 1 # 9000 + 5 * 100 + 1 = 9501
+    pl = swe.PLMOON_OFFSET + swe.JUPITER * 100 + 1 # 9000 + 5 * 100 + 1 = 9501
 
 Centers of body (COB) are calculated the same way, i.e. like a planetary moon
 but with the "moon number" 99 e.g. Jupiter center of body:
 
 .. code-block:: python
 
-    ipl = swe.PLMOON_OFFSET + swe.JUPITER * 100 + 99 # = 9599)
+    pl = swe.PLMOON_OFFSET + swe.JUPITER * 100 + 99 # = 9599
 
 =========== =============== ====
 Planet      Moon numbers    COB

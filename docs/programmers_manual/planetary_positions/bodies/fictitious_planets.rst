@@ -12,13 +12,13 @@ planet number of a fictitious planet is defined as:
 
 .. code-block:: python
 
-    ipl = swe.FICT_OFFSET - 1 + nth_fictitious_planet
+    pl = swe.FICT_OFFSET - 1 + nth_fictitious_planet
 
 e.g. for Kronos:
 
 .. code-block:: python
 
-    ipl = 40 - 1 + 4 = 43
+    pl = 40 - 1 + 4 = 43
 
 The file ``seorbel.txt`` has the following structure:
 
@@ -44,7 +44,7 @@ given in the elements and does not compute it internally.
 
 From version 1.62 on, the software also accepts orbital elements for fictitious
 bodies that move about the Earth. As an example, study the last elements set in
-the excerpt of ``seorbel.txt`` above. After the name of the body, ``, geo``
+the excerpt of ``seorbel.txt`` above. After the name of the body, ``", geo"``
 has to be added.
 
 ..

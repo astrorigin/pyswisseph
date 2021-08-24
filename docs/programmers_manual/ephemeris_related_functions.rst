@@ -2,6 +2,8 @@
 The Ephemeris file related functions
 ====================================
 
+.. _The ephemeris path:
+
 The ephemeris path
 ==================
 

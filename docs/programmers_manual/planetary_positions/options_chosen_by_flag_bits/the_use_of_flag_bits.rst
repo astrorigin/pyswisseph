@@ -58,20 +58,19 @@ Constant name           Usage
 
 .. note::
 
-    Center of body can be calculated either:
+    Center of body can be calculated either, with a flag:
 
     .. code-block:: python
 
-        # with a flag
-        ipl = swe.JUPITER
+        pl = swe.JUPITER
         flags |= swe.FLG_CENTER_BODY
 
     or, without any additional flags:
 
     .. code-block:: python
 
-        ipl = swe.PLMOON_OFFSET + swe.JUPITER * 100 + 99
-        xx, retflags = swe.calc_ut(jd, ipl, flags)
+        pl = swe.PLMOON_OFFSET + swe.JUPITER * 100 + 99
+        xx, retflags = swe.calc_ut(jd, pl, flags)
 
     See
     :doc:`/programmers_manual/planetary_positions/bodies/planetary_moons_and_body_centers`

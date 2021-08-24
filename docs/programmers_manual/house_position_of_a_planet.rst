@@ -28,14 +28,17 @@ geometrically accurate.
 Currently, geometrically correct house positions are provided for the following
 house methods:
 
-P Placidus, K Koch, C Campanus, R Regiomontanus, U Krusinski, A/E Equal,
-V Vehlow, W Whole Signs, D Equal/MC, N Equal/Zodiac, O Porphyry, B Alcabitius,
-X Meridian, F Carter, M Morinus, T Polich/Page, H Horizon, G Gauquelin.
+``P`` Placidus, ``K`` Koch, ``C`` Campanus, ``R`` Regiomontanus,
+``U`` Krusinski, ``A``/``E`` Equal, ``V`` Vehlow, ``W`` Whole Signs,
+``D`` Equal/MC, ``N`` Equal/Zodiac, ``O`` Porphyry, ``B`` Alcabitius,
+``X`` Meridian, ``F`` Carter, ``M`` Morinus, ``T`` Polich/Page, ``H`` Horizon,
+``G`` Gauquelin.
 
 A simplified house position (distance_from_cusp / house_size) is currently
 provided for the following house methods:
 
-Y APC houses, L Pullen SD, Q Pullen SR, I Sunshine, S Sripati.
+``Y`` APC houses, ``L`` Pullen SD, ``Q`` Pullen SR, ``I`` Sunshine,
+``S`` Sripati.
 
 This function requires *tropical* positions in xpin. *Sidereal* house positions
 are identical to tropical ones in the following cases:

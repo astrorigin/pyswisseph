@@ -78,6 +78,6 @@ the perigee.)
 Small discontinuities in ephemeris of true node and apogee based on compressed file
 ===================================================================================
 
-See remarks in chapter about the True Node.
+See remarks in chapter :doc:`true_node`.
 
 ..

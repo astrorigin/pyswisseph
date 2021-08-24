@@ -26,9 +26,8 @@ you can use the following constants: ``swe.AUNIT_TO_LIGHTYEAR`` and
 The daily motions of the fixed stars contain components of precession,
 nutation, aberration, parallax and the proper motions of the stars.
 
-If a star is found, its name is returned in the following format::
-
-    traditional_name, nomenclature_name -- e.g. "Aldebaran,alTau"
+If a star is found, its name is returned in the following format:
+``traditional_name,nomenclature_name`` e.g. ``"Aldebaran,alTau"``.
 
 The nomenclature name is usually the so-called Bayer designation or the
 Flamsteed designation, in some cases also Henry Draper (HD) or other

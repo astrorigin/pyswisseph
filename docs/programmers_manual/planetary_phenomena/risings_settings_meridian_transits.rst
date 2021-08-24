@@ -44,27 +44,27 @@ The variable ``rsmi`` can have the following values:
 =================== =============================================================
 Constant name       Comment
 =================== =============================================================
-CALC_RISE
-CALC_SET
-CALC_MTRANSIT       Upper meridian transit (southern for northern geo. latitudes)
-CALC_ITRANSIT       Lower meridian transit (northern, below the horizon)
+``CALC_RISE``
+``CALC_SET``
+``CALC_MTRANSIT``   Upper meridian transit (southern for northern geo. latitudes)
+``CALC_ITRANSIT``   Lower meridian transit (northern, below the horizon)
 =================== =============================================================
 
 And the following bits can be added (or'ed) to ``CALC_RISE`` or ``CALC_SET``:
 
-======================= ===================================================================
-Constant name           Comment
-======================= ===================================================================
-BIT_DISC_CENTER         For rising or setting of disc center
-BIT_DISC_BOTTOM         For rising or setting of lower limb of disc
-BIT_GEOCTR_NO_ECL_LAT   Use topocentric position of object and ignore its ecliptic latitude
-BIT_NO_REFRACTION       If refraction is not to be considered
-BIT_CIVIL_TWILIGHT      In order to calculate civil twilight
-BIT_NAUTIC_TWILIGHT     In order to calculate nautical twilight
-BIT_ASTRO_TWILIGHT      In order to calculate astronomical twilight
-BIT_FIXED_DISC_SIZE     Neglect the effect of distance on disc size
-BIT_HINDU_RISING        (BIT_DISC_CENTER | BIT_NO_REFRACTION | BIT_GEOCTR_NO_ECL_LAT)
-======================= ===================================================================
+=========================== ===================================================================
+Constant name               Comment
+=========================== ===================================================================
+``BIT_DISC_CENTER``         For rising or setting of disc center
+``BIT_DISC_BOTTOM``         For rising or setting of lower limb of disc
+``BIT_GEOCTR_NO_ECL_LAT``   Use topocentric position of object and ignore its ecliptic latitude
+``BIT_NO_REFRACTION``       If refraction is not to be considered
+``BIT_CIVIL_TWILIGHT``      In order to calculate civil twilight
+``BIT_NAUTIC_TWILIGHT``     In order to calculate nautical twilight
+``BIT_ASTRO_TWILIGHT``      In order to calculate astronomical twilight
+``BIT_FIXED_DISC_SIZE``     Neglect the effect of distance on disc size
+``BIT_HINDU_RISING``        (``BIT_DISC_CENTER | BIT_NO_REFRACTION | BIT_GEOCTR_NO_ECL_LAT``)
+=========================== ===================================================================
 
 .. note::
 
