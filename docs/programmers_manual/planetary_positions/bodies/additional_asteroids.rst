@@ -7,13 +7,13 @@ be constructed as follows:
 
 .. code-block:: python
 
-    ipl = swe.AST_OFFSET + minor_planet_catalogue_number
+    pl = swe.AST_OFFSET + minor_planet_catalogue_number
 
 e.g. for asteroid Eros:
 
 .. code-block:: python
 
-    ipl = swe.AST_OFFSET + 433
+    pl = swe.AST_OFFSET + 433
 
 .. note::
 

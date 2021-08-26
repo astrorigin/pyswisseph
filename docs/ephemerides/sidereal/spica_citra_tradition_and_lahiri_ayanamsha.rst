@@ -147,7 +147,7 @@ Thus, Lahiri actually wanted to base his ayanamsha on the mean equinox of a
 when the *mean* Sun was at zero aries tropically (mean equinox of date).
 Moreover he wanted to have a mean new-moon on the same day also and the star
 Citra/Spica at tropical 0° Libra/Tula exactly. (For testing, such an ayanamsha
-was added to the Swiss Ephemeris as ayanamsha No. 44.)
+was added to the Swiss Ephemeris as ayanamsha No. 44, ``SIDM_LAHIRI_VP285``)
 
 However, then Lahiri continues:
 "Due to proper motion of the star, the nirayana longitude of Spica has however
@@ -181,7 +181,7 @@ However, since Lahiri considered his zero date as essential to his ayanamsha,
 the Swiss Ephemeris calculates it using the modern precession model Vondrák
 2011, which for the same date provides the value 22°28' 0.90375.
 
-From all this, it is obvious that there are several „Lahiri ayanamsha", and the
+From all this, it is obvious that there are several "Lahiri ayanamsha", and the
 standard Lahiri ayanamsha which was adopted by the ICRC is not exactly what he
 had intended.
 
@@ -191,7 +191,8 @@ Ayanamsha having Spica/Citra at polar longitude 180° in 499 CE
 :Sweph n°: ``SIDM_SS_CITRA``
 :Ayanamsha: 2.11070444
 :t0: 21 Mar 499, 7:30:31.57 UT = noon at Ujjain, 75.7684565 E
-:Note: Spica at polar ecliptic longitude 180° on equinox 499, Spica (2000) 180°50' 3
+:Note: Spica at polar ecliptic longitude 180° on equinox 499, Spica (2000)
+       180°50' 3
 
 As has been stated, the Suryasiddhanta gives the position of Spica/Citra as
 180° in polar longitude (ecliptic longitude, but projection along meridian
@@ -211,8 +212,8 @@ the star has some proper motion and is not really fixed relative to a fixed
 reference frame.
 
 In the year 285, when the star was conjunct the autumnal equinox, its position
-was 180°00'17 (swetest -b1.1.285 -pf -xfSpica  -sid1 -true -bary -head -fTPL
--s365 -n2). Only in the year 675 CE, its position was exactly 180°. The motion
+was 180°00'17 (``swetest -b1.1.285 -pf -xfSpica  -sid1 -true -bary -head -fTPL
+-s365 -n2``). Only in the year 675 CE, its position was exactly 180°. The motion
 of the star is partly caused by its proper motion. Another part of its motion
 is apparent only, due to the so-called planetary precession, which causes very
 slow changes in the orientation of the ecliptic plane. As can be seen from the

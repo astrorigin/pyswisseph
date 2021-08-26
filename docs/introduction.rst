@@ -14,7 +14,7 @@ Swiss Ephemeris will, as we hope, be able to keep abreast to the scientific
 advances in ephemeris computation for the coming decades.
 
 Licensing
----------
+=========
 
 The Swiss Ephemeris is not a product for end users. It is a toolset for
 programmers to build into their astrological software.
@@ -30,7 +30,7 @@ The choice must be made before the software developer distributes software
 containing parts of Swiss Ephemeris to others, and before any public service
 using the developed software is activated.
 
-If the developer choses the GNU GPL software license, he or she must fulfill
+If the developer choses the GNU AGPL software license, he or she must fulfill
 the conditions of that license, which includes the obligation to place his or
 her whole software project under the GNU AGPL or a compatible license.
 See https://www.gnu.org/licenses/agpl-3.0.en.html
@@ -50,7 +50,7 @@ Professional license: The license fee for the first license is Swiss Francs
 An unlimited license is available for CHF 1550.-.
 
 Status of this documentation
-----------------------------
+============================
 
 This documentation is tailored to users of the Python extension to the Swiss
 Ephemeris library (Pyswisseph).

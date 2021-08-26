@@ -5,9 +5,9 @@ Ephemeris flags
 The flags to choose an ephemeris are:
 
 =============== =====================
-FLG_JPLEPH      Use JPL ephemeris
-FLG_SWIEPH      Use Swiss Ephemeris
-FLG_MOSEPH      Use Moshier ephemeris
+``FLG_JPLEPH``  Use JPL ephemeris
+``FLG_SWIEPH``  Use Swiss Ephemeris
+``FLG_MOSEPH``  Use Moshier ephemeris
 =============== =====================
 
 If none of this flags is specified, ``calc()`` tries to compute the default

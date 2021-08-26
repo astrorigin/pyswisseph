@@ -54,6 +54,32 @@ Here is a list of interesting **cmake** options:
  - ``PYSWE_DEFAULT_EPHE_PATH``: path to directory containing ephemeris files
  - ``PYSWE_USE_SWEPHELP``: build the ``swisseph.contrib`` submodule (on or off)
 
+CMake on Linux
+--------------
+
+Here is an example using **ccmake**, an application with a terminal
+user-interface. You can use **cmake-gui** if you prefer, or the regular
+**cmake**.
+
+.. code-block:: bash
+
+    git clone --recurse-submodules https://github.com/astrorigin/pyswisseph
+    cd pyswisseph
+    mkdir build
+    cd build
+    ccmake ..
+    # 'configure' and select your options, 'configure' again
+    # until you can 'generate' and exit
+    # with the regular cmake, it looks like this:
+    #cmake -D CMAKE_BUILD_TYPE=Release -D PYSWE_USE_SWEPHELP=0 ..
+    make
+    # put the resulting file 'swisseph.so' in your sys.path
+
+CMake on Windows
+----------------
+
+(TODO)
+
 Ephemeris files
 ===============
 

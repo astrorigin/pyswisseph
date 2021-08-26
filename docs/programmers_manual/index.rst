@@ -5,6 +5,7 @@ Programmer's manual
 .. toctree::
     :maxdepth: 3
 
+    installation
     steps_to_get_a_planets_position
     ephemeris_related_functions
     planetary_positions/index

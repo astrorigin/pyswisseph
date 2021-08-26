@@ -3,7 +3,7 @@ Contents
 ========
 
 **Python Extension to the Swiss Ephemeris** -- *Ephemeris for developers of
-astrological softwares*
+astrological software*
 
 .. image:: image001.png
     :align: center
@@ -22,11 +22,13 @@ Original documentation is Copyright Astrodienst AG 1997-2021
     participate.
 
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 2
 
-    installation
     introduction
     The ephemerides <ephemerides/index>
+    apparent_vs_true_planetary_positions
+    geo_topo_helio_bary_and_planetocentric_positions
+    heliacal_events_eclipses_occultations_etc/index
     programmers_manual/index
 
 
