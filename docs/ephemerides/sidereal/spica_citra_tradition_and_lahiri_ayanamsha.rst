@@ -9,7 +9,7 @@ documentation. TODO
 Lahiri ayanamsha (according to IAE 1985, our standard Lahiri ayanamsha)
 =======================================================================
 
-:Sweph n°: ``SIDM_LAHIRI``
+:Sweph n°: ``SIDM_LAHIRI`` (1)
 :Ayanamsha: 23°15'00".658
 :t0: 21 March 1956, 0:00 TDT Lahiri
 :Note: Spica (2000) 179°58'58"
@@ -17,7 +17,7 @@ Lahiri ayanamsha (according to IAE 1985, our standard Lahiri ayanamsha)
 Lahiri ayanamsha (according to ICRC, and pre-1985 IAE and IENA)
 ===============================================================
 
-:Sweph n°: ``SIDM_LAHIRI_ICRC``
+:Sweph n°: ``SIDM_LAHIRI_ICRC`` (46)
 :Ayanamsha: 23°15'00".0
 :t0: 21 March 1956, 0:00 TDT Lahiri
 :Note: Spica (2000) 179°58'59"
@@ -87,7 +87,7 @@ given in Indian Astronomical Ephemeris, see Appendix E. TODO
 Lahiri (1940) ayanamsha
 =======================
 
-:Sweph n°: ``SIDM_LAHIRI_1940``
+:Sweph n°: ``SIDM_LAHIRI_1940`` (43)
 :Ayanamsha: 22°26'45".50
 :t0: J1900.0 = 31 Dec. 1899, 12:00 TT
 :Note: Spica (2000) at 179°59'52"
@@ -111,7 +111,7 @@ definition of ayanamsha more correct than the one chosen by the ICRC.
 Lahiri (1972, vernal equinox 285) ayanamsha
 ===========================================
 
-:Sweph n°: ``SIDM_LAHIRI_VP285``
+:Sweph n°: ``SIDM_LAHIRI_VP285`` (44)
 :Ayanamsha: 0°
 :t0: 22 March 285 17:54:02 TT (Lahiri original: 17:48 ET)
 :Note: Spica (2000) at 179°58'35"
@@ -188,7 +188,7 @@ had intended.
 Ayanamsha having Spica/Citra at polar longitude 180° in 499 CE
 ==============================================================
 
-:Sweph n°: ``SIDM_SS_CITRA``
+:Sweph n°: ``SIDM_SS_CITRA`` (26)
 :Ayanamsha: 2.11070444
 :t0: 21 Mar 499, 7:30:31.57 UT = noon at Ujjain, 75.7684565 E
 :Note: Spica at polar ecliptic longitude 180° on equinox 499, Spica (2000)
@@ -201,7 +201,7 @@ lines).
 True Chitrapaksha ayanamsha
 ===========================
 
-:Sweph n°: ``SIDM_TRUE_CITRA``
+:Sweph n°: ``SIDM_TRUE_CITRA`` (27)
 :Note: Spica is always exactly at 180° or 0° Libra in ecliptic longitude
        (not polar!)
 

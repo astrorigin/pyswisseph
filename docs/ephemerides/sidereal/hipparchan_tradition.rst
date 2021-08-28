@@ -25,7 +25,7 @@ Hipparchus ayanamsha
 Mercier gives the following ayanamshas for Hipparchus and Ptolemy (who used the
 same star catalogue as Hipparchus):
 
-:Sweph n°: ``SIDM_HIPPARCHOS``
+:Sweph n°: ``SIDM_HIPPARCHOS`` (15)
 :Ayanamsha: -9°20'
 :t0: June 27th –128 (jd 1674484)
 :Note: zePsc 29°Pis33'49" Hipparchus
@@ -63,7 +63,7 @@ The same zero point near the star Revatî is also used by the so-called
 Ushâ-Shashî ayanamsha. It differs from the Hipparchan one by only 11 arc
 minutes.
 
-:Sweph n°: ``SIDM_USHASHASHI``
+:Sweph n°: ``SIDM_USHASHASHI`` (4)
 :Ayanamsha: 18°39'39.46
 :t0: Jan. 1st 1900
 :Note: zePsc (Revatî) 29°Pis50' (today), 29°Pis45' (Hipparchus' epoch)
@@ -98,7 +98,7 @@ After the Sassanian reform of astronomical tables, we have a new definition of
 the Greek-Arabic-Hindu sidereal zodiac (this is not explicitly stated by
 Mercier, however):
 
-:Sweph n°: ``SIDM_SASSANIAN``
+:Sweph n°: ``SIDM_SASSANIAN`` (16)
 :Ayanamsha: 0
 :t0: March 18th 564, 7:53:23 UT (jd/ET 1927135.8747793)
 :Note: Sassanian zePsc 29°Pis49'59"

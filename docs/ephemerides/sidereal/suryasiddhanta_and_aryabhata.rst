@@ -39,7 +39,7 @@ planets", in: Astron. Astrophys. 282,663-683 (1994).
 Suryasiddhanta/equinox ayanamshas with zero year 499 CE
 =======================================================
 
-:Sweph n°: ``SIDM_SURYASIDDHANTA``
+:Sweph n°: ``SIDM_SURYASIDDHANTA`` (21)
 :Ayanamsha: 0
 :t0: March 21st 499, 7:30:31.57 UT = 12:33:36 LMT at Ujjain, 75.7684565 E
 :Note: Based on Suryasiddhanta: ingress of mean Sun into Aries at point of mean
@@ -47,7 +47,7 @@ Suryasiddhanta/equinox ayanamshas with zero year 499 CE
 
 ..
 
-:Sweph n°: ``SIDM_SURYASIDDHANTA_MSUN``
+:Sweph n°: ``SIDM_SURYASIDDHANTA_MSUN`` (22)
 :Ayanamsha: -0.21463395
 :Note: Based on Suryasiddhanta again, but assuming ingress of mean Sun into
        Aries at true position of mean Sun at the same epoch.
@@ -55,7 +55,7 @@ Suryasiddhanta/equinox ayanamshas with zero year 499 CE
 Aryabhata/equinox ayanamshas with zero year 499 CE
 ==================================================
 
-:Sweph n°: ``SIDM_ARYABHATA``
+:Sweph n°: ``SIDM_ARYABHATA`` (23)
 :Ayanamsha: 0
 :t0: March 21st 499, 6:56:55.57 UT = 12 LMT, local noon at Ujjain, 75.7684565 E
 :Note: Based on Aryabhata, ingress of mean Sun into Aries at point of mean
@@ -63,7 +63,7 @@ Aryabhata/equinox ayanamshas with zero year 499 CE
 
 ..
 
-:Sweph n°: ``SIDM_ARYABHATA_MSUN``
+:Sweph n°: ``SIDM_ARYABHATA_MSUN`` (24)
 :Ayanamsha: -0.23763238
 :Note: Based on Aryabhata again, but assuming ingress of mean Sun into Aries at
        true position of mean Sun at the same epoch.
@@ -78,14 +78,14 @@ of Aryabhata's above-mentioned statement that he was 23 years old when 3600 had
 elapsed after the beginning of the Kaliyuga. For the sake of completeness, we
 therefore add the following ayanamsha:
 
-:Sweph n°: ``SIDM_ARYABHATA_522``
+:Sweph n°: ``SIDM_ARYABHATA_522`` (37)
 :Ayanamsha: 0
 :t0: March 21st 522, 5:46:44 UT
 
 Ayanamsha having Revati/zeta Piscium at polar longitude 359°50' in 499 CE
 =========================================================================
 
-:Sweph n°: ``SIDM_SS_REVATI``
+:Sweph n°: ``SIDM_SS_REVATI`` (25)
 :Ayanamsha: -0.79167046
 :t0: March 21st 499, 7:30:31.57 UT, noon at Ujjain, 75.7684565 E
 :Note: Revati/zePsc at polar ecliptic longitude 359°50'.
@@ -93,7 +93,7 @@ Ayanamsha having Revati/zeta Piscium at polar longitude 359°50' in 499 CE
 True Revati ayanamsha
 =====================
 
-:Sweph n°: ``SIDM_TRUE_REVATI``
+:Sweph n°: ``SIDM_TRUE_REVATI`` (28)
 :Note: Revati/zePsc is always exactly at longitude 359°50' (not polar!)
 
 (Note, this was incorrectly implemented in SE 2.00 – SE 2.04. The Position of
@@ -114,7 +114,7 @@ of the human body, the sign of Cancer is assigned to the heart, and according
 to Vedic spiritual literature, the root of human existence is in the heart.
 Mr. Narasimha Rao therefore proposed the following ayanamsha:
 
-:Sweph n°: ``SIDM_TRUE_PUSHYA``
+:Sweph n°: ``SIDM_TRUE_PUSHYA`` (29)
 :Note: Pushya/deCnC is always exactly at longitude 106°
 
 Sources

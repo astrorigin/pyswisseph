@@ -29,6 +29,8 @@ Original documentation is Copyright Astrodienst AG 1997-2021
     apparent_vs_true_planetary_positions
     geo_topo_helio_bary_and_planetocentric_positions
     heliacal_events_eclipses_occultations_etc/index
+    sidereal_time_ascendant_mc_houses_vertex/index
+    delta_t
     programmers_manual/index
 
 

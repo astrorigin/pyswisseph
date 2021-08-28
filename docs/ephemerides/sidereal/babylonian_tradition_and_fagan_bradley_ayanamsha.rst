@@ -15,20 +15,20 @@ three groups:
 
 1.
 
-:Sweph n°: ``SIDM_BABYL_KUGLER1``
+:Sweph n°: ``SIDM_BABYL_KUGLER1`` (9)
 :Ayanamsha: -5°40'
 :t0: -100
 
 2.
 
-:Sweph n°: ``SIDM_BABYL_KUGLER2``
+:Sweph n°: ``SIDM_BABYL_KUGLER2`` (10)
 :Ayanamhsa: -4°16'
 :t0: -100
 :Note: Spica at 29°Vir26'
 
 3.
 
-:Sweph n°: ``SIDM_BABYL_KUGLER3``
+:Sweph n°: ``SIDM_BABYL_KUGLER3`` (11)
 :Ayanamsah: -3°25'
 :t0: -100
 
@@ -42,7 +42,7 @@ Huber ayanamsha
 
 In 1958, Peter Huber reviewed the topic in the light of new material and found:
 
-:Sweph n°: ``SIDM_BABYL_HUBER``
+:Sweph n°: ``SIDM_BABYL_HUBER`` (12)
 :Ayanamsha: -4°28' +/- 20'
 :t0: –100
 :Note: Spica at 29°Vir07'59"
@@ -60,7 +60,7 @@ In 1977 Raymond Mercier noted that the zero point might have been defined as
 the ecliptic point that culminated simultaneously with the star eta Piscium
 (Al Pherg). For this possibility, we compute:
 
-:Sweph n°: ``SIDM_BABYL_ETPSC``
+:Sweph n°: ``SIDM_BABYL_ETPSC`` (13)
 :Ayanamsha: -5°04'46"
 :t0: –129
 :Note: Spica at 29°Vir21'
@@ -76,7 +76,7 @@ the sidereal longitude of the vernal point must be computed from Spica at
 29°Vir06'05" disregarding its proper motion. Fagan and Bradley defined their
 "synetic vernal point" as:
 
-:Sweph n°: ``SIDM_FAGAN_BRADLEY``
+:Sweph n°: ``SIDM_FAGAN_BRADLEY`` (0)
 :Ayanamsha: 24°02'31.36"
 :t0: Jan. 1st, 1950
 :Note: Spica at 29°Vir06'05" (without aberration)
@@ -97,7 +97,7 @@ sidereal zodiac ought to be tied up to one of those stars.
 
 For this possibility, Swiss Ephemeris gives an Aldebaran ayanamsha:
 
-:Sweph n°: ``SIDM_ALDEBARAN_15TAU``
+:Sweph n°: ``SIDM_ALDEBARAN_15TAU`` (14)
 :t0: around -100
 :Note: Aldebaran at 15°Tau00'00" and Antares at 15°Sco00'17"
 
@@ -109,7 +109,7 @@ Britton ayanamsha
 In 2010, the astronomy historian John P. Britton made another investigation in
 cuneiform astronomical tablets and corrected Huber's by a 7 arc minutes.
 
-:Sweph n°: ``SIDM_BABYL_BRITTON``
+:Sweph n°: ``SIDM_BABYL_BRITTON`` (38)
 :Ayanamsha: -3.2° +- 0.09° (5'24")
 :t0: Jan. 1st, 0
 :Note: Spica at 29°Vir14'58"
@@ -138,7 +138,7 @@ Sources
 Vettius Valens ayanamsha
 ========================
 
-:Sweph n°: ``SIDM_SIDM_VALENS_MOON``
+:Sweph n°: ``SIDM_SIDM_VALENS_MOON`` (42)
 
 The ayanamsha used by Greek astrologers in late antiquity does not have a
 clear-cut definition. However, from extant charts it is known that the

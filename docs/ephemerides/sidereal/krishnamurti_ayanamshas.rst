@@ -20,7 +20,7 @@ ayanamsha defined as follows:
 Krishnamurti/Senthilathiban ayanamsha (derived from zero ayanamsha year 291)
 ============================================================================
 
-:Sweph n°: ``SIDM_KRISHNAMURTI_VP291``
+:Sweph n°: ``SIDM_KRISHNAMURTI_VP291`` (45)
 :Ayanamsha: 0
 :t0: March 21st 291 CE, 6:10:29 TT (=4:02:45 UT)
 :Note: Spica at 180° 5'13
@@ -50,7 +50,7 @@ ayanamsha:
 Krishnamurti ayanamsha (derived from his ayanamsha table)
 =========================================================
 
-:Sweph n°: ``SIDM_KRISHNAMURTI``
+:Sweph n°: ``SIDM_KRISHNAMURTI`` (5)
 :Ayanamsha: 22.363889
 :t0: Jan 1st 1900
 :Note: Spica at 180° 4'52
