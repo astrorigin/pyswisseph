@@ -22,23 +22,30 @@
 # and is used as Distutils long description:
 """Python extension to AstroDienst Swiss Ephemeris library.
 
-Fork me on Github: https://github.com/astrorigin/pyswisseph
+The Swiss Ephemeris is the de-facto standard library for astrological
+calculations. It is a high-precision ephemeris, based upon the DE431
+ephemerides from NASA's JPL, and covering the time range 13201 BC to AD 17191.
 
-Compatible with Python 2.x and 3.x.
+::
 
-Usage example:
+    >>> import swisseph as swe
+    >>> # first set path to ephemeris files
+    >>> swe.set_ephe_path('/usr/share/sweph/ephe')
+    >>> # find time of next lunar eclipse
+    >>> jd = swe.julday(2007, 3, 3) # julian day
+    >>> res = swe.lun_eclipse_when(jd)
+    >>> ecltime = swe.revjul(res[1][0])
+    >>> print(ecltime)
+    (2007, 3, 3, 23.347926892340183)
+    >>> # get ecliptic position of asteroid 13681 "Monty Python"
+    >>> jd = swe.julday(2008, 3, 21)
+    >>> xx, rflags = swe.calc_ut(jd, swe.AST_OFFSET+13681)
+    >>> # print longitude
+    >>> print(xx[0])
+    0.09843983166646618
 
->>> import swisseph as swe
->>> swe.set_ephe_path('/usr/share/ephe') # set path to ephemeris files
->>> now = swe.julday(2007,3,3) # get Julian day number
->>> res = swe.lun_eclipse_when(now) # find next lunar eclipse (from now on)
->>> ecltime = swe.revjul(res[1][0]) # get date UTC
->>> ecltime
-(2007, 3, 3, 23.347975596785545)
->>> jd = swe.julday(2008,3,21)
->>> swe.calc_ut(jd, swe.AST_OFFSET+13681)[0][0] # asteroid Monty Python
-0.098474291148756998
->>> help(swe)
+:Documentation: https://astrorigin.com/pyswisseph
+:Repository: https://github.com/astrorigin/pyswisseph
 
 """
 
