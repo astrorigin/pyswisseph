@@ -37,6 +37,8 @@ Clone and build using **pip** with the following commands.
     cd pyswisseph
     pip install .
 
+The usual ``python setup.py install`` procedure works fine, too.
+
 .. _Git repository: https://github.com/astrorigin/pyswisseph
 
 Build using CMake
@@ -78,7 +80,26 @@ user-interface. You can use **cmake-gui** if you prefer, or the regular
 CMake on Windows
 ----------------
 
-(TODO)
+What's needed:
+
+- Visual Studio (tools for development with C++)
+  from https://visualstudio.microsoft.com
+- Python, CMake and Git, to clone the repository.
+- Use CMake to create a "solution":
+
+  1. Browse to the source code directory
+  2. Browse to an empty directory where you want to build
+  3. Click *Configure*, select your version of Visual Studio in the menu
+  4. Lines in red are newly found options, leave untouched in doubt
+  5. Click *Configure* again, lines become white, click *Generate*
+  6. With Visual Studio, open the "solution" located in your build directory
+  7. Select *Release* build type instead of *Debug*, click *Build Solution*
+
+.. image:: cmake01.png
+    :align: center
+
+The file ``swisseph.pyd`` is found in your build directory, under ``Release``.
+Put this file in your ``sys.path``.
 
 Ephemeris files
 ===============
