@@ -4,16 +4,18 @@
 *.a
 *.bak
 *.o
-*.pyc
-*.pyo
+*.py[cod]
 *.prj
 *.pui
+*.so
 *.zip
+
+.eggs/
 
 MANIFEST
 build*/
 dist/
-doc
+docs/_build
 epydoc/*
 make.py
 manifest

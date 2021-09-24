@@ -43,13 +43,13 @@ Usage example:
 """
 
 import os.path, sys
-from setuptools import setup
-from distutils.core import Extension
+from setuptools import setup, Extension
+from glob import glob
 
 # Pyswisseph version string
 # Our version string gets the version of the swisseph library (x.xx.xx)
 # and our increment as suffix (-x).
-VERSION = '2.08.00-1'
+VERSION = '2.08.00-2'
 
 # Corresponding swisseph version string
 swe_version = '2.08.00'
@@ -57,7 +57,7 @@ swe_version = '2.08.00'
 # libswe-dev detection
 # Set to True to find libswe in system.
 # Set to False to use internal libswe.
-swe_detection = True
+swe_detection = False
 
 # Additional functions and constants
 use_swephelp = True
@@ -159,51 +159,63 @@ else: # using internal libswe
     swe_defines = []
     print('Using internal libswe')
 
-# Includes
+# Defines
+defines = swe_defines
+if use_swephelp:
+    if sys.platform in ['win32', 'win_amd64', 'darwin']:
+        defines += [
+            ('SQLITE_DEFAULT_AUTOVACUUM', 1),
+            ('SQLITE_DEFAULT_FOREIGN_KEYS', 1),
+            ('SQLITE_DEFAULT_MEMSTATUS', 0),
+            ('SQLITE_DEFAULT_WAL_SYNCHRONOUS', 1),
+            ('SQLITE_DOESNT_MATCH_BLOBS',),
+            ('SQLITE_DQS', 0),
+            ('SQLITE_ENABLE_COLUMN_METADATA',),
+            ('SQLITE_ENABLE_FTS4',),
+            ('SQLITE_MAX_EXPR_DEPTH', 0),
+            ('SQLITE_OMIT_DEPRECATED',),
+            ('SQLITE_OMIT_SHARED_CACHE',),
+            ('SQLITE_SECURE_DELETE',),
+            ('SQLITE_THREADSAFE', 1)
+        ]
+    #
+
+# Include paths
 includes = swe_includes
 if use_swephelp:
     includes += ['swephelp']
+    if sys.platform in ['win32', 'win_amd64', 'darwin']:
+        includes += ['swephelp/sqlite3']
 
 # Sources
 sources = ['pyswisseph.c'] + swe_sources
 if use_swephelp:
-    sources += [
-        'swephelp/swhdatetime.c',
-        'swephelp/swhformat.c',
-        'swephelp/swhgeo.c',
-        'swephelp/swhmisc.c',
-        'swephelp/swhraman.c',
-        'swephelp/swhsearch.c',
-        'swephelp/swhutil.c'
-        ]
-    #
+    sources += glob('swephelp/*.c')
+    sources += glob('swephelp/*.cpp')
+    if sys.platform in ['win32', 'win_amd64', 'darwin']:
+        sources += ['swephelp/sqlite3/sqlite3.c']
 
 # Depends
 depends = swe_depends
 if use_swephelp:
-    depends += [
-        'swephelp/swephelp.h',
-        'swephelp/swhdef.h',
-        'swephelp/swhgeo.h',
-        'swephelp/swhraman.h',
-        'swephelp/swhutil.h',
-        'swephelp/swhdatetime.h',
-        'swephelp/swhformat.h',
-        'swephelp/swhmisc.h',
-        'swephelp/swhsearch.h',
-        'swephelp/swhwin.h'
-        ]
-    #
+    depends += glob('swephelp/*.h')
+    depends += glob('swephelp/*.hpp')
+
+# Libraries
+libraries = swe_libs
+if use_swephelp:
+    if sys.platform not in ['win32', 'win_amd64', 'darwin']:
+        libraries += ['sqlite3']
 
 # Pyswisseph extension
 swemodule = Extension(
     'swisseph',
-    define_macros = swe_defines,
+    define_macros = defines,
     depends = depends,
     extra_compile_args = cflags,
     extra_link_args = ldflags,
     include_dirs = includes,
-    libraries = swe_libs,
+    libraries = libraries,
     sources = sources
     )
 
@@ -230,7 +242,8 @@ setup(
         ],
     keywords = 'Astrology Ephemeris Swisseph',
     ext_modules = [swemodule],
-    setup_requires = ['wheel']
+    setup_requires = ['wheel'],
+    python_requires = '>=3.5'
     )
 
 # vi: set fenc=utf-8 ff=unix et sw=4 ts=4 sts=4 :

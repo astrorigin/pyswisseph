@@ -79,10 +79,9 @@ set( SOURCES pyswisseph.c )
 if ( MSVC )
     add_definitions( -D_CRT_SECURE_NO_WARNINGS )
 else()
-    add_definitions( -std=gnu99 -fno-strict-aliasing -DNDEBUG
-        -g -fwrapv -O2 -Wall -Wstrict-prototypes )
+    add_definitions( -std=gnu99 -g -O2 -Wall )
     if ( NOT MINGW )
-        add_definitions( -pthread -fPIC )
+        add_definitions( -fPIC )
     endif()
 endif()
 
@@ -98,20 +97,21 @@ add_library( swisseph MODULE ${SOURCES} )
 add_dependencies( swisseph swe )
 if ( PYSWE_USE_SWEPHELP )
     add_dependencies( swisseph swephelp )
+    if ( MSVC OR NOT SQLITE3_FOUND )
+        add_dependencies( swisseph sqlite3 )
+    endif()
 endif()
 
 # Linkage
 if ( MSVC )
     target_link_libraries( swisseph swe ${PYTHON_LIBRARIES} )
 elseif( MINGW )
-    target_link_libraries( swisseph swe m ${PYTHON_LIBRARIES}
-        pthread -Wl,-O1 -Wl,-Bsymbolic-functions )
+    target_link_libraries( swisseph swe m dl ${PYTHON_LIBRARIES} )
 else()
-    target_link_libraries( swisseph swe m ${PYTHON_LIBRARIES}
-        -pthread -Wl,-O1 -Wl,-Bsymbolic-functions )
+    target_link_libraries( swisseph swe m dl ${PYTHON_LIBRARIES} )
 endif()
 if ( PYSWE_USE_SWEPHELP )
-    target_link_libraries( swisseph swephelp )
+    target_link_libraries( swisseph swephelp sqlite3 )
 endif()
 
 # Target properties
