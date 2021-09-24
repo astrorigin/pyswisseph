@@ -1,85 +1,85 @@
 name: Build
 
 on:
-  push:
-  release:
-    types: [published]
+    push:
+    release:
+        types: [published]
 
 jobs:
-  build_src_wheel:
-    name: Build source wheel
-    runs-on: ubuntu-18.04
+    build_src_wheel:
+        name: Build source wheel
+        runs-on: ubuntu-18.04
 
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  submodules: recursive
 
-      - uses: actions/setup-python@v2
-        name: Install Python 3.7
-        with:
-          python-version: 3.7
+            - uses: actions/setup-python@v2
+              name: Install Python 3.7
+              with:
+                  python-version: 3.7
 
-      - name: Update to latest pip
-        run: |
-          python -m pip install -U setuptools pip wheel
+            - name: Update to latest pip
+              run: |
+                  python -m pip install -U setuptools pip wheel
 
-      - name: Build wheel
-        run: |
-          python setup.py sdist -d wheelhouse
+            - name: Build wheel
+              run: |
+                  python setup.py sdist -d wheelhouse
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: wheels
-          path: wheelhouse
+            - uses: actions/upload-artifact@v2
+              with:
+                  name: wheels
+                  path: wheelhouse
 
-  build_plat_wheels:
-    strategy:
-      matrix:
-        os: ["ubuntu-18.04", "windows-latest", "macos-latest"]
+    build_plat_wheels:
+        strategy:
+            matrix:
+                os: ["ubuntu-18.04", "windows-latest", "macos-latest"]
 
-    name: Build platform wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+        name: Build platform wheels on ${{ matrix.os }}
+        runs-on: ${{ matrix.os }}
 
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  submodules: recursive
 
-      - uses: actions/setup-python@v2
-        name: Install Python 3.7
-        with:
-          python-version: 3.7
+            - uses: actions/setup-python@v2
+              name: Install Python 3.7
+              with:
+                  python-version: 3.7
 
-      - name: Install cibuildwheel
-        run: |
-          python -m pip install cibuildwheel==2
+            - name: Install cibuildwheel
+              run: |
+                  python -m pip install cibuildwheel==2
 
-      - name: Build wheel
-        run: |
-          python -m cibuildwheel --output-dir wheelhouse
-        env:
-          CIBW_BUILD: cp*
+            - name: Build wheel
+              run: |
+                  python -m cibuildwheel --output-dir wheelhouse
+              env:
+                  CIBW_BUILD: cp*
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: wheels
-          path: ./wheelhouse
+            - uses: actions/upload-artifact@v2
+              with:
+                  name: wheels
+                  path: ./wheelhouse
 
-  pypi_upload:
-    needs: [build_src_wheel, build_plat_wheels]
-    name: Upload wheels to pypi
-    runs-on: ubuntu-18.04
-    if: github.event.release.published
+    pypi_upload:
+        needs: [build_src_wheel, build_plat_wheels]
+        name: Upload wheels to pypi
+        runs-on: ubuntu-18.04
+        if: github.event.release.published
 
-    steps:
-      - uses: actions/download-artifact@v2
-        with:
-          name: wheels
-          path: dist
+        steps:
+            - uses: actions/download-artifact@v2
+              with:
+                  name: wheels
+                  path: dist
 
-      - name: Publish package to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.4.2
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_TOKEN }}
+            - name: Publish package to PyPI
+              uses: pypa/gh-action-pypi-publish@v1.4.2
+              with:
+                  user: __token__
+                  password: ${{ secrets.PYPI_TOKEN }}
