@@ -1,5 +1,6 @@
 # Pyswisseph - gitignore
 
+*~
 *.a
 *.bak
 *.o
@@ -8,13 +9,10 @@
 *.pui
 *.so
 *.zip
-*~
 
 .eggs/
-.idea/
 
 MANIFEST
-
 build*/
 dist/
 docs/_build
@@ -29,3 +27,4 @@ swisseph.*.so
 swisseph.so
 
 venv/
+.idea/
