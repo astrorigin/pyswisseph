@@ -55,6 +55,7 @@
 
 /* Dont modify below */
 
+#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <swephexp.h>
 
@@ -71,7 +72,7 @@
 
 /* Macros */
 #define FUNCARGS_SELF       (PyObject *self)
-#define FUNCARGS_KEYWDS     (PyObject *self, PyObject *args, PyObject *keywds)
+#define FUNCARGS_KEYWDS     (PyObject *self, PyObject *args, PyObject *kwds)
 #define PyModule_AddFloatConstant(m, nam, d) \
         PyModule_AddObject(m, nam, Py_BuildValue("d", d))
 
@@ -208,7 +209,7 @@ static PyObject * pyswe_azalt FUNCARGS_KEYWDS
     char err[128] = {0};
     static char *kwlist[] = {"tjdut", "flag", "geopos", "atpress", "attemp",
                              "xin", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "diOddO", kwlist, &jd,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "diOddO", kwlist, &jd,
                                      &flag, &pygeo, &press, &temp, &pyxin))
         return NULL;
     /* extract geopos */
@@ -254,7 +255,7 @@ static PyObject * pyswe_azalt_rev FUNCARGS_KEYWDS
     PyObject *pygeo;
     static char *kwlist[] = {"tjdut", "flag", "geopos", "azimuth",
                              "true_altitude", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "diOdd", kwlist, &jd,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "diOdd", kwlist, &jd,
                                      &flag, &pygeo, &xin[0], &xin[1]))
         return NULL;
     /* extract geopos */
@@ -284,7 +285,7 @@ static PyObject * pyswe_calc FUNCARGS_KEYWDS
     int ret, pl, flag = SEFLG_SWIEPH|SEFLG_SPEED;
     char err[256] = {0};
     static char *kwlist[] = {"tjdet", "planet", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "di|i", kwlist,
                                      &jd, &pl, &flag))
         return NULL;
     ret = swe_calc(jd, pl, flag, xx, err);
@@ -312,7 +313,7 @@ static PyObject * pyswe_calc_pctr FUNCARGS_KEYWDS
     int ret, pl, plctr, flag = SEFLG_SWIEPH|SEFLG_SPEED;
     char err[256] = {0};
     static char* kwlist[] = {"tjdet", "planet", "center", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dii|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dii|i", kwlist,
                                      &jd, &pl, &plctr, &flag))
         return NULL;
     ret = swe_calc_pctr(jd, pl, plctr, flag, xx, err);
@@ -339,7 +340,7 @@ static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
     int ret, pl, flag = SEFLG_SWIEPH|SEFLG_SPEED;
     char err[256] = {0};
     static char *kwlist[] = {"tjdut", "planet", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "di|i", kwlist,
                                      &jd, &pl, &flag))
         return NULL;
     ret = swe_calc_ut(jd, pl, flag, xx, err);
@@ -388,7 +389,7 @@ static PyObject * pyswe_cotrans FUNCARGS_KEYWDS
     int i;
     char err[128] = {0};
     static char *kwlist[] = {"coord", "eps", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "Od", kwlist, &o, &eps))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "Od", kwlist, &o, &eps))
         return NULL;
     /* extract coord */
     i = py_seq2d(o, 3, xpo, err);
@@ -427,7 +428,7 @@ static PyObject * pyswe_cotrans_sp FUNCARGS_KEYWDS
     PyObject *o;
     char err[128] = {0};
     static char *kwlist[] = {"coord", "eps", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "Od", kwlist, &o, &eps))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "Od", kwlist, &o, &eps))
         return NULL;
     /* extract coord */
     i = py_seq2d(o, 6, xpo, err);
@@ -449,7 +450,7 @@ static PyObject * pyswe_cs2degstr FUNCARGS_KEYWDS
     int cs;
     char ret[9];
     static char *kwlist[] = {"cs", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &cs))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i", kwlist, &cs))
         return NULL;
     swe_cs2degstr(cs, ret);
     return Py_BuildValue("s", ret);
@@ -468,7 +469,7 @@ static PyObject * pyswe_cs2lonlatstr FUNCARGS_KEYWDS
     int cs;
     char ret[10], plus, minus;
     static char *kwlist[] = {"cs", "plus", "minus", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "icc", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "icc", kwlist,
                                      &cs, &plus, &minus))
         return NULL;
     swe_cs2lonlatstr(cs, plus, minus, ret);
@@ -488,7 +489,7 @@ static PyObject * pyswe_cs2timestr FUNCARGS_KEYWDS
     int cs, sep, suppresszero = 0;
     char ret[9];
     static char *kwlist[] = {"cs", "sep", "suppresszero", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ic|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ic|i", kwlist,
                                      &cs, &sep, &suppresszero))
         return NULL;
     swe_cs2timestr(cs, sep, suppresszero, ret);
@@ -505,7 +506,7 @@ static PyObject * pyswe_csnorm FUNCARGS_KEYWDS
 {
     int cs;
     static char *kwlist[] = {"cs", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &cs))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i", kwlist, &cs))
         return NULL;
     return Py_BuildValue("i", swe_csnorm(cs));
 }
@@ -520,7 +521,7 @@ static PyObject * pyswe_csroundsec FUNCARGS_KEYWDS
 {
     int cs;
     static char *kwlist[] = {"cs", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &cs))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i", kwlist, &cs))
         return NULL;
     return Py_BuildValue("i", swe_csroundsec(cs));
 }
@@ -535,7 +536,7 @@ static PyObject * pyswe_d2l FUNCARGS_KEYWDS
 {
     double d;
     static char *kwlist[] = {"d", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &d))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &d))
         return NULL;
     return Py_BuildValue("l", swe_d2l(d));
 }
@@ -561,7 +562,7 @@ static PyObject * pyswe_date_conversion FUNCARGS_KEYWDS
     double jd, hour = 12.0, h;
     char cal = 'g';
     static char *kwlist[] = {"year", "month", "day", "hour", "cal", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iii|dc", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "iii|dc", kwlist,
                                      &year, &month, &day, &hour, &cal))
         return NULL;
     if (cal != 'g' && cal != 'j')
@@ -591,7 +592,7 @@ static PyObject * pyswe_day_of_week FUNCARGS_KEYWDS
 {
     double jd;
     static char *kwlist[] = {"jd", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &jd))
         return NULL;
     return Py_BuildValue("i", swe_day_of_week(jd));
 }
@@ -606,7 +607,7 @@ static PyObject * pyswe_deg_midp FUNCARGS_KEYWDS
 {
     double x1, x2;
     static char *kwlist[] = {"x1", "x2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &x1, &x2))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd", kwlist, &x1, &x2))
         return NULL;
     return Py_BuildValue("d", swe_deg_midp(x1, x2));
 }
@@ -621,7 +622,7 @@ static PyObject * pyswe_degnorm FUNCARGS_KEYWDS
 {
     double x;
     static char *kwlist[] = {"x", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &x))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &x))
         return NULL;
     return Py_BuildValue("d", swe_degnorm(x));
 }
@@ -667,7 +668,7 @@ static PyObject * pyswe_deltat FUNCARGS_KEYWDS
 {
     double jd;
     static char *kwlist[] = {"tjdut", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &jd))
         return NULL;
     return Py_BuildValue("d", swe_deltat(jd));
 }
@@ -700,7 +701,7 @@ static PyObject * pyswe_deltat_ex FUNCARGS_KEYWDS
     int flag;
     char err[256] = {0};
     static char* kwlist[] = {"tjdut", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di", kwlist, &jd, &flag))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "di", kwlist, &jd, &flag))
         return NULL;
     ret = swe_deltat_ex(jd, flag, err);
     if (err[0] != 0)
@@ -718,7 +719,7 @@ static PyObject * pyswe_difcs2n FUNCARGS_KEYWDS
 {
     int p1, p2;
     static char *kwlist[] = {"p1", "p2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ii", kwlist, &p1, &p2))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii", kwlist, &p1, &p2))
         return NULL;
     return Py_BuildValue("i", swe_difcs2n(p1, p2));
 }
@@ -733,7 +734,7 @@ static PyObject * pyswe_difcsn FUNCARGS_KEYWDS
 {
     int p1, p2;
     static char *kwlist[] = {"p1", "p2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ii", kwlist, &p1, &p2))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii", kwlist, &p1, &p2))
         return NULL;
     return Py_BuildValue("i", swe_difcsn(p1, p2));
 }
@@ -748,7 +749,7 @@ static PyObject * pyswe_difdeg2n FUNCARGS_KEYWDS
 {
     double p1, p2;
     static char *kwlist[] = {"p1", "p2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &p1, &p2))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd", kwlist, &p1, &p2))
         return NULL;
     return Py_BuildValue("d", swe_difdeg2n(p1, p2));
 }
@@ -763,7 +764,7 @@ static PyObject * pyswe_difdegn FUNCARGS_KEYWDS
 {
     double p1, p2;
     static char *kwlist[] = {"p1", "p2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &p1, &p2))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd", kwlist, &p1, &p2))
         return NULL;
     return Py_BuildValue("d", swe_difdegn(p1, p2));
 }
@@ -778,7 +779,7 @@ static PyObject * pyswe_difrad2n FUNCARGS_KEYWDS
 {
     double p1, p2;
     static char *kwlist[] = {"p1", "p2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &p1, &p2))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd", kwlist, &p1, &p2))
         return NULL;
     return Py_BuildValue("d", swe_difrad2n(p1, p2));
 }
@@ -802,7 +803,7 @@ static PyObject * pyswe_fixstar FUNCARGS_KEYWDS
     double jd, xx[6];
     int ret, flag = SEFLG_SWIEPH;
     static char *kwlist[] = {"star", "tjdet", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "sd|i", kwlist,
                                      &star, &jd, &flag))
         return NULL;
     memset(st, 0, (SE_MAX_STNAME*2)+1);
@@ -833,7 +834,7 @@ static PyObject * pyswe_fixstar2 FUNCARGS_KEYWDS
     double jd, xx[6];
     int ret, flag = SEFLG_SWIEPH;
     static char *kwlist[] = {"star", "tjdet", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "sd|i", kwlist,
                                      &star, &jd, &flag))
         return NULL;
     memset(st, 0, (SE_MAX_STNAME*2)+1);
@@ -861,7 +862,7 @@ static PyObject * pyswe_fixstar2_mag FUNCARGS_KEYWDS
     int ret;
     double mag;
     static char *kwlist[] = {"star", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &star))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &star))
         return NULL;
     memset(st, 0, (SE_MAX_STNAME*2)+1);
     strncpy(st, star, SE_MAX_STNAME*2);
@@ -890,7 +891,7 @@ static PyObject * pyswe_fixstar2_ut FUNCARGS_KEYWDS
     double jd, xx[6];
     int ret, flag = SEFLG_SWIEPH;
     static char *kwlist[] = {"star", "tjdut", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "sd|i", kwlist,
                                      &star, &jd, &flag))
         return NULL;
     memset(st, 0, (SE_MAX_STNAME*2)+1);
@@ -918,7 +919,7 @@ static PyObject * pyswe_fixstar_mag FUNCARGS_KEYWDS
     int ret;
     double mag;
     static char *kwlist[] = {"star", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &star))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &star))
         return NULL;
     memset(st, 0, (SE_MAX_STNAME*2)+1);
     strncpy(st, star, SE_MAX_STNAME*2);
@@ -936,7 +937,7 @@ PyDoc_STRVAR(pyswe_fixstar_ut__doc__,
 " - tjdut: input time, Julian day number,  Universal Time\n"
 " - flags: bit flags indicating what kind of computation is wanted\n\n"
 ":Return: (xx), str stnam, int retflags\n\n"
-" - xs: tuple of 6 float for results\n"
+" - xx: tuple of 6 float for results\n"
 " - stnam: returned star name\n"
 " - retflags: bit flags indicating what kind of computation was done\n\n"
 "This function raises swisseph.Error in case of fatal error.");
@@ -947,7 +948,7 @@ static PyObject * pyswe_fixstar_ut FUNCARGS_KEYWDS
     double jd, xx[6];
     int ret, flag = SEFLG_SWIEPH;
     static char *kwlist[] = {"star", "tjdut", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "sd|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "sd|i", kwlist,
                                      &star, &jd, &flag))
         return NULL;
     memset(st, 0, (SE_MAX_STNAME*2)+1);
@@ -992,7 +993,7 @@ static PyObject * pyswe_gauquelin_sector FUNCARGS_KEYWDS
     PyObject *body, *seq;
     static char *kwlist[] = {"tjdut", "body", "method", "geopos", "atpress",
                              "attemp", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOiO|ddi", kwlist, &jd,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dOiO|ddi", kwlist, &jd,
                                    &body, &method, &seq, &press, &temp, &flag))
         return NULL;
     /* extract pl/star */
@@ -1033,7 +1034,7 @@ static PyObject * pyswe_get_ayanamsa FUNCARGS_KEYWDS
 {
     double jd;
     static char *kwlist[] = {"tjdet", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &jd))
         return NULL;
     return Py_BuildValue("d", swe_get_ayanamsa(jd));
 }
@@ -1055,7 +1056,7 @@ static PyObject * pyswe_get_ayanamsa_ex FUNCARGS_KEYWDS
     double jd, daya;
     char err[256] = {0};
     static char *kwlist[] = {"tjdet", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di", kwlist, &jd, &flags))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "di", kwlist, &jd, &flags))
         return NULL;
     i = swe_get_ayanamsa_ex(jd, flags, &daya, err);
     if (i < 0)
@@ -1080,7 +1081,7 @@ static PyObject * pyswe_get_ayanamsa_ex_ut FUNCARGS_KEYWDS
     double jd, daya;
     char err[256] = {0};
     static char *kwlist[] = {"tjdut", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di", kwlist, &jd, &flags))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "di", kwlist, &jd, &flags))
         return NULL;
     i = swe_get_ayanamsa_ex_ut(jd, flags, &daya, err);
     if (i < 0)
@@ -1101,7 +1102,7 @@ static PyObject * pyswe_get_ayanamsa_name FUNCARGS_KEYWDS
     int mode;
     char *name = NULL;
     static char *kwlist[] = {"sidmode", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &mode))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i", kwlist, &mode))
         return NULL;
     name = (char*) swe_get_ayanamsa_name(mode);
     return Py_BuildValue("s", name ? name : "");
@@ -1119,7 +1120,7 @@ static PyObject * pyswe_get_ayanamsa_ut FUNCARGS_KEYWDS
 {
     double jd;
     static char *kwlist[] = {"tjdut", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &jd))
         return NULL;
     return Py_BuildValue("d", swe_get_ayanamsa_ut(jd));
 }
@@ -1153,7 +1154,7 @@ static PyObject * pyswe_get_current_file_data FUNCARGS_KEYWDS
     char* path = NULL;
     double start = 0, end = 0;
     static char* kwlist[] = {"fno", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &fno))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i", kwlist, &fno))
         return NULL;
     path = (char*) swe_get_current_file_data(fno, &start, &end, &denum);
     return Py_BuildValue("sddi", path ? path : "", start, end, denum);
@@ -1165,7 +1166,8 @@ PyDoc_STRVAR(pyswe_get_library_path__doc__,
 ":Args: --\n"
 ":Return: str path\n\n"
 ".. note::\n\n"
-"    This function may fail on Windows, and return an empty string.");
+"    This function may fail on Windows, and only find the executable path, not"
+"    the dll.");
 
 static PyObject * pyswe_get_library_path FUNCARGS_SELF
 {
@@ -1204,7 +1206,7 @@ static PyObject * pyswe_get_planet_name FUNCARGS_KEYWDS
     int pl;
     char name[128], spl[128];
     static char *kwlist[] = {"planet", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &pl))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i", kwlist, &pl))
         return NULL;
     snprintf(spl, 128, "%d", pl);
     swe_get_planet_name(pl, name);
@@ -1255,7 +1257,7 @@ static PyObject * pyswe_get_orbital_elements FUNCARGS_KEYWDS
     double jd, dret[50];
     char err[256] = {0};
     static char *kwlist[] = {"tjdet", "planet", "flags", NULL};
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "dii", kwlist,
+    if(!PyArg_ParseTupleAndKeywords(args, kwds, "dii", kwlist,
                                     &jd, &pl, &flg))
         return NULL;
     memset(dret, 0, sizeof(double) * 50);
@@ -1369,7 +1371,7 @@ static PyObject * pyswe_heliacal_pheno_ut FUNCARGS_KEYWDS
     PyObject *o1, *o2, *o3;
     static char *kwlist[] = {"tjdut", "geopos", "atmo", "observer", "objname",
                              "eventtype", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOOOsii", kwlist, &jd,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dOOOsii", kwlist, &jd,
                                      &o1, &o2, &o3, &obj, &evnt, &flg))
         return NULL;
     /* extract geopos */
@@ -1464,13 +1466,13 @@ PyDoc_STRVAR(pyswe_heliacal_ut__doc__,
 
 static PyObject * pyswe_heliacal_ut FUNCARGS_KEYWDS
 {
-    double jd, geopos[3], atmo[4], observ[6], dret[3];
+    double jd, geopos[3], atmo[4], observ[6], dret[50];
     char err[256] = {0}, *obj;
     int i, evnt, flg;
     PyObject *o1, *o2, *o3;
     static char *kwlist[] = {"tjdut", "geopos", "atmo", "observer", "objname",
                              "eventtype", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOOOsii", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dOOOsii", kwlist,
                                      &jd, &o1, &o2, &o3, &obj, &evnt, &flg))
         return NULL;
     /* extract geopos */
@@ -1519,7 +1521,7 @@ static PyObject * pyswe_helio_cross FUNCARGS_KEYWDS
     char err[256] = {0};
     static char* kwlist[] = {"planet", "x2cross", "tjdet", "flags",
                              "backwards", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "idd|ii", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "idd|ii", kwlist,
                                      &pl, &x2, &jd, &flags, &backw))
         return NULL;
     backw = backw ? -1 : 1;
@@ -1549,7 +1551,7 @@ static PyObject * pyswe_helio_cross_ut FUNCARGS_KEYWDS
     char err[256] = {0};
     static char* kwlist[] = {"planet", "x2cross", "tjdut", "flags",
                              "backwards", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "idd|ii", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "idd|ii", kwlist,
                                      &pl, &x2, &jd, &flags, &backw))
         return NULL;
     backw = backw ? -1 : 1;
@@ -1570,7 +1572,7 @@ static PyObject * pyswe_house_name FUNCARGS_KEYWDS
 {
     char h, *nam;
     static char *kwlist[] = {"hsys", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "c", kwlist, &h))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "c", kwlist, &h))
         return NULL;
     if (h != 'i')
         h = toupper(h);
@@ -1600,7 +1602,7 @@ static PyObject * pyswe_house_pos FUNCARGS_KEYWDS
     char err[256] = {0};
     PyObject* coord;
     static char *kwlist[] = {"armc", "geolat", "eps", "objcoord", "hsys", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddO|c", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddO|c", kwlist,
                                      &armc, &lat, &obl, &coord, &hsys))
         return NULL;
     /* extract coord */
@@ -1632,7 +1634,7 @@ static PyObject * pyswe_houses FUNCARGS_KEYWDS
     double jd, lat, lon, cusps[37], ascmc[10];
     int ret, hsys = 'P';
     static char *kwlist[] = {"tjdut", "lat", "lon", "hsys", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|c", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ddd|c", kwlist,
                                      &jd, &lat, &lon, &hsys))
         return NULL;
     ret = swe_houses(jd, lat, lon, hsys, cusps, ascmc);
@@ -1675,7 +1677,7 @@ static PyObject * pyswe_houses_armc FUNCARGS_KEYWDS
     int ret, hsys = 'P';
     ascmc[9] = 0; /* sunshine hsys */
     static char *kwlist[] = {"armc", "lat", "eps", "hsys", "ascmc9", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|cd", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ddd|cd", kwlist,
                                      &armc, &lat, &obl, &hsys, &ascmc[9]))
         return NULL;
     ret = swe_houses_armc(armc, lat, obl, hsys, cusps, ascmc);
@@ -1721,7 +1723,7 @@ static PyObject * pyswe_houses_armc_ex2 FUNCARGS_KEYWDS
     char err[256] = {0};
     ascmc[9] = 0; /* sunshine hsys */
     static char *kwlist[] = {"armc", "lat", "eps", "hsys", "ascmc9", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|cd", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ddd|cd", kwlist,
                                      &armc, &lat, &obl, &hsys, &ascmc[9]))
         return NULL;
     ret = swe_houses_armc_ex2(armc, lat, obl, hsys, cusps, ascmc,
@@ -1775,7 +1777,7 @@ static PyObject * pyswe_houses_ex FUNCARGS_KEYWDS
     double jd, lat, lon, cusps[37], ascmc[10];
     int ret, hsys = 'P', flag = 0;
     static char *kwlist[] = {"tjdut", "lat", "lon", "hsys", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|ci", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ddd|ci", kwlist,
                                      &jd, &lat, &lon, &hsys, &flag))
         return NULL;
     ret = swe_houses_ex(jd, flag, lat, lon, hsys, cusps, ascmc);
@@ -1819,7 +1821,7 @@ static PyObject * pyswe_houses_ex2 FUNCARGS_KEYWDS
     int ret, hsys = 'P', flag = 0;
     char err[256] = {0};
     static char *kwlist[] = {"tjdut", "lat", "lon", "hsys", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd|ci", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ddd|ci", kwlist,
                                      &jd, &lat, &lon, &hsys, &flag))
         return NULL;
     ret = swe_houses_ex2(jd, flag, lat, lon, hsys, cusps, ascmc,
@@ -1870,7 +1872,7 @@ static PyObject * pyswe_jdet_to_utc FUNCARGS_KEYWDS
     int y, m, d, h, mi, flg = SE_GREG_CAL;
     double s, et;
     static char *kwlist[] = {"tjdet", "cal", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist, &et, &flg))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d|i", kwlist, &et, &flg))
         return NULL;
     if (flg != SE_GREG_CAL && flg != SE_JUL_CAL)
         return PyErr_Format(PyExc_ValueError,
@@ -1895,7 +1897,7 @@ static PyObject * pyswe_jdut1_to_utc FUNCARGS_KEYWDS
     int y, m, d, h, mi, flg = SE_GREG_CAL;
     double s, ut;
     static char *kwlist[] = {"tjdut", "cal", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist, &ut, &flg))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d|i", kwlist, &ut, &flg))
         return NULL;
     if (flg != SE_GREG_CAL && flg != SE_JUL_CAL)
         return PyErr_Format(PyExc_ValueError,
@@ -1920,7 +1922,7 @@ static PyObject * pyswe_julday FUNCARGS_KEYWDS
     double hour = 12.0;
     int cal = SE_GREG_CAL;
     static char *kwlist[] = {"year", "month", "day", "hour", "cal", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iii|di", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "iii|di", kwlist,
                                      &year, &month, &day, &hour, &cal))
         return NULL;
     if (cal != SE_GREG_CAL && cal != SE_JUL_CAL)
@@ -1945,7 +1947,7 @@ static PyObject * pyswe_lat_to_lmt FUNCARGS_KEYWDS
     double jd, lon, ret;
     char err[256] = {0};
     static char *kwlist[] = {"tjdlat", "geolon" , NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &jd, &lon))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd", kwlist, &jd, &lon))
         return NULL;
     i = swe_lat_to_lmt(jd, lon, &ret, err);
     if (i < 0)
@@ -1969,7 +1971,7 @@ static PyObject * pyswe_lmt_to_lat FUNCARGS_KEYWDS
     double jd, lon, ret;
     char err[256] = {0};
     static char *kwlist[] = {"tjdlmt", "geolon" , NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &jd, &lon))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd", kwlist, &jd, &lon))
         return NULL;
     i = swe_lmt_to_lat(jd, lon, &ret, err);
     if (i < 0)
@@ -2013,7 +2015,7 @@ static PyObject * pyswe_lun_eclipse_how FUNCARGS_KEYWDS
     char err[256] = {0};
     PyObject *gp;
     static char *kwlist[] = {"tjdut", "geopos", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dO|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dO|i", kwlist,
                                      &jd, &gp, &flag))
         return NULL;
     /* extract geopos */
@@ -2063,7 +2065,7 @@ static PyObject * pyswe_lun_eclipse_when FUNCARGS_KEYWDS
     int i, ecltype = 0, backw = 0, flag = SEFLG_SWIEPH;
     char err[256] = {0};
     static char *kwlist[] = {"tjdut", "flags", "ecltype", "backwards", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|iii", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d|iii", kwlist,
                                      &jd, &flag, &ecltype, &backw))
         return NULL;
     i = swe_lun_eclipse_when(jd, flag, ecltype, tret, backw, err);
@@ -2120,7 +2122,7 @@ static PyObject * pyswe_lun_eclipse_when_loc FUNCARGS_KEYWDS
     char err[256] = {0};
     PyObject *gp;
     static char *kwlist[] = {"tjdut", "geopos", "flags", "backwards", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dO|ii", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dO|ii", kwlist,
                                      &jd, &gp, &flag, &backw))
         return NULL;
     /* extract geopos */
@@ -2187,7 +2189,7 @@ static PyObject * pyswe_lun_occult_when_glob FUNCARGS_KEYWDS
     PyObject *body;
     static char *kwlist[] = {"tjdut", "body", "flags", "ecltype",
                              "backwards", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dO|iii", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dO|iii", kwlist,
                                      &jd, &body, &flag, &ecltype, &backw))
         return NULL;
     /* extract pl/star */
@@ -2261,7 +2263,7 @@ static PyObject * pyswe_lun_occult_when_loc FUNCARGS_KEYWDS
     PyObject *body, *gp;
     static char *kwlist[] = {"tjdut", "body", "geopos", "flags",
                              "backwards", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOO|ii", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dOO|ii", kwlist,
                                      &jd, &body, &gp, &flag, &backw))
         return NULL;
     /* extract pl/star */
@@ -2345,7 +2347,7 @@ static PyObject * pyswe_lun_occult_where FUNCARGS_KEYWDS
     char *star = NULL, st[(SE_MAX_STNAME*2)+1] = {0}, err[256] = {0};
     PyObject *body;
     static char *kwlist[] = {"tjdut", "body", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dO|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dO|i", kwlist,
                                      &jd, &body, &flag))
         return NULL;
     /* extract pl/star */
@@ -2386,7 +2388,7 @@ static PyObject * pyswe_mooncross FUNCARGS_KEYWDS
     double x2, jd, res;
     char err[256] = {0};
     static char* kwlist[] = {"x2cross", "tjdet", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd|i", kwlist,
                                      &x2, &jd, &flags))
         return NULL;
     if ((res = swe_mooncross(x2, jd, flags, err)) < jd)
@@ -2412,7 +2414,7 @@ static PyObject * pyswe_mooncross_node FUNCARGS_KEYWDS
     double jd, xlon, xlat, res;
     char err[256] = {0};
     static char* kwlist[] = {"tjdet", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist, &jd, &flags))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d|i", kwlist, &jd, &flags))
         return NULL;
     if ((res = swe_mooncross_node(jd, flags, &xlon, &xlat, err)) < jd)
         return PyErr_Format(pyswe_Error, "mooncross_node: %s", err);
@@ -2437,7 +2439,7 @@ static PyObject * pyswe_mooncross_node_ut FUNCARGS_KEYWDS
     double jd, xlon, xlat, res;
     char err[256] = {0};
     static char* kwlist[] = {"tjdut", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist, &jd, &flags))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d|i", kwlist, &jd, &flags))
         return NULL;
     if ((res = swe_mooncross_node(jd, flags, &xlon, &xlat, err)) < jd)
         return PyErr_Format(pyswe_Error, "mooncross_node: %s", err);
@@ -2461,7 +2463,7 @@ static PyObject * pyswe_mooncross_ut FUNCARGS_KEYWDS
     double x2, jd, res;
     char err[256] = {0};
     static char* kwlist[] = {"x2cross", "tjdut", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd|i", kwlist,
                                      &x2, &jd, &flags))
         return NULL;
     if ((res = swe_mooncross_ut(x2, jd, flags, err)) < jd)
@@ -2490,7 +2492,7 @@ static PyObject * pyswe_nod_aps FUNCARGS_KEYWDS
     double jd, xasc[6], xdsc[6], xper[6], xaph[6];
     int ret, planet, method = SE_NODBIT_MEAN, flags = SEFLG_SWIEPH|SEFLG_SPEED;
     static char *kwlist[] = {"tjdet", "planet", "method", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|ii", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "di|ii", kwlist,
                                      &jd, &planet, &method, &flags))
         return NULL;
     ret = swe_nod_aps(jd, planet, flags, method, xasc, xdsc, xper, xaph, err);
@@ -2523,7 +2525,7 @@ static PyObject * pyswe_nod_aps_ut FUNCARGS_KEYWDS
     double jd, xasc[6], xdsc[6], xper[6], xaph[6];
     int ret, planet, method = SE_NODBIT_MEAN, flags = SEFLG_SWIEPH|SEFLG_SPEED;
     static char *kwlist[] = {"tjdut", "planet", "method", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|ii", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "di|ii", kwlist,
                                      &jd, &planet, &method, &flags))
         return NULL;
     ret = swe_nod_aps_ut(jd, planet, flags, method, xasc, xdsc, xper, xaph, err);
@@ -2556,7 +2558,7 @@ static PyObject * pyswe_orbit_max_min_true_distance FUNCARGS_KEYWDS
     double jd, dmax, dmin, dtrue;
     char err[256] = {0};
     static char *kwlist[] = {"tjdet", "planet", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dii", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dii", kwlist,
                                      &jd, &pl, &flg))
         return NULL;
     i = swe_orbit_max_min_true_distance(jd, pl, flg, &dmax, &dmin, &dtrue, err);
@@ -2589,7 +2591,7 @@ static PyObject * pyswe_pheno FUNCARGS_KEYWDS
     int i, pl, flag = SEFLG_SWIEPH;
     char err[256] = {0};
     static char *kwlist[] = {"tjdet", "planet", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "di|i", kwlist,
                                      &jd, &pl, &flag))
         return NULL;
     i = swe_pheno(jd, pl, flag, attr, err);
@@ -2624,7 +2626,7 @@ static PyObject * pyswe_pheno_ut FUNCARGS_KEYWDS
     int i, pl, flag = SEFLG_SWIEPH;
     char err[256] = {0};
     static char *kwlist[] = {"tjdut", "planet", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "di|i", kwlist,
                                      &jd, &pl, &flag))
         return NULL;
     i = swe_pheno_ut(jd, pl, flag, attr, err);
@@ -2646,7 +2648,7 @@ static PyObject * pyswe_rad_midp FUNCARGS_KEYWDS
 {
     double x, y;
     static char *kwlist[] = {"x", "y", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &x, &y))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd", kwlist, &x, &y))
         return NULL;
     return Py_BuildValue("d", swe_rad_midp(x, y));
 }
@@ -2661,7 +2663,7 @@ static PyObject * pyswe_radnorm FUNCARGS_KEYWDS
 {
     double x;
     static char *kwlist[] = {"x", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &x))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &x))
         return NULL;
     return Py_BuildValue("d", swe_radnorm(x));
 }
@@ -2683,7 +2685,7 @@ static PyObject * pyswe_refrac FUNCARGS_KEYWDS
     double alt, press, temp;
     int flag;
     static char *kwlist[] = {"alt", "atpress", "attemp", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddi", kwlist, &alt,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddi", kwlist, &alt,
                                      &press, &temp, &flag))
         return NULL;
     return Py_BuildValue("d", swe_refrac(alt, press, temp, flag));
@@ -2715,7 +2717,7 @@ static PyObject * pyswe_refrac_extended FUNCARGS_KEYWDS
     int flag;
     static char *kwlist[] = {"alt", "geoalt", "atpress", "attemp", "lapserate",
                              "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddi", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddddi", kwlist,
                     &alt, &geoalt, &press, &temp, &lapserate, &flag))
         return NULL;
     ret = swe_refrac_extended(alt, geoalt, press, temp, lapserate, flag, dret);
@@ -2736,7 +2738,7 @@ static PyObject * pyswe_revjul FUNCARGS_KEYWDS
     int year, month, day, cal = SE_GREG_CAL;
     double hour, jd;
     static char *kwlist[] = {"jd", "cal", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist, &jd, &cal))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d|i", kwlist, &jd, &cal))
         return NULL;
     if (cal != SE_GREG_CAL && cal != SE_JUL_CAL)
         return PyErr_Format(PyExc_ValueError,
@@ -2777,7 +2779,7 @@ static PyObject * pyswe_rise_trans FUNCARGS_KEYWDS
     PyObject *body, *gp;
     static char *kwlist[] = {"tjdut", "body", "rsmi", "geopos", "atpress",
                              "attemp", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOiO|ddi", kwlist, &jd,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dOiO|ddi", kwlist, &jd,
                                      &body, &rsmi, &gp, &press, &temp, &flag))
         return NULL;
     /* extract pl/star */
@@ -2839,7 +2841,7 @@ static PyObject * pyswe_rise_trans_true_hor FUNCARGS_KEYWDS
     PyObject *body, *gp;
     static char *kwlist[] = {"tjdut", "body", "rsmi", "geopos", "atpress",
                              "attemp", "horhgt", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOiO|dddi", kwlist, &jd,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dOiO|dddi", kwlist, &jd,
                             &body, &rsmi, &gp, &press, &temp, &horhgt, &flag))
         return NULL;
     /* extract pl/star */
@@ -2886,7 +2888,7 @@ static PyObject * pyswe_set_delta_t_userdef FUNCARGS_KEYWDS
 {
     double acc;
     static char *kwlist[] = {"acc", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &acc))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &acc))
         return NULL;
     swe_set_delta_t_userdef(acc);
     Py_RETURN_NONE;
@@ -2903,7 +2905,7 @@ static PyObject * pyswe_set_ephe_path FUNCARGS_KEYWDS
 {
     char *path = PYSWE_DEFAULT_EPHE_PATH;
     static char *kwlist[] = {"path", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "|z", kwlist, &path))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|z", kwlist, &path))
         return NULL;
     swe_set_ephe_path(path);
     Py_RETURN_NONE;
@@ -2927,7 +2929,7 @@ static PyObject * pyswe_set_jpl_file FUNCARGS_KEYWDS
 {
     char *name;
     static char *kwlist[] = {"name", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &name))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &name))
         return NULL;
     swe_set_jpl_file(name);
     Py_RETURN_NONE;
@@ -2935,14 +2937,15 @@ static PyObject * pyswe_set_jpl_file FUNCARGS_KEYWDS
 
 /* swisseph.set_lapse_rate */
 PyDoc_STRVAR(pyswe_set_lapse_rate__doc__,
-"Set lapse rate.\n\nArgs: float lrate\nReturn: None");
+"Set lapse rate.\n\n"
+":Args: float lrate\n"
+":Return: None");
 
 static PyObject * pyswe_set_lapse_rate FUNCARGS_KEYWDS
 {
     double lapserate;
     static char *kwlist[] = {"lrate", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist,
-        &lapserate))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &lapserate))
         return NULL;
     swe_set_lapse_rate(lapserate);
     Py_RETURN_NONE;
@@ -2968,7 +2971,7 @@ static PyObject * pyswe_set_sid_mode FUNCARGS_KEYWDS
     int mode;
     double t0 = 0.0, ayan_t0 = 0.0;
     static char *kwlist[] = {"mode", "t0", "ayan_t0", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i|dd", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i|dd", kwlist,
                                      &mode, &t0, &ayan_t0))
         return NULL;
     swe_set_sid_mode(mode, t0, ayan_t0);
@@ -3012,7 +3015,7 @@ static PyObject * pyswe_set_tid_acc FUNCARGS_KEYWDS
 {
     double acc;
     static char *kwlist[] = {"acc", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &acc))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &acc))
         return NULL;
     swe_set_tid_acc(acc);
     Py_RETURN_NONE;
@@ -3022,8 +3025,8 @@ static PyObject * pyswe_set_tid_acc FUNCARGS_KEYWDS
 PyDoc_STRVAR(pyswe_set_topo__doc__,
 "Set topocentric parameters.\n\n"
 ":Args: float lon, float lat, float alt=0.0\n\n"
-" - lon: geographic longitude in degrees\n"
-" - lat: geographic latitude in degrees\n"
+" - lon: geographic longitude, in degrees (eastern positive)\n"
+" - lat: geographic latitude, in degrees (northern positive)\n"
 " - alt: geographic altitude in meters above sea level\n\n"
 ":Return: None");
 
@@ -3031,7 +3034,7 @@ static PyObject * pyswe_set_topo FUNCARGS_KEYWDS
 {
     double lon, lat, alt = 0.0;
     static char *kwlist[] = {"lon", "lat", "alt", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|d", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd|d", kwlist,
                                      &lon, &lat, &alt))
         return NULL;
     swe_set_topo(lon, lat, alt);
@@ -3049,7 +3052,7 @@ static PyObject * pyswe_sidtime FUNCARGS_KEYWDS
 {
     double jd;
     static char *kwlist[] = {"tjdut", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &jd))
         return NULL;
     return Py_BuildValue("d", swe_sidtime(jd));
 }
@@ -3067,7 +3070,7 @@ static PyObject * pyswe_sidtime0 FUNCARGS_KEYWDS
 {
     double jd, obliquity, nutation;
     static char *kwlist[] = {"tjdut", "eps", "nutation", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ddd", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ddd", kwlist,
                                      &jd, &obliquity, &nutation))
         return NULL;
     return Py_BuildValue("d", swe_sidtime0(jd, obliquity, nutation));
@@ -3111,7 +3114,7 @@ static PyObject * pyswe_sol_eclipse_how FUNCARGS_KEYWDS
     char err[256] = {0};
     PyObject *gp;
     static char *kwlist[] = {"tjdut", "geopos", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dO|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dO|i", kwlist,
                                      &jd, &gp, &flag))
         return NULL;
     /* extract geopos */
@@ -3167,7 +3170,7 @@ static PyObject * pyswe_sol_eclipse_when_glob FUNCARGS_KEYWDS
     int res, ecltype = 0, backw = 0, flag = SEFLG_SWIEPH;
     char err[256] = {0};
     static char *kwlist[] = {"tjdut", "flags", "ecltype", "backwards", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|iii", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d|iii", kwlist,
             &jd, &flag, &ecltype, &backw))
         return NULL;
     res = swe_sol_eclipse_when_glob(jd, flag, ecltype, tret, backw, err);
@@ -3184,7 +3187,7 @@ PyDoc_STRVAR(pyswe_sol_eclipse_when_loc__doc__,
 ":Args: float tjdut, seq geopos, int flags=FLG_SWIEPH, bool backwards=False\n\n"
 " - tjdut: input time, Julian day number, Universal Time\n"
 " - geopos: a sequence with:\n"
-"    - geographic longitude,in degrees (eastern positive)\n"
+"    - geographic longitude, in degrees (eastern positive)\n"
 "    - geographic latitude, in degrees (northern positive)\n"
 "    - geographic altitude above sea level, in meters\n"
 " - flags: ephemeris flag, etc\n"
@@ -3226,7 +3229,7 @@ static PyObject * pyswe_sol_eclipse_when_loc FUNCARGS_KEYWDS
     char err[256] = {0};
     PyObject *gp;
     static char *kwlist[] = {"tjdut", "geopos", "flags", "backwards", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dO|ii", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dO|ii", kwlist,
                                      &jd, &gp, &flag, &backw))
         return NULL;
     /* extract geopos */
@@ -3297,7 +3300,7 @@ static PyObject * pyswe_sol_eclipse_where FUNCARGS_KEYWDS
     int i, flag = SEFLG_SWIEPH;
     char err[256] = {0};
     static char *kwlist[] = {"tjdut", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist, &jd, &flag))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d|i", kwlist, &jd, &flag))
         return NULL;
     i = swe_sol_eclipse_where(jd, flag, geopos, attr, err);
     if (i < 0)
@@ -3326,7 +3329,7 @@ static PyObject * pyswe_solcross FUNCARGS_KEYWDS
     double x2, jd, res;
     char err[256] = {0};
     static char* kwlist[] = {"x2cross", "tjdet", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd|i", kwlist,
                                      &x2, &jd, &flags))
         return NULL;
     if ((res = swe_solcross(x2, jd, flags, err)) < jd)
@@ -3351,7 +3354,7 @@ static PyObject * pyswe_solcross_ut FUNCARGS_KEYWDS
     double x2, jd, res;
     char err[256] = {0};
     static char* kwlist[] = {"x2cross", "tjdut", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd|i", kwlist,
                                      &x2, &jd, &flags))
         return NULL;
     if ((res = swe_solcross_ut(x2, jd, flags, err)) < jd)
@@ -3386,7 +3389,7 @@ static PyObject * pyswe_split_deg FUNCARGS_KEYWDS
     double ddeg, secfr;
     int deg, min, sec, sign, flag;
     static char *kwlist[] = {"degree", "roundflag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "di", kwlist, &ddeg, &flag))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "di", kwlist, &ddeg, &flag))
         return NULL;
     swe_split_deg(ddeg, flag, &deg, &min, &sec, &secfr, &sign);
     return Py_BuildValue("iiidi", deg, min, sec, secfr, sign);
@@ -3407,7 +3410,7 @@ static PyObject * pyswe_time_equ FUNCARGS_KEYWDS
     double jd, ret;
     char err[256] = {0};
     static char *kwlist[] = {"tjdut", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &jd))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &jd))
         return NULL;
     i = swe_time_equ(jd, &ret, err);
     if (i < 0)
@@ -3434,7 +3437,7 @@ static PyObject * pyswe_utc_time_zone FUNCARGS_KEYWDS
     double s, tz, s2;
     static char *kwlist[] = {"year", "month", "day", "hour", "minutes",
                              "seconds", "offset", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iiiiidd", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "iiiiidd", kwlist,
                                      &y, &m, &d, &h, &mi, &s, &tz))
         return NULL;
     swe_utc_time_zone(y, m, d, h, mi, s, tz, &y2, &m2, &d2, &h2, &mi2, &s2);
@@ -3461,7 +3464,7 @@ static PyObject * pyswe_utc_to_jd FUNCARGS_KEYWDS
     char err[256] = {0};
     static char *kwlist[] = {"year", "month", "day", "hour", "minutes",
                              "seconds", "cal", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iiiiid|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "iiiiid|i", kwlist,
                                      &y, &m, &d, &h, &mi, &s, &flg))
         return NULL;
     if (flg != SE_GREG_CAL && flg != SE_JUL_CAL)
@@ -3537,7 +3540,7 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
     PyObject *o1, *o2, *o3;
     static char *kwlist[] = {"tjdut", "geopos", "atmo", "observer", "objname",
                              "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dOOOsi", kwlist, &jd, &o1,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dOOOsi", kwlist, &jd, &o1,
                                      &o2, &o3, &obj, &flg))
         return NULL;
     /* extract geopos */
@@ -3568,33 +3571,44 @@ static PyObject * pyswe_vis_limit_mag FUNCARGS_KEYWDS
 
 #if PYSWE_USE_SWEPHELP /* Pyswisseph contrib submodule */
 
+/* swisseph.contrib.Error (module exception type) */
+static PyObject * pyswh_Error;
+
 /* generic object holding a pointer */
 
 #define pyswh_Object_new(tp)    ((pyswh_Object*) (tp)->tp_alloc((tp), 0))
+#define pyswh_Object_dealloc(o) Py_TYPE(o)->tp_free((PyObject*)o)
 
 typedef struct {
     PyObject_HEAD
     void* p;
 } pyswh_Object;
 
+/* get-setters */
+
 typedef struct {
     double (*get)(void*);
     int (*set)(void*, double);
-} pyswh_double_getsetters;
+} pyswh_double_getsetter;
 
 typedef struct {
-    int (*get)(void*);
-    int (*set)(void*, int);
-} pyswh_int_getsetters;
+    long (*get)(void*);
+    int (*set)(void*, long);
+} pyswh_long_getsetter;
 
 typedef struct {
     const char* (*get)(void*);
     int (*set)(void*, const char*);
-} pyswh_string_getsetters;
+} pyswh_string_getsetter;
+
+typedef struct {
+    unsigned long (*get)(void*);
+    int (*set)(void*, unsigned long);
+} pyswh_ulong_getsetter;
 
 static PyObject * pyswh_Object_get_double(pyswh_Object* self, void* cl)
 {
-    double d = ((pyswh_double_getsetters*)cl)->get(self->p);
+    double d = ((pyswh_double_getsetter*)cl)->get(self->p);
     PyObject* o = PyFloat_FromDouble(d);
     return o ? o : PyErr_NoMemory();
 }
@@ -3602,15 +3616,17 @@ static PyObject * pyswh_Object_get_double(pyswh_Object* self, void* cl)
 static int pyswh_Object_set_double(pyswh_Object* self, PyObject* val, void* cl)
 {
     double d;
-    if (!val || (!PyLong_Check(val) && !PyFloat_Check(val))) {
+    if (PyFloat_Check(val))
+        d = PyFloat_AsDouble(val);
+    else if (PyLong_Check(val))
+        d = PyLong_AsDouble(val);
+    else {
         PyErr_SetString(PyExc_TypeError, "must be a float");
         return -1;
     }
-    d = PyLong_Check(val) ? PyLong_AsLong(val) :
-        PyFloat_Check(val) ? PyFloat_AsDouble(val) : -1;
-    if (d == -1  && PyErr_Occurred())
+    if (d == -1 && PyErr_Occurred())
         return -1;
-    if (((pyswh_double_getsetters*)cl)->set(self->p, d)) {
+    if (((pyswh_double_getsetter*)cl)->set(self->p, d)) {
         PyErr_SetString(PyExc_AttributeError, swhxx_get_error(self->p));
         swhxx_clear_error(self->p);
         return -1;
@@ -3618,24 +3634,24 @@ static int pyswh_Object_set_double(pyswh_Object* self, PyObject* val, void* cl)
     return 0;
 }
 
-static PyObject * pyswh_Object_get_int(pyswh_Object* self, void* cl)
+static PyObject * pyswh_Object_get_long(pyswh_Object* self, void* cl)
 {
-    int i = ((pyswh_int_getsetters*)cl)->get(self->p);
+    long i = ((pyswh_long_getsetter*)cl)->get(self->p);
     PyObject* o = PyLong_FromLong(i);
     return o ? o : PyErr_NoMemory();
 }
 
-static int pyswh_Object_set_int(pyswh_Object* self, PyObject* val, void* cl)
+static int pyswh_Object_set_long(pyswh_Object* self, PyObject* val, void* cl)
 {
-    int i;
-    if (!val || !PyLong_Check(val)) {
+    long i;
+    if (!PyLong_Check(val)) {
         PyErr_SetString(PyExc_TypeError, "must be an int");
         return -1;
     }
     i = PyLong_AsLong(val);
     if (i == -1 && PyErr_Occurred())
         return -1;
-    if (((pyswh_int_getsetters*)cl)->set(self->p, i)) {
+    if (((pyswh_long_getsetter*)cl)->set(self->p, i)) {
         PyErr_SetString(PyExc_AttributeError, swhxx_get_error(self->p));
         swhxx_clear_error(self->p);
         return -1;
@@ -3645,7 +3661,7 @@ static int pyswh_Object_set_int(pyswh_Object* self, PyObject* val, void* cl)
 
 static PyObject * pyswh_Object_get_string(pyswh_Object* self, void* cl)
 {
-    const char* s = ((pyswh_string_getsetters*)cl)->get(self->p);
+    const char* s = ((pyswh_string_getsetter*)cl)->get(self->p);
     PyObject* o = PyUnicode_FromString(s);
     return o ? o : PyErr_NoMemory();
 }
@@ -3653,17 +3669,48 @@ static PyObject * pyswh_Object_get_string(pyswh_Object* self, void* cl)
 static int pyswh_Object_set_string(pyswh_Object* self, PyObject* val, void* cl)
 {
     char* str;
-    if (!val || !PyUnicode_Check(val)) {
+    if (!PyUnicode_Check(val)) {
         PyErr_SetString(PyExc_TypeError, "must be a string");
         return -1;
     }
     str = (char*) PyUnicode_AsUTF8(val);
-    if (((pyswh_string_getsetters*)cl)->set(self->p, str)) {
+    if (((pyswh_string_getsetter*)cl)->set(self->p, str)) {
         PyErr_SetString(PyExc_AttributeError, swhxx_get_error(self->p));
         swhxx_clear_error(self->p);
         return -1;
     }
     return 0;
+}
+
+static PyObject * pyswh_Object_get_ulong(pyswh_Object* self, void* cl)
+{
+    unsigned long i = ((pyswh_ulong_getsetter*)cl)->get(self->p);
+    PyObject* o = PyLong_FromUnsignedLong(i);
+    return o ? o : PyErr_NoMemory();
+}
+#if 0
+static int pyswh_Object_set_ulong(pyswh_Object* self, PyObject* val, void* cl)
+{
+    unsigned long i;
+    if (!PyLong_Check(val)) {
+        PyErr_SetString(PyExc_TypeError, "must be an int");
+        return -1;
+    }
+    i = PyLong_AsUnsignedLong(val);
+    if (i == -1 && PyErr_Occurred())
+        return -1;
+    if (((pyswh_ulong_getsetter*)cl)->set(self->p, i)) {
+        PyErr_SetString(PyExc_AttributeError, swhxx_get_error(self->p));
+        swhxx_clear_error(self->p);
+        return -1;
+    }
+    return 0;
+}
+#endif
+static int pyswh_Object_set_readonly(pyswh_Object* s, PyObject* val, void* cl)
+{
+    PyErr_SetString(PyExc_AttributeError, "read-only attribute");
+    return -1;
 }
 
 /* swisseph.contrib.User */
@@ -3680,33 +3727,40 @@ PyDoc_STRVAR(pyswh_User_mail__doc__,
 PyDoc_STRVAR(pyswh_User_info__doc__,
 "User info");
 PyDoc_STRVAR(pyswh_User_drop__doc__,
-"Delete user from database.\n\n"
-"Args: -\n"
-"Return: None");
+"Delete the user from database.\n\n"
+":Args: --\n"
+":Return: None\n\n"
+"Raises KeyError if not found.");
 PyDoc_STRVAR(pyswh_User_list__doc__,
 "List all users in database.\n\n"
-"Args: -\n"
-"Return: list of swh.User instances");
+":Args: str orderby='name'\n\n"
+" - orderby: order by index ('idx'), by name ('name')\n\n"
+":Return: list of swh.User instances");
 PyDoc_STRVAR(pyswh_User_root__doc__,
-"Load the default user (root) from database (static method)\n\n"
-"Args: -\n"
-"Return: swh.User instance");
+"Load the default user (root) from database\n\n"
+":Args: --\n"
+":Return: swh.User instance");
 PyDoc_STRVAR(pyswh_User_save__doc__,
 "Save user in database.\n\n"
-"Args: -\n"
-"Return: None");
+":Args: --\n"
+":Return: None\n\n"
+"Raises KeyError if duplicate or name is invalid.");
 PyDoc_STRVAR(pyswh_User_select__doc__,
-"Load a user from database (static method)\n\n"
-"Args: str name\n"
-"Return: swh.User instance");
+"Load a user from database\n\n"
+":Args: str name\n"
+":Return: swh.User instance\n\n"
+"Raises KeyError if not found or name is invalid.");
 
 static PyObject * pyswh_User_new(PyTypeObject* tp, PyObject* args, PyObject* kwds)
 {
     pyswh_Object* self = pyswh_Object_new(tp);
-    if (self)
+    if (self) {
         swhxx_db_user_new(&self->p);
-    else
-        self->p = NULL;
+        if (!self->p) {
+            pyswh_Object_dealloc(self);
+            self = NULL;
+        }
+    }
     return (PyObject*) self;
 }
 
@@ -3714,7 +3768,7 @@ static void pyswh_User_dealloc(pyswh_Object* self)
 {
     if (self->p)
         swhxx_db_user_dealloc(&self->p);
-    Py_TYPE(self)->tp_free((PyObject*)self);
+    pyswh_Object_dealloc(self);
 }
 
 static int pyswh_User_init(pyswh_Object* self, PyObject* args, PyObject* kwds)
@@ -3735,24 +3789,24 @@ static int pyswh_User_init(pyswh_Object* self, PyObject* args, PyObject* kwds)
     return 0;
 }
 
-static pyswh_int_getsetters pyswh_User_getset_idx = {
-    &swhxx_db_user_get_idx, &swhxx_db_user_set_idx
+static pyswh_ulong_getsetter pyswh_User_getset_idx = {
+    &swhxx_db_user_get_idx, NULL
 };
-static pyswh_string_getsetters pyswh_User_getset_name = {
+static pyswh_string_getsetter pyswh_User_getset_name = {
     &swhxx_db_user_get_name, &swhxx_db_user_set_name
 };
-static pyswh_string_getsetters pyswh_User_getset_pswd = {
+static pyswh_string_getsetter pyswh_User_getset_pswd = {
     &swhxx_db_user_get_pswd, &swhxx_db_user_set_pswd
 };
-static pyswh_string_getsetters pyswh_User_getset_mail = {
+static pyswh_string_getsetter pyswh_User_getset_mail = {
     &swhxx_db_user_get_mail, &swhxx_db_user_set_mail
 };
-static pyswh_string_getsetters pyswh_User_getset_info = {
+static pyswh_string_getsetter pyswh_User_getset_info = {
     &swhxx_db_user_get_info, &swhxx_db_user_set_info
 };
 
 static PyGetSetDef pyswh_User_getsetters[] = {
-{"_idx", (getter) pyswh_Object_get_int, (setter) pyswh_Object_set_int,
+{"_idx", (getter) pyswh_Object_get_ulong, (setter) pyswh_Object_set_readonly,
     pyswh_User_idx__doc__, &pyswh_User_getset_idx},
 {"name", (getter) pyswh_Object_get_string, (setter) pyswh_Object_set_string,
     pyswh_User_name__doc__, &pyswh_User_getset_name},
@@ -3765,17 +3819,17 @@ static PyGetSetDef pyswh_User_getsetters[] = {
 {NULL}
 };
 
-PyObject * pyswh_User_drop FUNCARGS_SELF;
-PyObject * pyswh_User_list FUNCARGS_SELF;
-PyObject * pyswh_User_root FUNCARGS_SELF;
-PyObject * pyswh_User_save FUNCARGS_SELF;
-PyObject * pyswh_User_select FUNCARGS_KEYWDS;
+static PyObject * pyswh_User_drop FUNCARGS_SELF;
+static PyObject * pyswh_User_list FUNCARGS_KEYWDS;
+static PyObject * pyswh_User_root FUNCARGS_SELF;
+static PyObject * pyswh_User_save FUNCARGS_SELF;
+static PyObject * pyswh_User_select FUNCARGS_KEYWDS;
 
 static PyMethodDef pyswh_User_methods[] = {
 {"drop", (PyCFunction) pyswh_User_drop,
     METH_NOARGS, pyswh_User_drop__doc__},
 {"list", (PyCFunction) pyswh_User_list,
-    METH_STATIC|METH_NOARGS, pyswh_User_list__doc__},
+    METH_STATIC|METH_VARARGS|METH_KEYWORDS, pyswh_User_list__doc__},
 {"root", (PyCFunction) pyswh_User_root,
     METH_STATIC|METH_NOARGS, pyswh_User_root__doc__},
 {"save", (PyCFunction) pyswh_User_save,
@@ -3800,12 +3854,12 @@ static PyTypeObject pyswh_User_type = {
     .tp_getset = pyswh_User_getsetters,
 };
 
-PyObject * pyswh_User_drop FUNCARGS_SELF
+static PyObject * pyswh_User_drop FUNCARGS_SELF
 {
     pyswh_Object* o = (pyswh_Object*) self;
     int x;
     if ((x = swhxx_db_user_drop(o->p))) {
-        PyErr_SetString(x == 1 ? PyExc_KeyError : pyswe_Error,
+        PyErr_SetString(x == 1 ? PyExc_KeyError : pyswh_Error,
                         swhxx_get_error(o->p));
         swhxx_clear_error(o->p);
         return NULL;
@@ -3813,48 +3867,89 @@ PyObject * pyswh_User_drop FUNCARGS_SELF
     Py_RETURN_NONE;
 }
 
-int pyswh_User_list_cb(void* p, int argc, char** argv, char** cols)
+static int pyswh_User_list_cb(void* p, int argc, char** argv, char** cols)
 {
     PyObject* lst = (PyObject*) p;
     pyswh_Object* u = pyswh_Object_new(&pyswh_User_type);
-    if (!u)
+    if (!u) {
+        PyErr_NoMemory();
         return 1;
+    }
     swhxx_db_user_new(&u->p);
-    if (!u->p
-        || swhxx_db_user_set_idx(u->p, atoi(argv[0]))
+    if (!u->p) {
+        PyErr_NoMemory();
+        pyswh_Object_dealloc(u);
+        return 1;
+    }
+    if (swhxx_db_user_set_idx(u->p, strtoul(argv[0], NULL, 10))
         || swhxx_db_user_set_name(u->p, argv[1])
         || swhxx_db_user_set_pswd(u->p, argv[2])
         || swhxx_db_user_set_mail(u->p, argv[3])
-        || swhxx_db_user_set_info(u->p, argv[4]))
+        || swhxx_db_user_set_info(u->p, argv[4])) {
+        PyErr_SetString(PyExc_AttributeError, swhxx_get_error(u->p));
+        pyswh_Object_dealloc(u);
         return 1;
-    if (PyList_Append(lst, (PyObject*) u))
+    }
+    if (PyList_Append(lst, (PyObject*) u)) {
+        pyswh_Object_dealloc(u);
         return 1;
+    }
     return 0;
 }
 
-PyObject * pyswh_User_list FUNCARGS_SELF
+static PyObject * pyswh_User_list FUNCARGS_KEYWDS
 {
+    int order;
+    char* orderby = NULL;
     char err[512] = {0};
-    PyObject* lst = PyList_New(0);
-    if (!lst)
+    PyObject* lst = NULL;
+    static char* kwlist[] = {"orderby", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|z", kwlist, &orderby))
+        return NULL;
+    if (!orderby || !strcmp(orderby, "name"))
+        order = 0;
+    else if (!strcmp(orderby, "idx"))
+        order = 1;
+    else
+        return PyErr_Format(PyExc_ValueError, "invalid orderby (%s)", orderby);
+    if (!(lst = PyList_New(0)))
         return PyErr_NoMemory();
-    if (swh_db_exec("select * from Users order by _idx;", &pyswh_User_list_cb,
+    if (swh_db_exec(order == 0 ? "select * from Users order by name;" :
+                    "select * from Users order by _idx;", &pyswh_User_list_cb,
                     lst, err)) {
-        PyErr_SetString(pyswe_Error, err);
+        if (!PyErr_Occurred())
+            PyErr_SetString(pyswh_Error, *err ? err : "error?");
         Py_DECREF(lst);
         return NULL;
     }
     return lst;
 }
 
-PyObject * pyswh_User_root FUNCARGS_SELF
+static PyObject * pyswh_User_root FUNCARGS_SELF
 {
-    void* p;
+    void* p = NULL;
     pyswh_Object* o;
-    char err[512];
     int x;
+    char err[512] = {0};
     if ((x = swhxx_db_user_root(&p, err))) {
-        PyErr_SetString(x == 1 ? PyExc_KeyError : pyswe_Error, err);
+        switch (x) {
+        case 4:
+            return PyErr_NoMemory();
+        case 3:
+            assert(p);
+            PyErr_SetString(pyswh_Error,
+                            swhxx_has_error(p) ? swhxx_get_error(p) : "error");
+            swhxx_db_user_dealloc(&p);
+            break;
+        case 2:
+            PyErr_SetString(pyswh_Error, err);
+            break;
+        case 1:
+            PyErr_SetString(PyExc_KeyError, err);
+            break;
+        default:
+            Py_FatalError("oops");
+        }
         return NULL;
     }
     if (!(o = pyswh_Object_new(&pyswh_User_type))) {
@@ -3865,12 +3960,12 @@ PyObject * pyswh_User_root FUNCARGS_SELF
     return (PyObject*) o;
 }
 
-PyObject * pyswh_User_save FUNCARGS_SELF
+static PyObject * pyswh_User_save FUNCARGS_SELF
 {
     pyswh_Object* o = (pyswh_Object*) self;
     int x;
     if ((x = swhxx_db_user_save(o->p))) {
-        PyErr_SetString(x == 1 ? PyExc_KeyError : pyswe_Error,
+        PyErr_SetString(x == 1 ? PyExc_KeyError : pyswh_Error,
                         swhxx_get_error(o->p));
         swhxx_clear_error(o->p);
         return NULL;
@@ -3878,18 +3973,35 @@ PyObject * pyswh_User_save FUNCARGS_SELF
     Py_RETURN_NONE;
 }
 
-PyObject * pyswh_User_select FUNCARGS_KEYWDS
+static PyObject * pyswh_User_select FUNCARGS_KEYWDS
 {
     char* name;
-    void* p;
+    void* p = NULL;
     pyswh_Object* o;
-    char err[512];
     int x;
+    char err[512] = {0};
     static char* kwlist[] = {"name", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &name))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &name))
         return NULL;
     if ((x = swhxx_db_user_select(name, &p, err))) {
-        PyErr_SetString(x == 1 ? PyExc_KeyError : pyswe_Error, err);
+        switch (x) {
+        case 4:
+            return PyErr_NoMemory();
+        case 3:
+            assert(p);
+            PyErr_SetString(pyswh_Error,
+                            swhxx_has_error(p) ? swhxx_get_error(p) : "");
+            swhxx_db_user_dealloc(&p);
+            break;
+        case 2:
+            PyErr_SetString(pyswh_Error, err);
+            break;
+        case 1:
+            PyErr_SetString(PyExc_KeyError, err);
+            break;
+        default:
+            Py_FatalError("oops");
+        }
         return NULL;
     }
     if (!p)
@@ -3907,17 +4019,17 @@ PyDoc_STRVAR(pyswh_Data__doc__,
 "Astro data");
 PyDoc_STRVAR(pyswh_Data_idx__doc__,
 "Data idx");
-PyDoc_STRVAR(pyswh_Data_uidx__doc__,
-"Data uidx");
+PyDoc_STRVAR(pyswh_Data_useridx__doc__,
+"Data user idx");
 PyDoc_STRVAR(pyswh_Data_title__doc__,
 "Data title");
 PyDoc_STRVAR(pyswh_Data_jd__doc__,
 "Data julian day");
-PyDoc_STRVAR(pyswh_Data_lat__doc__,
+PyDoc_STRVAR(pyswh_Data_latitude__doc__,
 "Data latitude");
-PyDoc_STRVAR(pyswh_Data_lon__doc__,
+PyDoc_STRVAR(pyswh_Data_longitude__doc__,
 "Data longitude");
-PyDoc_STRVAR(pyswh_Data_alt__doc__,
+PyDoc_STRVAR(pyswh_Data_altitude__doc__,
 "Data altitude");
 PyDoc_STRVAR(pyswh_Data_datetime__doc__,
 "Data date and time");
@@ -3930,17 +4042,20 @@ PyDoc_STRVAR(pyswh_Data_location__doc__,
 PyDoc_STRVAR(pyswh_Data_country__doc__,
 "Data country");
 PyDoc_STRVAR(pyswh_Data_owner__doc__,
-"Get owner of data\n\n"
-"Args: -\n"
-"Return: swh.User found, or None");
+"Get the owner of data\n\n"
+":Args: --\n"
+":Return: swh.User found, or None");
 
 static PyObject * pyswh_Data_new(PyTypeObject* tp, PyObject* args, PyObject* kwds)
 {
     pyswh_Object* self = pyswh_Object_new(tp);
-    if (self)
+    if (self) {
         swhxx_db_data_new(&self->p);
-    else
-        self->p = NULL;
+        if (!self->p) {
+            pyswh_Object_dealloc(self);
+            self = NULL;
+        }
+    }
     return (PyObject*) self;
 }
 
@@ -3948,24 +4063,25 @@ static void pyswh_Data_dealloc(pyswh_Object* self)
 {
     if (self->p)
         swhxx_db_data_dealloc(&self->p);
-    Py_TYPE(self)->tp_free((PyObject*)self);
+    pyswh_Object_dealloc(self);
 }
 
 static int pyswh_Data_init(pyswh_Object* self, PyObject* args, PyObject* kwds)
 {
     char* title = "now", *dt = "", *tz = "", *loc = "", *ctry = "";
     double jd = swh_jdnow(), lat = 0, lon = 0;
-    int alt = 0, isdst = -1;
-    static char* kwlist[] = {"title", "jd", "lat", "lon", "alt", "datetime",
-                             "timezone", "isdst", "location", "country", NULL};
+    long alt = 0, isdst = -1;
+    static char* kwlist[] = {"title", "jd", "latitude", "longitude", "altitude",
+                             "datetime", "timezone", "isdst", "location",
+                             "country", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "|sdddississ", kwlist,
-            &title, &jd, &lat, &lon, &alt, &dt, &tz, &loc, &ctry))
+                &title, &jd, &lat, &lon, &alt, &dt, &tz, &loc, &ctry))
         return -1;
     if (swhxx_db_data_set_title(self->p, title)
         || swhxx_db_data_set_jd(self->p, jd)
-        || swhxx_db_data_set_lat(self->p, lat)
-        || swhxx_db_data_set_lon(self->p, lon)
-        || swhxx_db_data_set_alt(self->p, alt)
+        || swhxx_db_data_set_latitude(self->p, lat)
+        || swhxx_db_data_set_longitude(self->p, lon)
+        || swhxx_db_data_set_altitude(self->p, alt)
         || swhxx_db_data_set_datetime(self->p, dt)
         || swhxx_db_data_set_timezone(self->p, tz)
         || swhxx_db_data_set_isdst(self->p, isdst)
@@ -3978,63 +4094,63 @@ static int pyswh_Data_init(pyswh_Object* self, PyObject* args, PyObject* kwds)
     return 0;
 }
 
-static pyswh_int_getsetters pyswh_Data_getset_idx = {
-    &swhxx_db_data_get_idx, &swhxx_db_data_set_idx
+static pyswh_ulong_getsetter pyswh_Data_getset_idx = {
+    &swhxx_db_data_get_idx, NULL
 };
-static pyswh_int_getsetters pyswh_Data_getset_uidx = {
-    &swhxx_db_data_get_uidx, &swhxx_db_data_set_uidx
+static pyswh_ulong_getsetter pyswh_Data_getset_useridx = {
+    &swhxx_db_data_get_useridx, NULL
 };
-static pyswh_string_getsetters pyswh_Data_getset_title = {
+static pyswh_string_getsetter pyswh_Data_getset_title = {
     &swhxx_db_data_get_title, &swhxx_db_data_set_title
 };
-static pyswh_double_getsetters pyswh_Data_getset_jd = {
+static pyswh_double_getsetter pyswh_Data_getset_jd = {
     &swhxx_db_data_get_jd, &swhxx_db_data_set_jd
 };
-static pyswh_double_getsetters pyswh_Data_getset_lat = {
-    &swhxx_db_data_get_lat, &swhxx_db_data_set_lat
+static pyswh_double_getsetter pyswh_Data_getset_latitude = {
+    &swhxx_db_data_get_latitude, &swhxx_db_data_set_latitude
 };
-static pyswh_double_getsetters pyswh_Data_getset_lon = {
-    &swhxx_db_data_get_lon, &swhxx_db_data_set_lon
+static pyswh_double_getsetter pyswh_Data_getset_longitude = {
+    &swhxx_db_data_get_longitude, &swhxx_db_data_set_longitude
 };
-static pyswh_int_getsetters pyswh_Data_getset_alt = {
-    &swhxx_db_data_get_alt, &swhxx_db_data_set_alt
+static pyswh_long_getsetter pyswh_Data_getset_altitude = {
+    &swhxx_db_data_get_altitude, &swhxx_db_data_set_altitude
 };
-static pyswh_string_getsetters pyswh_Data_getset_datetime = {
+static pyswh_string_getsetter pyswh_Data_getset_datetime = {
     &swhxx_db_data_get_datetime, &swhxx_db_data_set_datetime
 };
-static pyswh_string_getsetters pyswh_Data_getset_timezone = {
+static pyswh_string_getsetter pyswh_Data_getset_timezone = {
     &swhxx_db_data_get_timezone, &swhxx_db_data_set_timezone
 };
-static pyswh_int_getsetters pyswh_Data_getset_isdst = {
+static pyswh_long_getsetter pyswh_Data_getset_isdst = {
     &swhxx_db_data_get_isdst, &swhxx_db_data_set_isdst
 };
-static pyswh_string_getsetters pyswh_Data_getset_location = {
+static pyswh_string_getsetter pyswh_Data_getset_location = {
     &swhxx_db_data_get_location, &swhxx_db_data_set_location
 };
-static pyswh_string_getsetters pyswh_Data_getset_country = {
+static pyswh_string_getsetter pyswh_Data_getset_country = {
     &swhxx_db_data_get_country, &swhxx_db_data_set_country
 };
 
 static PyGetSetDef pyswh_Data_getsetters[] = {
-{"_idx", (getter) pyswh_Object_get_int, (setter) pyswh_Object_set_int,
+{"_idx", (getter) pyswh_Object_get_ulong, (setter) pyswh_Object_set_readonly,
     pyswh_Data_idx__doc__, &pyswh_Data_getset_idx},
-{"_uidx", (getter) pyswh_Object_get_int, (setter) pyswh_Object_set_int,
-    pyswh_Data_uidx__doc__, &pyswh_Data_getset_uidx},
+{"_useridx", (getter) pyswh_Object_get_ulong, (setter) pyswh_Object_set_readonly,
+    pyswh_Data_useridx__doc__, &pyswh_Data_getset_useridx},
 {"title", (getter) pyswh_Object_get_string, (setter) pyswh_Object_set_string,
     pyswh_Data_title__doc__, &pyswh_Data_getset_title},
 {"jd", (getter) pyswh_Object_get_double, (setter) pyswh_Object_set_double,
     pyswh_Data_jd__doc__, &pyswh_Data_getset_jd},
-{"lat", (getter) pyswh_Object_get_double, (setter) pyswh_Object_set_double,
-    pyswh_Data_lat__doc__, &pyswh_Data_getset_lat},
-{"lon", (getter) pyswh_Object_get_double, (setter) pyswh_Object_set_double,
-    pyswh_Data_lon__doc__, &pyswh_Data_getset_lon},
-{"alt", (getter) pyswh_Object_get_int, (setter) pyswh_Object_set_int,
-    pyswh_Data_alt__doc__, &pyswh_Data_getset_alt},
+{"latitude", (getter) pyswh_Object_get_double, (setter) pyswh_Object_set_double,
+    pyswh_Data_latitude__doc__, &pyswh_Data_getset_latitude},
+{"longitude", (getter) pyswh_Object_get_double, (setter) pyswh_Object_set_double,
+    pyswh_Data_longitude__doc__, &pyswh_Data_getset_longitude},
+{"altitude", (getter) pyswh_Object_get_long, (setter) pyswh_Object_set_long,
+    pyswh_Data_altitude__doc__, &pyswh_Data_getset_altitude},
 {"datetime", (getter) pyswh_Object_get_string, (setter) pyswh_Object_set_string,
     pyswh_Data_datetime__doc__, &pyswh_Data_getset_datetime},
 {"timezone", (getter) pyswh_Object_get_string, (setter) pyswh_Object_set_string,
     pyswh_Data_timezone__doc__, &pyswh_Data_getset_timezone},
-{"isdst", (getter) pyswh_Object_get_int, (setter) pyswh_Object_set_int,
+{"isdst", (getter) pyswh_Object_get_long, (setter) pyswh_Object_set_long,
     pyswh_Data_isdst__doc__, &pyswh_Data_getset_isdst},
 {"location", (getter) pyswh_Object_get_string, (setter) pyswh_Object_set_string,
     pyswh_Data_location__doc__, &pyswh_Data_getset_location},
@@ -4043,7 +4159,7 @@ static PyGetSetDef pyswh_Data_getsetters[] = {
 {NULL}
 };
 
-PyObject * pyswh_Data_owner FUNCARGS_SELF;
+static PyObject * pyswh_Data_owner FUNCARGS_SELF;
 
 static PyMethodDef pyswh_Data_methods[] = {
 {"owner", (PyCFunction) pyswh_Data_owner,
@@ -4066,13 +4182,25 @@ static PyTypeObject pyswh_Data_type = {
     .tp_getset = pyswh_Data_getsetters,
 };
 
-PyObject * pyswh_Data_owner FUNCARGS_SELF
+static PyObject * pyswh_Data_owner FUNCARGS_SELF
 {
     pyswh_Object* o = (pyswh_Object*) self;
     void* p;
-    char err[512];
-    if (swhxx_db_data_owner(o->p, &p, err)) {
-        PyErr_SetString(pyswe_Error, err);
+    int x;
+    char err[512] = {0};
+    if ((x = swhxx_db_data_owner(o->p, &p, err))) {
+        switch (x) {
+        case 3:
+            return PyErr_NoMemory();
+        case 2:
+            PyErr_SetString(pyswh_Error, err);
+            break;
+        case 1:
+            PyErr_SetString(PyExc_KeyError, err);
+            break;
+        default:
+            Py_FatalError("oops");
+        }
         return NULL;
     }
     if (!p)
@@ -4088,37 +4216,45 @@ PyObject * pyswh_Data_owner FUNCARGS_SELF
 /* swisseph.contrib.antiscion */
 PyDoc_STRVAR(pyswh_antiscion__doc__,
 "Calculate antiscion and contrantiscion of an object\n\n"
+":Args: float lon, float lat=0, float dist=0, float lonspeed=0,"
+" float latspeed=0, float distspeed=0, float axis=90\n\n"
+" - lon, lat, dist, lonspeed, latspeed, distspeed: object position and speed\n"
+" - axis: degree of mirror axis, default to solsticial axis (90).\n"
+"   Manilius-like is 105, equinox axis is 0, usw.\n\n"
+":Return: (antiscion), (contrantiscion)\n\n"
+" - antiscion: tuple of 6 float for antiscion position and speed\n"
+" - contrantiscion: tuple of 6 float for contrantiscion position and speed\n\n"
+"The antiscion of any given planet is a point equal in distance on the"
+" opposite side of the solsticial axis to the planet's position, effectively"
+" the *shadow* of a planet.\n\n"
 "Usage example:\n\n"
-"\tpos, flg = swh.calc_ut(jd, pl)\n"
-"\tantis, contrantis = swh.antiscion(*pos)\n\n"
-"Args: float lon, float lat=0, float dist=0, float lonspeed=0, float latspeed=0,"
-" float distspeed=0, float axis=90\n"
-"Return: antiscion (lon, lat, dist, lonspeed, latspeed, distspeed) contrantiscion (...)");
+"\t>>> xx, rflags = swe.calc_ut(jd, pl)\n"
+"\t>>> antis, contrantis = swh.antiscion(*xx)");
 
 static PyObject * pyswh_antiscion FUNCARGS_KEYWDS
 {
     double p[6] = {0,0,0,0,0,0}, antis[6], contrantis[6], axis = 90;
     static char* kwlist[] = {"lon", "lat", "dist", "lonspeed", "latspeed",
                              "distspeed", "axis", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|dddddd", kwlist,
-        &p[0], &p[1], &p[2], &p[3], &p[4], &p[5], &axis))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d|dddddd", kwlist,
+                            &p[0], &p[1], &p[2], &p[3], &p[4], &p[5], &axis))
         return NULL;
     swh_antiscion(p, axis, antis, contrantis);
-    return Py_BuildValue("(dddddd)(dddddd)", antis[0],antis[1],antis[2],antis[3],
-        antis[4],antis[5],contrantis[0],contrantis[1],contrantis[2],contrantis[3],
-        contrantis[4],contrantis[5]);
+    return Py_BuildValue("(dddddd)(dddddd)",antis[0],antis[1],antis[2],antis[3],
+        antis[4],antis[5],contrantis[0],contrantis[1],contrantis[2],
+        contrantis[3],contrantis[4],contrantis[5]);
 }
 
 /* swisseph.contrib.atlas_close */
 PyDoc_STRVAR(pyswh_atlas_close__doc__,
 "Close previously connected atlas database\n\n"
-"Args: -\n"
-"Return: None");
+":Args: --\n"
+":Return: None");
 
 static PyObject * pyswh_atlas_close FUNCARGS_SELF
 {
     if (swh_atlas_close()) {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.atlas_close: error");
+        PyErr_SetString(pyswh_Error, "swisseph.contrib.atlas_close: error");
         return NULL;
     }
     Py_RETURN_NONE;
@@ -4127,19 +4263,20 @@ static PyObject * pyswh_atlas_close FUNCARGS_SELF
 /* swisseph.contrib.atlas_connect */
 PyDoc_STRVAR(pyswh_atlas_connect__doc__,
 "Connect to the atlas database\n\n"
-"The environment variable SWH_ATLAS_PATH will be searched for a valid string"
-" and will override the path argument given.\n\n"
-"Args: str path=''\n"
-"Return: None");
+":Args: str path=''\n\n"
+" - path: path to atlas database file\n\n"
+":Return: None\n\n"
+"The environment variable ``SWH_ATLAS_PATH`` will be searched for a valid"
+" string and will override the path argument given.");
 
 static PyObject * pyswh_atlas_connect FUNCARGS_KEYWDS
 {
     char* p = NULL;
     static char* kwlist[] = {"path", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "|s", kwlist, &p))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|z", kwlist, &p))
         return NULL;
     if (swh_atlas_connect(p)) {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.atlas_connect: error");
+        PyErr_SetString(pyswh_Error, "swisseph.contrib.atlas_connect: error");
         return NULL;
     }
     Py_RETURN_NONE;
@@ -4148,33 +4285,33 @@ static PyObject * pyswh_atlas_connect FUNCARGS_KEYWDS
 /* swisseph.contrib.atlas_countries_list */
 PyDoc_STRVAR(pyswh_atlas_countries_list__doc__,
 "Get a list of all countries (and ISO codes) in the atlas database\n\n"
-"Args: -\n"
-"Return: list of (country, code)");
+":Args: --\n"
+":Return: a list of (country, code)");
 
 int pyswh_atlas_countries_list_cb(void* p, int argc, char** argv, char** cols)
 {
     PyObject* lst = (PyObject*) p;
     PyObject* tup = Py_BuildValue("(ss)", argv[5], argv[1]);
-    if (!tup)
+    if (!tup) {
+        PyErr_NoMemory();
         return 1;
-    if (PyList_Append(lst, tup))
-        return 1;
-    return 0;
+    }
+    return PyList_Append(lst, tup) ? 1 : 0;
 }
 
 static PyObject * pyswh_atlas_countries_list FUNCARGS_SELF
 {
     int x;
-    char err[512] = {'\0'};
+    char err[512] = {0};
     PyObject* p = PyList_New(0);
     if (!p)
         return PyErr_NoMemory();
     x = swh_atlas_countries_list(&pyswh_atlas_countries_list_cb, p, err);
     if (x) {
-        if (*err)
-            return PyErr_Format(pyswe_Error, "swisseph.contrib.atlas_countries: %s", err);
-        else
-            PyErr_SetString(pyswe_Error, "swisseph.contrib.atlas_countries: error");
+        if (!PyErr_Occurred())
+            PyErr_Format(pyswh_Error,
+                         "swisseph.contrib.atlas_countries_list: %s",
+                         *err ? err : "error");
         Py_DECREF(p);
         return NULL;
     }
@@ -4184,15 +4321,17 @@ static PyObject * pyswh_atlas_countries_list FUNCARGS_SELF
 /* swisseph.contrib.atlas_search */
 PyDoc_STRVAR(pyswh_atlas_search__doc__,
 "Search for a location in the atlas database.\n\n"
+":Args: str location, str country\n\n"
+" - location:\n"
+" - country:\n\n"
+":Return: list of (name, asciiname, alternatenames, countrycode, latitude,"
+" longitude, elevation, timezone)\n\n"
 "Location and country names can be abbreviated. If country is a 2-character"
 " string, it will be evaluated as an ISO country code, and the search will be"
 " faster.\n\n"
 "Usage example:\n\n"
-"\tlst = swh.atlas_search('zurich', 'swi')\n"
-"\tlst = swh.atlas_search('zurich', 'ch')\n\n"
-"Args: str location, str country\n"
-"Return: list of (name, asciiname, alternatenames, countrycode, latitude,"
-" longitude, elevation, timezone)");
+"\t>>> lst = swh.atlas_search('zurich', 'swi')\n"
+"\t>>> lst = swh.atlas_search('zurich', 'ch')");
 
 int pyswh_atlas_search_cb(void* p, int argc, char** argv, char** cols)
 {
@@ -4200,30 +4339,29 @@ int pyswh_atlas_search_cb(void* p, int argc, char** argv, char** cols)
     PyObject* tup = Py_BuildValue("(ssssddis)", argv[0], argv[1], argv[2],
         argv[3], *argv[4] ? atof(argv[4]) : 0, *argv[5] ? atof(argv[5]) : 0,
         *argv[6] ? atoi(argv[6]) : 0, argv[7]);
-    if (!tup)
+    if (!tup) {
+        PyErr_NoMemory();
         return 1;
-    if (PyList_Append(lst, tup))
-        return 1;
-    return 0;
+    }
+    return PyList_Append(lst, tup) ? 1 : 0;
 }
 
 static PyObject * pyswh_atlas_search FUNCARGS_KEYWDS
 {
     char* loc, *ctry;
     int x;
-    char err[512] = {'\0'};
+    char err[512] = {0};
     PyObject* p = NULL;
     static char* kwlist[] = {"location", "country", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ss", kwlist, &loc, &ctry))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ss", kwlist, &loc, &ctry))
         return NULL;
     if (!(p = PyList_New(0)))
         return PyErr_NoMemory();
     x = swh_atlas_search(loc, ctry, &pyswh_atlas_search_cb, p, err);
     if (x) {
-        if (*err)
-            return PyErr_Format(pyswe_Error, "swisseph.contrib.atlas_search: %s", err);
-        else
-            PyErr_SetString(pyswe_Error, "swisseph.contrib.atlas_search: error");
+        if (!PyErr_Occurred())
+            PyErr_Format(pyswh_Error, "swisseph.contrib.atlas_search: %s",
+                         *err ? err : "error");
         Py_DECREF(p);
         return NULL;
     }
@@ -4232,62 +4370,57 @@ static PyObject * pyswh_atlas_search FUNCARGS_KEYWDS
 
 /* swisseph.contrib.calc_ut */
 PyDoc_STRVAR(pyswh_calc_ut__doc__,
-"Calculate positions of either a planet (using function calc_ut)"
-" or a fixed star (using function fixstar2_ut).\n\n"
-"Args: float tjdut, int or str obj, flags=FLG_SWIEPH+FLG_SPEED\n"
-"Return: 2 tuples: positions of object (on success), returned flags and object name\n\n"
+"Calculate positions of a planet or fixed star or special point.\n\n"
+":Args: float tjdut, int or str body, flags=FLG_SWIEPH|FLG_SPEED\n\n"
+" - tjdut:\n"
+" - body:\n"
+" - flags:\n\n"
+":Return: (xx), retnam, retflags\n\n"
+" - xx:\n"
+" - retnam:\n"
+" - retflags:\n\n"
 "Usage examples:\n\n"
-"\tres, xtra = swh.calc_ut(swh.jdnow(), swisseph.SUN)\n"
-"\tres, xtra = swh.calc_ut(swh.jdnow(), \"Regulus\")");
+"\txx, retnam, retflags = swh.calc_ut(swh.jdnow(), swe.SUN)\n"
+"\txx, retnam, retflags = swh.calc_ut(swh.jdnow(), \"Regulus\")");
 
 static PyObject * pyswh_calc_ut FUNCARGS_KEYWDS
 {
-    int x, pl = 0, flags = SEFLG_SWIEPH+SEFLG_SPEED;
+    int i, pl, flags = SEFLG_SWIEPH|SEFLG_SPEED;
     double t, res[6] = {0,0,0,0,0,0};
-    char err[256], nam[256] = {'\0'}, st[(SE_MAX_STNAME*2)+1] = {'\0'};
-    char* star = NULL;
+    char err[256] = {0}, nam[256] = {0}, st[(SE_MAX_STNAME*2)+1] = {0};
+    char* star;
     PyObject* p;
-    static char* kwlist[] = {"tjdut", "obj", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dO|i", kwlist,
-        &t, &p, &flags))
+    static char* kwlist[] = {"tjdut", "body", "flags", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dO|i", kwlist,
+                                     &t, &p, &flags))
         return NULL;
-    if (PyLong_CheckExact(p)) /* long -> planet */
-        pl = (int) PyLong_AsLong(p);
-#if PY_MAJOR_VERSION >= 3
-    else if (PyUnicode_CheckExact(p)) /* unicode -> fixed star */
-        star = (char*) PyUnicode_AsUTF8(p);
-#elif PY_MAJOR_VERSION < 3
-    else if (PyInt_CheckExact(p)) /* int -> planet */
-        pl = (int) PyInt_AsLong(p);
-    else if (PyString_CheckExact(p)) /* str -> fixed star */
-        star = PyString_AsString(p);
-#endif
-    else {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.calc_ut: invalid body type");
+    /* extract pl/star */
+    i = py_obj2plstar(p, &pl, &star);
+    if (i > 0) {
+        PyErr_SetString(pyswh_Error,
+                        "swisseph.contrib.calc_ut: invalid body type");
         return NULL;
     }
-    x = swh_calc_ut(t, pl, star, flags, res, st, err);
-    if (x < 0) {
-        PyErr_SetString(pyswe_Error, err);
-        return NULL;
-    }
+    i = swh_calc_ut(t, pl, star, flags, res, st, err);
+    if (i < 0)
+        return PyErr_Format(pyswe_Error, "swisseph.contrib.calc_ut: %s", err);
     return star ?
-        Py_BuildValue("(dddddd)(is)",res[0],res[1],res[2],res[3],res[4],res[5],
-                x, st)
-        : Py_BuildValue("(dddddd)(is)",res[0],res[1],res[2],res[3],res[4],res[5],
-                x, swe_get_planet_name(pl, nam));
+        Py_BuildValue("(dddddd)si",res[0],res[1],res[2],res[3],res[4],res[5],
+                st, i)
+        : Py_BuildValue("(dddddd)si",res[0],res[1],res[2],res[3],res[4],res[5],
+                swe_get_planet_name(pl, nam), i);
 }
 
 /* swisseph.contrib.db_close */
 PyDoc_STRVAR(pyswh_db_close__doc__,
 "Close previously connected astro database\n\n"
-"Args: -\n"
-"Return: None");
+":Args: --\n"
+":Return: None");
 
 static PyObject * pyswh_db_close FUNCARGS_SELF
 {
     if (swh_db_close()) {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.db_close: error");
+        PyErr_SetString(pyswh_Error, "swisseph.contrib.db_close: error");
         return NULL;
     }
     Py_RETURN_NONE;
@@ -4295,8 +4428,12 @@ static PyObject * pyswh_db_close FUNCARGS_SELF
 
 /* swisseph.contrib.db_connect */
 PyDoc_STRVAR(pyswh_db_connect__doc__,
-"Args: str path='', bool check=True\n"
-"Return: None");
+"Connect to astro database file\n\n"
+":Args: str path='', bool check=True\n\n"
+" - path: path to astro database file\n"
+" - check: verify database version\n\n"
+":Return: None\n\n"
+"If it does not exist, the database file will be created.");
 
 static PyObject * pyswh_db_connect FUNCARGS_KEYWDS
 {
@@ -4304,26 +4441,32 @@ static PyObject * pyswh_db_connect FUNCARGS_KEYWDS
     char* p = NULL;
     char err[512];
     static char* kwlist[] = {"path", "check", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "|sp", kwlist, &p, &check))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|zp", kwlist, &p, &check))
         return NULL;
     if (swh_db_connect(p, check, err))
-        return PyErr_Format(pyswe_Error, "swisseph.contrib.db_connect: %s", err);
+        return PyErr_Format(pyswh_Error,
+                            "swisseph.contrib.db_connect: %s", err);
     Py_RETURN_NONE;
 }
 
 /* swisseph.contrib.degsplit */
 PyDoc_STRVAR(pyswh_degsplit__doc__,
-"Get degrees [0;29], sign number [0;11], minutes [0;59], seconds [0;59],"
-" from a longitude position [0;360[.\n\n"
-"Args: float deg\n"
-"Return: 4 int (degree, sign, minutes, seconds)");
+"Get degrees, sign number, minutes, seconds, from a longitude position.\n\n"
+":Args: float deg\n\n"
+" - deg: longitude position [0;360[\n\n"
+":Return: int degree, sign, minutes, seconds\n\n"
+" - degree: degree number [0;29]\n"
+" - sign: sign number [0;11]\n"
+" - minutes: minutes number [0;59]\n"
+" - seconds: seconds number [0;59]\n\n"
+"Look at ``swe.split_deg()`` for more options.");
 
 static PyObject * pyswh_degsplit FUNCARGS_KEYWDS
 {
     int ret[6];
     double pos;
     static char *kwlist[] = {"deg", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &pos))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &pos))
         return NULL;
     swh_degsplit(pos, ret);
     return Py_BuildValue("iiii", ret[0], ret[1], ret[2], ret[3]);
@@ -4331,16 +4474,17 @@ static PyObject * pyswh_degsplit FUNCARGS_KEYWDS
 
 /* swisseph.contrib.dt2i */
 PyDoc_STRVAR(pyswh_dt2i__doc__,
-"Split a standardized datetime string 'YYYY-mm-dd HH:MM:SS' into integers.\n\n"
+"Split a standardized datetime string into integers.\n\n"
+":Args: str datetime\n\n"
+" - datetime: date and time string, in format 'YYYY-mm-dd HH:MM:SS'\n\n"
+":Return: int year, month, day, hour, minutes, seconds\n\n"
 "Datetimes are expected to roughly follow the ISO 8601 standard,"
-" 'Year-Month-Day Hour:Minutes:Seconds'.\n"
+" 'Year-Month-Day Hour:Minutes:Seconds'.\n\n"
 "All non-digits in the given string are ignored and any of them can be"
 " used as separator, including spaces. A minus is evaluated only in"
-" front of the year, as first char of the string.\n"
+" front of the year, as first char of the string.\n\n"
 "Optionaly, the time part (hour etc) can be omitted, in that case will"
-" return zeros.\n\n"
-"Args: str dt\n"
-"Return: 6 int (year, month, day, hour, minutes, seconds)");
+" return zeros.");
 
 static PyObject * pyswh_dt2i FUNCARGS_KEYWDS
 {
@@ -4348,19 +4492,19 @@ static PyObject * pyswh_dt2i FUNCARGS_KEYWDS
     char* dt;
     int ret[6];
     static char* kwlist[] = {"dt", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &dt))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &dt))
         return NULL;
     x = swh_dt2i(dt, ret);
-    if (x) {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.dt2i: invalid string");
-        return NULL;
-    }
-    return Py_BuildValue("iiiiii",ret[0],ret[1],ret[2],ret[3],ret[4],ret[5]);
+    return x ? PyErr_Format(pyswh_Error,
+                    "swisseph.contrib.dt2i: invalid datetime string (%s)", dt)
+        : Py_BuildValue("iiiiii",ret[0],ret[1],ret[2],ret[3],ret[4],ret[5]);
 }
 
 /* swisseph.contrib.geoc2d */
 PyDoc_STRVAR(pyswh_geoc2d__doc__,
-"Get float from given string meant as a geographical coordinates.\n\n"
+"Get a float from given string meant as a geographical coordinates.\n\n"
+":Args: str geocoord\n"
+":Return: float\n\n"
 "Possible string formats:\n"
 " - DMSx\n"
 " - DxMS\n"
@@ -4371,35 +4515,29 @@ PyDoc_STRVAR(pyswh_geoc2d__doc__,
 " - DM\n"
 " - D\n"
 "Where D is degrees, M is minutes, S is seconds, x is a char in \"NSEW\""
-" (direction).\n"
+" (direction).\n\n"
 "The last number given can be a floating point number.\n"
 "If no direction is given, a negative degree value is accepted down to -180.\n"
 "Decorations chars (like °\"':/,) can serve as separators and are accepted"
-" anywhere (ignored), as well as spaces.\n\n"
-"Args: str coord\n"
-"Return: float");
+" anywhere (ignored), as well as spaces.");
 
 static PyObject * pyswh_geoc2d FUNCARGS_KEYWDS
 {
-    int i;
     double ret;
     char *coord;
     static char *kwlist[] = {"coord", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &coord))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &coord))
         return NULL;
-    i = swh_geoc2d(coord, &ret);
-    if (i) {
-        PyErr_SetString(pyswe_Error, "swisseph.contrib.geoc2d: invalid coord string");
-        return NULL;
-    }
-    return Py_BuildValue("d", ret);
+    return swh_geoc2d(coord, &ret) ? PyErr_Format(pyswh_Error,
+                "swisseph.contrib.geoc2d: invalid coord string (%s)", coord)
+        : Py_BuildValue("d", ret);
 }
 
 /* swisseph.contrib.geolat2c */
 PyDoc_STRVAR(pyswh_geolat2c__doc__,
 "Get formated string of given geographical latitude.\n\n"
-"Args: float lat\n"
-"Return: str");
+":Args: float lat\n"
+":Return: str");
 
 static PyObject * pyswh_geolat2c FUNCARGS_KEYWDS
 {
@@ -4407,7 +4545,7 @@ static PyObject * pyswh_geolat2c FUNCARGS_KEYWDS
     double lat;
     char ret[11];
     static char *kwlist[] = {"lat", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &lat))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &lat))
         return NULL;
     i = swh_geolat2c(lat, ret);
     if (i == -1) {
@@ -4429,7 +4567,7 @@ static PyObject * pyswh_geolon2c FUNCARGS_KEYWDS
     double lon;
     char ret[12];
     static char *kwlist[] = {"lon", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &lon))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &lon))
         return NULL;
     i = swh_geolon2c(lon, ret);
     if (i == -1) {
@@ -4450,7 +4588,7 @@ static PyObject * pyswh_get_nakshatra_name FUNCARGS_KEYWDS
     char ret[15];
     int nak;
     static char *kwlist[] = {"nakshatra", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &nak))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i", kwlist, &nak))
         return NULL;
     if (swh_get_nakshatra_name(nak, ret) == -1) {
         PyErr_SetString(pyswe_Error, "swisseph.contrib.get_nakshatra_name: invalid nakshatra number");
@@ -4471,7 +4609,7 @@ static PyObject * pyswh_house_system_name FUNCARGS_KEYWDS
 {
     char* hsys, str[50];
     static char *kwlist[] = {"hsys", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &hsys))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &hsys))
         return NULL;
     if (strlen(hsys) != 1 || swh_house_system_name(*hsys, str)) {
         PyErr_SetString(pyswe_Error,
@@ -4493,7 +4631,7 @@ static PyObject * pyswh_jd2isostr FUNCARGS_KEYWDS
     double jd;
     char ret[64];
     static char* kwlist[] = {"jd", "cal", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist, &jd, &cal))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d|i", kwlist, &jd, &cal))
         return NULL;
     if (swh_jd2isostr(jd, cal, ret)) {
         PyErr_SetString(pyswe_Error, "swisseph.contrib.jd2isostr: error");
@@ -4504,9 +4642,9 @@ static PyObject * pyswh_jd2isostr FUNCARGS_KEYWDS
 
 /* swisseph.contrib.jdnow */
 PyDoc_STRVAR(pyswh_jdnow__doc__,
-"Get current Julian day number (Gregorian calendar, UTC).\n\n"
-"Args: -\n"
-"Return: float");
+"Get current Julian day number (UT).\n\n"
+":Args: --\n"
+":Return: float tjdut");
 
 static PyObject * pyswh_jdnow FUNCARGS_SELF
 {
@@ -4524,7 +4662,7 @@ static PyObject * pyswh_jduration FUNCARGS_KEYWDS
     double jd1, jd2;
     int ret[4];
     static char* kwlist[] = {"jdstart", "jdend", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd", kwlist, &jd1, &jd2))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd", kwlist, &jd1, &jd2))
         return NULL;
     swh_jduration(jd1, jd2, ret);
     return Py_BuildValue("iiii", ret[0],ret[1],ret[2],ret[3]);
@@ -4542,7 +4680,7 @@ static PyObject * pyswh_julday FUNCARGS_KEYWDS
     int year, mon, day, hour=12, min=0, sec=0, flag=SE_GREG_CAL;
     static char *kwlist[] = {"year", "month", "day", "hour", "minutes",
         "seconds", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iii|iiii", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "iii|iiii", kwlist,
         &year, &mon, &day, &hour, &min, &sec, &flag))
         return NULL;
     return Py_BuildValue("d", swh_julday(year, mon, day, hour,
@@ -4560,7 +4698,7 @@ static PyObject * pyswh_long2nakshatra FUNCARGS_KEYWDS
     int ret[2];
     double lon;
     static char *kwlist[] = {"lon", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &lon))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &lon))
         return NULL;
     swh_long2nakshatra(lon, ret);
     return Py_BuildValue("ii", ret[0], ret[1]);
@@ -4576,7 +4714,7 @@ static PyObject * pyswh_long2navamsa FUNCARGS_KEYWDS
 {
     double lon;
     static char *kwlist[] = {"lon", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &lon))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &lon))
         return NULL;
     return Py_BuildValue("i", swh_long2navamsa(lon));
 }
@@ -4591,7 +4729,7 @@ static PyObject * pyswh_long2rasi FUNCARGS_KEYWDS
 {
     double lon;
     static char *kwlist[] = {"lon", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d", kwlist, &lon))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", kwlist, &lon))
         return NULL;
     return Py_BuildValue("i", swh_long2rasi(lon));
 }
@@ -4606,7 +4744,7 @@ static PyObject * pyswh_lord FUNCARGS_KEYWDS
 {
     int sign, i;
     static char *kwlist[] = {"sign", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &sign))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i", kwlist, &sign))
         return NULL;
     i = swh_lord(sign);
     if (i == -1) {
@@ -4635,7 +4773,7 @@ static PyObject * pyswh_match_aspect FUNCARGS_KEYWDS
     double x, pos0, pos1, sp0, sp1, asp, orb, diff, applic, ftor;
     static char *kwlist[] = {"pos1", "speed1", "pos2", "speed2", "aspect",
         "orb", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddd", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddddd", kwlist,
         &pos0, &sp0, &pos1, &sp1, &asp, &orb))
         return NULL;
     x = swh_match_aspect(pos0, sp0, pos1, sp1, asp, orb, &diff, &applic, &ftor);
@@ -4655,7 +4793,7 @@ static PyObject * pyswh_match_aspect2 FUNCARGS_KEYWDS
     double x, pos0, pos1, sp0, sp1, asp, orb, diff, applic, ftor;
     static char *kwlist[] = {"pos1", "speed1", "pos2", "speed2", "aspect",
         "orb", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddd", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddddd", kwlist,
         &pos0, &sp0, &pos1, &sp1, &asp, &orb))
         return NULL;
     x = swh_match_aspect2(pos0, sp0, pos1, sp1, asp, orb, &diff, &applic, &ftor);
@@ -4676,7 +4814,7 @@ static PyObject * pyswh_match_aspect3 FUNCARGS_KEYWDS
     double x, pos0, pos1, sp0, sp1, asp, app_orb, sep_orb, sta_orb, diff, applic, ftor;
     static char *kwlist[] = {"pos1", "speed1", "pos2", "speed2", "aspect",
         "app_orb", "sep_orb", "sta_orb", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddddd", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddddddd", kwlist,
         &pos0, &sp0, &pos1, &sp1, &asp, &app_orb, &sep_orb, &sta_orb))
         return NULL;
     x = swh_match_aspect3(pos0, sp0, pos1, sp1, asp, app_orb, sep_orb, sta_orb,
@@ -4698,7 +4836,7 @@ static PyObject * pyswh_match_aspect4 FUNCARGS_KEYWDS
     double x, pos0, pos1, sp0, sp1, asp, app_orb, sep_orb, sta_orb, diff, applic, ftor;
     static char *kwlist[] = {"pos1", "speed1", "pos2", "speed2", "aspect",
         "app_orb", "sep_orb", "sta_orb", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dddddddd", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddddddd", kwlist,
         &pos0, &sp0, &pos1, &sp1, &asp, &app_orb, &sep_orb, &sta_orb))
         return NULL;
     x = swh_match_aspect4(pos0, sp0, pos1, sp1, asp, app_orb, sep_orb, sta_orb,
@@ -4716,7 +4854,7 @@ static PyObject * pyswh_naisargika_relation FUNCARGS_KEYWDS
 {
     int gr1, gr2, i, ret;
     static char *kwlist[] = {"gr1", "gr2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ii", kwlist, &gr1, &gr2))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii", kwlist, &gr1, &gr2))
         return NULL;
     i = swh_naisargika_relation(gr1, gr2, &ret);
     if (i == -1) {
@@ -4744,7 +4882,7 @@ static PyObject * pyswh_next_aspect FUNCARGS_KEYWDS
     char err[256];
     static char *kwlist[] = {"planet", "aspect", "fixedpt", "jdstart",
         "backw", "stop", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iddd|idi", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "iddd|idi", kwlist,
         &plnt, &asp, &fix, &jd, &backw, &trange, &flag))
         return NULL;
     i = swh_next_aspect(plnt, asp, fix, jd, backw, trange, flag,
@@ -4776,7 +4914,7 @@ static PyObject * pyswh_next_aspect2 FUNCARGS_KEYWDS
     char err[256];
     static char *kwlist[] = {"planet", "aspect", "fixedpt", "jdstart",
         "backw", "stop", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "iddd|idi", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "iddd|idi", kwlist,
         &plnt, &asp, &fix, &jd, &backw, &trange, &flag))
         return NULL;
     res = swh_next_aspect2(plnt, asp, fix, jd, backw, trange, flag,
@@ -4814,7 +4952,7 @@ static PyObject * pyswh_next_aspect_cusp FUNCARGS_KEYWDS
     PyObject *body;
     static char *kwlist[] = {"body", "aspect", "cusp", "jdstart", "lat", "lon",
         "hsys", "backw", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "Odiddd|cii", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "Odiddd|cii", kwlist,
         &body, &asp, &cusp, &jd, &lat, &lon, &hsys, &backw, &flag))
         return NULL;
     if (PyLong_CheckExact(body)) /* long -> planet */
@@ -4875,7 +5013,7 @@ static PyObject * pyswh_next_aspect_cusp2 FUNCARGS_KEYWDS
     PyObject *body;
     static char *kwlist[] = {"body", "aspect", "cusp", "jdstart", "lat", "lon",
         "hsys", "backw", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "Odiddd|cii", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "Odiddd|cii", kwlist,
         &body, &asp, &cusp, &jd, &lat, &lon, &hsys, &backw, &flag))
         return NULL;
     if (PyLong_CheckExact(body)) /* long -> planet */
@@ -4939,7 +5077,7 @@ static PyObject * pyswh_next_aspect_with FUNCARGS_KEYWDS
     PyObject *body;
     static char *kwlist[] = {"planet", "aspect", "other", "jdstart",
         "backw", "stop", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "idOd|idi", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "idOd|idi", kwlist,
         &plnt, &asp, &body, &jd, &backw, &trange, &flag))
         return NULL;
     if (PyLong_CheckExact(body)) /* long -> planet */
@@ -4990,7 +5128,7 @@ static PyObject * pyswh_next_aspect_with2 FUNCARGS_KEYWDS
     PyObject *body;
     static char *kwlist[] = {"planet", "aspect", "other", "jdstart",
         "backw", "stop", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "idOd|idi", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "idOd|idi", kwlist,
         &plnt, &asp, &body, &jd, &backw, &trange, &flag))
         return NULL;
     if (PyLong_CheckExact(body)) /* long -> planet */
@@ -5042,7 +5180,7 @@ static PyObject * pyswh_next_retro FUNCARGS_KEYWDS
     double jd, trange=0, jdret, posret[6];
     char err[256];
     static char *kwlist[] = {"planet", "jdstart", "backw", "stop", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "id|idi", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "id|idi", kwlist,
         &plnt, &jd, &backw, &trange, &flag))
         return NULL;
     res = swh_next_retro(plnt, jd, backw, trange, flag, &jdret, posret, err);
@@ -5071,7 +5209,7 @@ static PyObject * pyswh_ochchabala FUNCARGS_KEYWDS
     int pl;
     double lon, d;
     static char *kwlist[] = {"pl", "longitude", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "id", kwlist, &pl, &lon))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "id", kwlist, &pl, &lon))
         return NULL;
     d = swh_ochchabala(pl, lon);
     if (d == -1) {
@@ -5092,7 +5230,7 @@ static PyObject * pyswh_raman_houses FUNCARGS_KEYWDS
     int sdi = 0;
     double asc, mc, ret[12];
     static char *kwlist[] = {"asc", "mc", "sandhi", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|b", kwlist, &asc, &mc, &sdi))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd|b", kwlist, &asc, &mc, &sdi))
         return NULL;
     swh_raman_houses(asc, mc, ret, sdi);
     return Py_BuildValue("dddddddddddd", ret[0],ret[1],ret[2],ret[3],ret[4],
@@ -5109,7 +5247,7 @@ static PyObject * pyswh_rasi_dif FUNCARGS_KEYWDS
 {
     int r1, r2;
     static char *kwlist[] = {"r1", "r2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ii", kwlist, &r1, &r2))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii", kwlist, &r1, &r2))
         return NULL;
     return Py_BuildValue("i", swh_rasi_dif(r1, r2));
 }
@@ -5124,7 +5262,7 @@ static PyObject * pyswh_rasi_dif2 FUNCARGS_KEYWDS
 {
     int r1, r2;
     static char *kwlist[] = {"r1", "r2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ii", kwlist, &r1, &r2))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii", kwlist, &r1, &r2))
         return NULL;
     return Py_BuildValue("i", swh_rasi_dif2(r1, r2));
 }
@@ -5139,7 +5277,7 @@ static PyObject * pyswh_rasinorm FUNCARGS_KEYWDS
 {
     int rasi;
     static char *kwlist[] = {"rasi", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &rasi))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i", kwlist, &rasi))
         return NULL;
     return Py_BuildValue("i", swh_rasinorm(rasi));
 }
@@ -5157,7 +5295,7 @@ static PyObject * pyswh_residential_strength FUNCARGS_KEYWDS
     double bh[12], ret, plon;
     PyObject *seq, *p;
     static char *kwlist[] = {"plon", "bhavas", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dO", kwlist, &plon, &seq))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dO", kwlist, &plon, &seq))
         return NULL;
     if ((PySequence_Check(seq) != 1) || (PySequence_Length(seq) < 12)) {
         PyErr_SetString(pyswe_Error, "swisseph.contrib.residential_strength: invalid bhavas");
@@ -5197,7 +5335,7 @@ static PyObject * pyswh_revjul FUNCARGS_KEYWDS
     int dt[6], flag=SE_GREG_CAL;
     double jd;
     static char *kwlist[] = {"julday", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d|i", kwlist,
         &jd, &flag))
         return NULL;
     swh_revjul(jd, flag, dt);
@@ -5216,7 +5354,7 @@ static PyObject * pyswh_saturn_4_stars FUNCARGS_KEYWDS
     int res, flag = SEFLG_SWIEPH | SEFLG_SPEED;
     char err[256];
     static char *kwlist[] = {"jd", "flag", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "d|i", kwlist, &jd, &flag))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d|i", kwlist, &jd, &flag))
         return NULL;
     res = swh_saturn_4_stars(jd, flag, ret, err);
     if (res < 0) {
@@ -5237,7 +5375,7 @@ static PyObject * pyswh_signtostr FUNCARGS_KEYWDS
     int res, sign;
     char str[12];
     static char *kwlist[] = {"sign", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "i", kwlist, &sign))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i", kwlist, &sign))
         return NULL;
     res = swh_signtostr(sign, str);
     if (res < 0) {
@@ -5264,7 +5402,7 @@ static PyObject * pyswh_t2i FUNCARGS_KEYWDS
     char* t;
     int ret[3];
     static char* kwlist[] = {"t", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &t))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &t))
         return NULL;
     x = swh_t2i(t, ret);
     if (x) {
@@ -5284,7 +5422,7 @@ static PyObject * pyswh_tatkalika_relation FUNCARGS_KEYWDS
 {
     int r1, r2;
     static char *kwlist[] = {"r1", "r2", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "ii", kwlist, &r1, &r2))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii", kwlist, &r1, &r2))
         return NULL;
     return Py_BuildValue("i", swh_tatkalika_relation(r1, r2));
 }
@@ -5308,7 +5446,7 @@ static PyObject * pyswh_tzabbr_find FUNCARGS_KEYWDS
     struct swh_tzabbr** p = ret;
     static char* kwlist[] = {"tz", NULL};
     PyObject* lst;
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s", kwlist, &tz))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &tz))
         return NULL;
     if (!(lst = PyList_New(0)))
         return PyErr_NoMemory();
@@ -5363,7 +5501,7 @@ static PyObject * pyswh_years_diff FUNCARGS_KEYWDS
     int flags = SEFLG_SWIEPH|SEFLG_SPEED|SEFLG_NOGDEFL, res;
     char err[256];
     static char *kwlist[] = {"jd1", "jd2", "flags", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "dd|i", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd|i", kwlist,
         &jd1, &jd2, &flags))
         return NULL;
     res = swh_years_diff(jd1, jd2, flags, &years, err);
@@ -5707,8 +5845,6 @@ struct PyModuleDef pyswh_module =
 #if PYSWE_AUTO_SET_EPHE_PATH
 PyDoc_STRVAR(pyswe_module_documentation,
 "Python extension to AstroDienst Swiss Ephemeris library.\n\n"
-"Extended documentation can be found at AstroDienst website.\n"
-"Please refer to: https://www.astro.com/swisseph/swephprg.htm\n\n"
 "Import of this extension module does automagicaly set the ephemeris path"
 " to \"" PYSWE_DEFAULT_EPHE_PATH "\".\n\n"
 "    Pyswisseph homepage: https://astrorigin.com/pyswisseph/\n"
@@ -5717,8 +5853,6 @@ PyDoc_STRVAR(pyswe_module_documentation,
 #else /* no auto set ephe path */
 PyDoc_STRVAR(pyswe_module_documentation,
 "Python extension to AstroDienst Swiss Ephemeris library.\n\n"
-"Extended documentation can be found at AstroDienst website.\n"
-"Please refer to: https://www.astro.com/swisseph/swephprg.htm\n\n"
 "    Pyswisseph homepage: https://astrorigin.com/pyswisseph/\n"
 "    AstroDienst: https://www.astro.com/swisseph/\n"
 "    PyPI: https://pypi.org/project/pyswisseph/");
@@ -5758,6 +5892,7 @@ PyMODINIT_FUNC initswisseph(void)
         (PyObject*) NULL, PYTHON_API_VERSION);
 #endif
 
+    /* Initialize exception */
     pyswe_Error = PyErr_NewException("swisseph.Error", NULL, NULL);
     Py_INCREF(pyswe_Error);
     PyModule_AddObject(m, "Error", pyswe_Error);
@@ -6129,6 +6264,7 @@ PyMODINIT_FUNC initswisseph(void)
     PyModule_AddIntConstant(m, "MOD_DELTAT_STEPHENSON_ETC_2016", SEMOD_DELTAT_STEPHENSON_ETC_2016);
     PyModule_AddIntConstant(m, "MOD_DELTAT_DEFAULT", SEMOD_DELTAT_DEFAULT);
 
+    /* Swephelp module */
 #if PYSWE_USE_SWEPHELP
 #if PY_MAJOR_VERSION >= 3
     m2 = PyModule_Create(&pyswh_module);
@@ -6139,6 +6275,13 @@ PyMODINIT_FUNC initswisseph(void)
         pyswh_module_documentation,
         (PyObject*) NULL, PYTHON_API_VERSION);
 #endif
+
+    /* Initialize exception */
+    pyswh_Error = PyErr_NewException("swisseph.contrib.Error", NULL, NULL);
+    Py_INCREF(pyswh_Error);
+    PyModule_AddObject(m2, "Error", pyswh_Error);
+
+    /* Initialize types */
 
     if (PyType_Ready(&pyswh_User_type) < 0)
         Py_FatalError("User type not ready!");

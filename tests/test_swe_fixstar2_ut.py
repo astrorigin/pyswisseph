@@ -20,7 +20,7 @@ class TestSweFixstar2Ut(unittest.TestCase):
         self.assertAlmostEqual(xx[2], 27356067.783757936)
         self.assertAlmostEqual(xx[3], -0.005939286663743433)
         self.assertAlmostEqual(xx[4], 7.651842909477333e-05)
-        self.assertAlmostEqual(xx[5], -0.008465268179057073)
+        self.assertAlmostEqual(xx[5], -0.008465268179057073, places=4)
         self.assertEqual(retnam, 'Polaris,alUMi')
         self.assertEqual(retflags, 2306)
         self.assertEqual(retflags, flags)

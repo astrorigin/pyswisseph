@@ -16,7 +16,7 @@ class TestSweGetLibraryPath(unittest.TestCase):
         if system() != 'Windows':
             self.assertIn('swisseph', path)
         else:
-            self.assertEqual(path, '')
+            self.assertNotEqual(path, '')
 
 if __name__ == '__main__':
     unittest.main()

@@ -10,7 +10,7 @@ build:
 	$(PYTHON) setup.py build
 
 clean:
-	rm -rf MANIFEST build dist docs/_build/*
+	rm -rf MANIFEST build dist .eggs *.egg-info *.so docs/_build/*
 
 html:
 	cd docs && make html

@@ -4,7 +4,7 @@
 import swisseph as swe
 import unittest
 
-class TestTidAcc(unittest.TestCase):
+class TestSweTidAcc(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

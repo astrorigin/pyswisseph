@@ -4,7 +4,7 @@
 import swisseph as swe
 import unittest
 
-class TestX(unittest.TestCase):
+class TestSweSetJplFile(unittest.TestCase):
 
     def test_01(self):
         self.assertIsNone(swe.set_jpl_file('de431.eph'))
