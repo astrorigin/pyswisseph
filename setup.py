@@ -54,9 +54,15 @@ from setuptools import setup, Extension
 from glob import glob
 
 # Pyswisseph version string
-# Our version string gets the version of the swisseph library (x.xx.xx)
-# and our increment as suffix (.x), plus an eventual pre-release tag (.dev).
-VERSION = '2.10.02.0.dev'
+# Our version string gets the version of the swisseph library (X.XX.XX)
+# and our increment as suffix (.X), plus an eventual pre-release tag (.devX).
+#
+# Note about Github Actions:
+# Each push tagged with vX.XX.XX.X triggers a stable release on PyPI.
+# Each push tagged with vX.XX.XX.X.devX triggers a pre-release on PyPI.
+# Do not forget to: increment version string right here, and modify file
+# pyswisseph.c (PYSWISSEPH_VERSION).
+VERSION = '2.10.02.0.dev1'
 
 # Corresponding swisseph version string (for pkg-config)
 swe_version = '2.10.02'
