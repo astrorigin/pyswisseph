@@ -18,7 +18,14 @@ MANIFEST
 build*/
 dist/
 docs/_build
+epydoc/*
+make.py
 manifest
 pyswisseph.egg-info/*
 setup.cfg
+src
+swe_unix_src*
+swisseph.*.so
+swisseph.so
+
 venv/
