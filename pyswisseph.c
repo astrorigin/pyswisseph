@@ -368,7 +368,7 @@ static PyObject * pyswe_close FUNCARGS_SELF
 /* swisseph.cotrans */
 PyDoc_STRVAR(pyswe_cotrans__doc__,
 "Coordinate transformation from ecliptic to equator or vice-versa.\n\n"
-":Args: seq coord, float obliquity\n\n"
+":Args: seq coord, float eps\n\n"
 " - coord: tuple of 3 float for coordinates:\n"
 "    - 0: longitude\n"
 "    - 1: latitude\n"
@@ -1659,7 +1659,7 @@ static PyObject * pyswe_houses FUNCARGS_KEYWDS
 /* swisseph.houses_armc */
 PyDoc_STRVAR(pyswe_houses_armc__doc__,
 "Calculate houses cusps with ARMC.\n\n"
-":Args: float armc, float lat, float obliquity, bytes hsys=b'P',"
+":Args: float armc, float lat, float eps, bytes hsys=b'P',"
 " float ascmc9=0.0\n\n"
 " - armc: ARMC\n"
 " - lat: geographic latitude, in degrees (northern positive)\n"
@@ -1702,7 +1702,7 @@ static PyObject * pyswe_houses_armc FUNCARGS_KEYWDS
 /* swisseph.houses_armc_ex2 */
 PyDoc_STRVAR(pyswe_houses_armc_ex2__doc__,
 "Calculate houses cusps and their speeds with ARMC.\n\n"
-":Args: float armc, float lat, float obliquity, bytes hsys=b'P',"
+":Args: float armc, float lat, float eps, bytes hsys=b'P',"
 " float ascmc9=0.0\n\n"
 " - armc: ARMC\n"
 " - lat: geographic latitude, in degrees (northern positive)\n"
