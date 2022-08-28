@@ -1576,7 +1576,7 @@ static PyObject * pyswe_house_name FUNCARGS_KEYWDS
         return NULL;
     if (h != 'i')
         h = toupper(h);
-    nam = swe_house_name(h);
+    nam = (char*) swe_house_name(h);
     return Py_BuildValue("s", h != 'P' && !strcmp(nam, "Placidus") ? "" : nam);
 }
 
