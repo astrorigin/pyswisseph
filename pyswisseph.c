@@ -1,7 +1,7 @@
 /*
     This file is part of Pyswisseph.
 
-    Copyright (c) 2007-2021 Stanislas Marquis <stan@astrorigin.com>
+    Copyright (c) 2007-2022 Stanislas Marquis <stan@astrorigin.com>
 
     Pyswisseph is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -29,10 +29,10 @@
  *  Swisseph authors: Alois Treindl, Dieter Koch (et al.)
  *  Swisseph homepage: https://www.astro.com/swisseph
  *
- *  Swisseph version: 2.10.02
+ *  Swisseph version: 2.10.03
  */
 
-#define PYSWISSEPH_VERSION      20210926
+#define PYSWISSEPH_VERSION      20220828
 
 /* Set the default argument for set_ephe_path function */
 #ifndef PYSWE_DEFAULT_EPHE_PATH

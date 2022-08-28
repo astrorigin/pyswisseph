@@ -3,7 +3,7 @@
 
 #   This file is part of Pyswisseph.
 #
-#   Copyright (c) 2007-2021 Stanislas Marquis <stan@astrorigin.com>
+#   Copyright (c) 2007-2022 Stanislas Marquis <stan@astrorigin.com>
 #
 #   Pyswisseph is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU Affero General Public License as published by
@@ -62,10 +62,10 @@ from glob import glob
 # Each push tagged with vX.XX.XX.X.devX triggers a pre-release on PyPI.
 # Do not forget to: increment version string right here, and modify file
 # pyswisseph.c (PYSWISSEPH_VERSION).
-VERSION = '2.10.02.0.dev1'
+VERSION = '2.10.03.0.dev0'
 
 # Corresponding swisseph version string (for pkg-config)
-swe_version = '2.10.02'
+swe_version = '2.10.03'
 
 # Debian libswe-dev detection
 # Set to True to try and find libswe in system.
