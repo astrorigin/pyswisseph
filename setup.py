@@ -256,6 +256,7 @@ setup(
     version = VERSION,
     description = 'Python extension to the Swiss Ephemeris',
     long_description = __doc__,
+    long_description_content_type = 'text/x-rst',
     author = 'Stanislas Marquis',
     author_email = 'stan@astrorigin.com',
     url = 'https://astrorigin.com/pyswisseph',
