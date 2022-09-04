@@ -1167,7 +1167,7 @@ PyDoc_STRVAR(pyswe_get_library_path__doc__,
 ":Return: str path\n\n"
 ".. note::\n\n"
 "    This function may fail on Windows, and only find the executable path, not"
-"    the dll.");
+" the dll.");
 
 static PyObject * pyswe_get_library_path FUNCARGS_SELF
 {
@@ -2044,7 +2044,7 @@ PyDoc_STRVAR(pyswe_lun_eclipse_when__doc__,
 " - ecltype: bit flags for eclipse type wanted:\n"
 "    - ECL_TOTAL ECL_PARTIAL ECL_PENUMBRAL\n"
 "    - ECL_ALLTYPES_LUNAR or 0 for any type\n"
-" - backwards: boolean, set to True to search back in time\n"
+" - backwards: boolean, set to True to search back in time\n\n"
 ":Return: int retflag, (tret)\n\n"
 " - retflag: returned bit flag:\n"
 "    - ECL_TOTAL ECL_PARTIAL ECL_PENUMBRAL\n"
