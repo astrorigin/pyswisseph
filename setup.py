@@ -62,16 +62,15 @@ from glob import glob
 # Each push tagged with vX.XX.XX.X.devX triggers a pre-release on PyPI.
 # Do not forget to: increment version string right here, and modify file
 # pyswisseph.c (PYSWISSEPH_VERSION).
-VERSION = '2.10.03.0.dev0'
+VERSION = '2.10.03.1.dev0'
 
-# Corresponding swisseph version string (for pkg-config)
-swe_version = '2.10.03'
+# Corresponding swisseph version string (normalized for pkg-config)
+swe_version = '2.10.3'
 
 # Debian libswe-dev detection
 # Set to True to try and find libswe in system.
 # Set to False to use bundled libswe.
-# Disabled by default until that package is updated.
-swe_detection = False
+swe_detection = True
 
 # Include additional functions and constants (contrib submodule)
 use_swephelp = True
@@ -121,21 +120,28 @@ if has_pkgconfig and swe_detection:
     print('Searching for libswe-dev...')
     try:
         out = subprocess.check_output(
-            ['pkg-config', '--cflags-only-I', 'libswe-'+swe_version],
+            ['pkg-config', '--modversion', 'swe'],
+            stderr=subprocess.STDOUT).decode().strip()
+        if out != swe_version:
+            raise ValueError
+        out = subprocess.check_output(
+            ['pkg-config', '--cflags-only-I', 'swe'],
             stderr=subprocess.STDOUT).decode().strip().split(' ')
         swe_includes = [x[2:] for x in out if x != '']
         out = subprocess.check_output(
-            ['pkg-config', '--libs-only-l', 'libswe-'+swe_version],
+            ['pkg-config', '--libs-only-l', 'swe'],
             stderr=subprocess.STDOUT).decode().strip().split(' ')
         swe_libs = [x[2:] for x in out if x != '']
         swe_sources = []
         swe_depends = []
         swe_defines = [('PYSWE_DEFAULT_EPHE_PATH',
-            '"/usr/share/libswe/ephe2:/usr/share/libswe/ephe"')]
+            '"/usr/share/libswe:/usr/local/share/libswe"')]
         libswe_found = True
-        print('pkg-config found libswe-'+swe_version)
+        print('pkg-config found libswe-dev '+swe_version)
     except subprocess.CalledProcessError:
-        print('pkg-config has not found libswe-dev')
+        print('pkg-config has not found libswe-dev '+swe_version)
+    except ValueError:
+        print('pkg-config found version '+out+', but not '+swe_version)
     #
 
 if not libswe_found: # using internal libswe
