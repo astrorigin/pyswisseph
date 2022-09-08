@@ -32,7 +32,7 @@
  *  Swisseph version: 2.10.03
  */
 
-#define PYSWISSEPH_VERSION      20220905
+#define PYSWISSEPH_VERSION      20220908
 
 /* Set the default argument for set_ephe_path function */
 #ifndef PYSWE_DEFAULT_EPHE_PATH

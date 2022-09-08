@@ -62,7 +62,7 @@ from glob import glob
 # Each push tagged with vX.XX.XX.X.devX triggers a pre-release on PyPI.
 # Do not forget to: increment version string right here, and modify file
 # pyswisseph.c (PYSWISSEPH_VERSION).
-VERSION = '2.10.03.1.dev0'
+VERSION = '2.10.03.1'
 
 # Corresponding swisseph version string (normalized for pkg-config)
 swe_version = '2.10.3'
