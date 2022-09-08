@@ -17,7 +17,7 @@ class TestSweVersion(unittest.TestCase):
         se_version_path = int(parts[2])
         self.assertEqual(se_version_major, 2)
         self.assertEqual(se_version_minor, 10)
-        self.assertEqual(se_version_path, 2)
+        self.assertEqual(se_version_path, 3)
 
 class TestSwe__Version__(unittest.TestCase):
 

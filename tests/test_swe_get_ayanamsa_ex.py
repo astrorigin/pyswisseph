@@ -22,8 +22,8 @@ class TestSweGetAyanamsaEx(unittest.TestCase):
         flags = swe.FLG_SWIEPH
         swe.set_sid_mode(swe.SIDM_FAGAN_BRADLEY)
         retflags, daya = swe.get_ayanamsa_ex(2452275.5, flags)
-        self.assertEqual(retflags, 66)
-        #self.assertEqual(retflags, flags)
+        self.assertEqual(retflags, 2)
+        self.assertEqual(retflags, flags)
         self.assertAlmostEqual(daya, 24.76365543416117)
 
 if __name__ == '__main__':

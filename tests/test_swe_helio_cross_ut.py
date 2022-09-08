@@ -13,7 +13,7 @@ class TestSweHelioCrossUt(unittest.TestCase):
     def test_01(self):
         pl = swe.SATURN
         jdx = swe.helio_cross_ut(pl, 30, 2455334.0, swe.FLG_SWIEPH, False)
-        self.assertAlmostEqual(jdx, 2461855.379497089)
+        self.assertAlmostEqual(jdx, 2461855.379534041)
 
 if __name__ == '__main__':
     unittest.main()

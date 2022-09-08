@@ -15,21 +15,21 @@ class TestSweSplitDeg(unittest.TestCase):
 
     def test_01(self):
         x = swe.split_deg(123.123, swe.SPLIT_DEG_ROUND_SEC)
-        t1 = (123, 7, 23, 6.90612538158216e-310, 1)
+        t1 = (123, 7, 23, 23, 1)
         for i in range(5):
             if i == 3: self.assertAlmostEqual(x[i], t1[i])
             else: self.assertEqual(x[i], t1[i])
 
     def test_02(self):
         x = swe.split_deg(123.123, swe.SPLIT_DEG_ROUND_MIN)
-        t1 = (123, 7, 52, 6.914068669116e-310, 1)
+        t1 = (123, 7, 52, 52, 1)
         for i in range(5):
             if i == 3: self.assertAlmostEqual(x[i], t1[i])
             else: self.assertEqual(x[i], t1[i])
 
     def test_03(self):
         x = swe.split_deg(123.123, swe.SPLIT_DEG_ROUND_DEG)
-        t1 = (123, 37, 22, 6.9245189510258e-310, 1)
+        t1 = (123, 37, 22, 22, 1)
         for i in range(5):
             if i == 3: self.assertAlmostEqual(x[i], t1[i])
             else: self.assertEqual(x[i], t1[i])

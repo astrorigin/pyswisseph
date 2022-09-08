@@ -13,10 +13,10 @@ class TestSweSetSidMode(unittest.TestCase):
     def test_01(self):
         jd = swe.julday(2021, 8, 20, 12)
         xx, rflags = swe.calc_ut(jd, swe.VENUS)
-        self.assertAlmostEqual(xx[0], 185.09289015936383)
+        self.assertAlmostEqual(xx[0], 185.09289080174835)
         self.assertIsNone(swe.set_sid_mode(swe.SIDM_LAHIRI))
         xx, rflags = swe.calc_ut(jd, swe.VENUS, swe.FLG_SWIEPH|swe.FLG_SIDEREAL)
-        self.assertAlmostEqual(xx[0], 160.93755372025907)
+        self.assertAlmostEqual(xx[0], 160.93755436261293)
 
 if __name__ == '__main__':
     unittest.main()
