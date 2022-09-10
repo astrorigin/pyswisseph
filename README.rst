@@ -39,10 +39,14 @@ Links
 
 Source code
 ===========
+Navigate into the folder you want to clone the repository.
 
 Clone the Github repository with command:
 
 ``git clone --recurse-submodules https://github.com/astrorigin/pyswisseph``
+
+cd pyswisseph
+python setup.py install
 
 Licensing
 =========

@@ -18,10 +18,10 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Pyswisseph'
-copyright = '2007-2021, Pyswisseph authors'
+copyright = '2007-2022, Pyswisseph authors'
 author = ''
-version = '2.10.02.0-dev'
-release = '2.10.02.0-dev'
+version = '2.10.03.2-dev0'
+release = '2.10.03.2-dev0'
 
 # -- General configuration ---------------------------------------------------
 
