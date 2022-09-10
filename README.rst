@@ -46,6 +46,7 @@ Clone the Github repository with command:
 ``git clone --recurse-submodules https://github.com/astrorigin/pyswisseph``
 
 cd pyswisseph
+
 python setup.py install
 
 Licensing
