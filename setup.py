@@ -62,7 +62,7 @@ from glob import glob
 # Each push tagged with vX.XX.XX.X.devX triggers a pre-release on PyPI.
 # Do not forget to: increment version string right here, and modify file
 # pyswisseph.c (PYSWISSEPH_VERSION).
-VERSION = '2.10.03.1'
+VERSION = '2.10.03.2.dev1'
 
 # Corresponding swisseph version string (normalized for pkg-config)
 swe_version = '2.10.3'
@@ -135,7 +135,7 @@ if has_pkgconfig and swe_detection:
         swe_sources = []
         swe_depends = []
         swe_defines = [('PYSWE_DEFAULT_EPHE_PATH',
-            '"/usr/share/libswe:/usr/local/share/libswe"')]
+            '"/usr/share/libswe/ephe:/usr/local/share/libswe/ephe"')]
         libswe_found = True
         print('pkg-config found libswe-dev '+swe_version)
     except subprocess.CalledProcessError:
