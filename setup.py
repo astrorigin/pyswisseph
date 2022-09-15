@@ -224,6 +224,8 @@ if use_swephelp and not sqlite3_found: # using internal sqlite3
 defines = swe_defines
 if use_swephelp:
     defines += sqlite3_defines
+else:
+    defines += [('PYSWE_USE_SWEPHELP', 0)]
 
 # Include paths
 includes = swe_includes
