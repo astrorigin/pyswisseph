@@ -49,7 +49,12 @@ ephemerides from NASA's JPL, and covering the time range 13201 BC to AD 17191.
 
 """
 
-import os.path, sys
+import sys
+
+if len(sys.argv) > 1 and sys.argv[1] in ('config', 'clean'):
+    sys.exit(0)
+
+import os.path
 from setuptools import setup, Extension
 from glob import glob
 
