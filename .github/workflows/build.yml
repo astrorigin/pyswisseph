@@ -62,7 +62,7 @@ jobs:
                   python -m cibuildwheel --output-dir wheelhouse
               env:
                   CIBW_BUILD: cp*
-                  CIBW_ARCHS: all
+                  CIBW_ARCHS_MACOS: universal2
 
             - uses: actions/upload-artifact@v2
               with:
