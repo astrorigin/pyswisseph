@@ -29,3 +29,13 @@ swisseph.*.so
 swisseph.so
 
 venv/
+
+# debian
+.pybuild/
+debian/*.substvars
+debian/debhelper-build-stamp
+debian/files
+debian/python3-swisseph
+debian/python3-swisseph-doc
+debian/tmp
+debian/.debhelper
