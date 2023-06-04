@@ -33,7 +33,6 @@ Links
 =====
 
 :Pyswisseph docs:       https://astrorigin.com/pyswisseph
-:Launchpad PPA:         https://launchpad.net/~astrorigin/+archive/ubuntu/python-swisseph
 :Python Package Index:  https://pypi.org/project/pyswisseph
 :AstroDienst:           https://www.astro.com/swisseph
 
@@ -80,6 +79,6 @@ Credits
 
 Author: Stanislas Marquis <stan(at)astrorigin.com>
 
-PyPI maintainer (branch pypi): Jonathan de Jong <jonathan(at)automatia.nl>
+PyPI/CI: Jonathan de Jong <jonathan(at)automatia.nl>
 
 ..
