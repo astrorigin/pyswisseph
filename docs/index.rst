@@ -16,7 +16,7 @@ Original documentation is Copyright Astrodienst AG 1997-2021
 
 .. note::
 
-    This version of the documention, adapted for the Python programming
+    This version of the documentation, adapted for the Python programming
     language, is a work in progress.
     Head to https://github.com/astrorigin/pyswisseph if you want to
     participate.
