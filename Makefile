@@ -23,4 +23,21 @@ sdist:
 
 void: ;
 
-# vi: sw=4 ts=4 noet
+# modern documentaiton
+
+.PHONY: docs clean-docs live
+
+BUILD_DIR := _site
+SPHINX_SOURCE_DIR := docs/
+
+docs: clean-docs
+	@echo "Building documentation with Sphinx..."
+	uv run sphinx-build -b html $(SPHINX_SOURCE_DIR) $(BUILD_DIR)
+
+clean-docs:
+	@echo "Cleaning up documentation build directory ($(BUILD_DIR))..."
+	rm -rf $(BUILD_DIR)
+
+live:
+	@echo "Starting live documentation server..."
+	uv run sphinx-autobuild $(SPHINX_SOURCE_DIR) $(BUILD_DIR) --watch $(SPHINX_SOURCE_DIR)
