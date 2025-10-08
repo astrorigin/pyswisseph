@@ -2,7 +2,7 @@ name: Deploy Sphinx Documentation to GitHub Pages
 
 on:
   push:
-    branches: ["docs-dev"]
+    branches: ["master", "docs-dev"]
   workflow_dispatch:
 
 permissions:
