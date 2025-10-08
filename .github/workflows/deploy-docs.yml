@@ -1,0 +1,54 @@
+name: Deploy Sphinx Documentation to GitHub Pages
+
+on:
+  push:
+    branches: ["docs-dev"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          # Install Sphinx and any extensions from your requirements file
+          pip install -r docs/requirements.txt
+
+      - name: Build Sphinx documentation
+        run: |
+          sphinx-build -b html docs docs/_build/html
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          # The path is the directory containing your static files (HTML, CSS, etc.)
+          path: 'docs/_build/html'
+
+  deploy:
+    environment:
+      name: docs-dev-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    # This job runs only after the 'build' job has successfully completed
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
