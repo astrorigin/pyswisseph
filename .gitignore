@@ -39,3 +39,7 @@ debian/python3-swisseph
 debian/python3-swisseph-doc
 debian/tmp
 debian/.debhelper
+
+# docs – uv env, sphinx live server
+_site
+.venv
