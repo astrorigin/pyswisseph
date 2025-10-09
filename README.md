@@ -17,13 +17,18 @@ import swisseph as swe
 from datetime import datetime, timezone
 
 # 1. Define a day and convert it to Julian day (JD)
-# Note: swe.julday() uses calendar date and time zone (UT=0)
 date = datetime(1997, 9, 30, 14, 0, 0, tzinfo=timezone.utc)
-jd = swe.utc_to_jd(date.year, date.month, date.day, date.hour, date.minute, date.second)[1]
+jd_ut, jd_tt = swe.utc_to_jd(
+    date.year,
+    date.month,
+    date.day,
+    date.hour,
+    date.minute,
+    date.second
+)
 
 # 2. Calculate the position of the Sun (swe.SUN)
-# The result 'xx' is a 6-element tuple; xx[0] is the ecliptic longitude
-coords, flags = swe.calc_ut(jd, swe.SUN)
+coords, flags = swe.calc_ut(jd_tt, swe.SUN)
 longitude = coords[0]
 
 # 3. Print the results
@@ -31,8 +36,8 @@ print(f"Julian day: {jd}")
 print(f"Sun Ecliptic Longitude (DD): {longitude}")
 
 # Output:
-# Julian day: 2450734.5097263525
-# Sun Ecliptic Longitude (DD): 199.70147256421265
+# Julian day: 2450722.0833377214
+# Sun Ecliptic Longitude (DD): 187.44207682576493
 ```
 
 ### Advanced Usage
