@@ -22,10 +22,10 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install documentation dependencies
+      - name: Install dependencies
         run: |
-            pip install -r docs/requirements.txt
-            pip install -e .
+          # Install Sphinx and any extensions from your requirements file
+          pip install -r docs/requirements.txt
 
       - name: Build Sphinx documentation
         run: |
