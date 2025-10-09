@@ -33,6 +33,6 @@ In the tropical zodiac, this is 15 Libra.
 
 1. **Julian day**: The Swiss Ephemeris uses Julian day numbers for astronomical time. `swe.julday()` converts from calender dates.
 2. **`calc_ut()`**: "UT" means Universal Time (UTC). This function returns a tuple of `(coordinates, flags)`:
-    * `coordaintes`: 6-element tuple of `(longitude, latitude, distance, speed_lon, spweed_lat, speed_dist)`
+    * `coordinates`: 6-element tuple of `(longitude, latitude, distance, speed_lon, spweed_lat, speed_dist)`
     * `flags`: Return code indicating calculation success.
 3. **`swe.SUN`**: A constant for the Sun (value: `0`). See [all available bodies](api/planetary_positions.md/#bodies).
