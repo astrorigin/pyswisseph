@@ -27,7 +27,7 @@ void: ;
 
 .PHONY: docs clean-docs live
 
-BUILD_DIR := _site
+BUILD_DIR := docs/_build
 SPHINX_SOURCE_DIR := docs/
 
 docs: clean-docs
