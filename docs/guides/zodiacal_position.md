@@ -1,4 +1,4 @@
-# Planets in Signs
+# Zodiacal Position
 
 When we [calculated the current position of the Sun](../quickstart.md), `pyswisseph` output the body's **ecliptic longitude** from Earth's point of view—in our example, `196.1388645301424` **decimal degrees** (DD). This absolute longitude is measured counter-clockwise along the ecliptic plane, starting from the vernal equinox.
 
