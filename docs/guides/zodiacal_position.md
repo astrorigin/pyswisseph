@@ -100,4 +100,4 @@ The sign index at `dms[4]` corresponds to the `0`-based array/tuple index:
 - `10`: Aquarius
 - `11`: Pisces
 
-By using this index to access the `sign_order` tuple, we successfully translated the raw output into the human-readable string: **`16 Lib 8 19`**.
+By using this index to access the `sign_order` tuple, we successfully translated the raw output into the human-readable string: **`16 Lib 38 15`**.
