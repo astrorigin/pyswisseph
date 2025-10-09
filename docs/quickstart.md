@@ -26,10 +26,10 @@ coords, flags = swe.calc_ut(jd_tt, swe.SUN)
 
 # 4. Extract longitude (first element of the 6-element coordinates tuple)
 longitude = coords[0]
-print(f"Sun longitude: {longitude:.2f}°")
+print(f"Sun longitude: {longitude}")
 
-# Example output: Sun longitude: 196.61872533619996
-# In the tropical zodiac, this is `~16 Libra`.
+# Example output:
+# Sun longitude: 196.63771952317063
 ```
 
 
