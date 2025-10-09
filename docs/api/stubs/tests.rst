@@ -1,0 +1,96 @@
+tests package
+=============
+
+.. automodule:: tests
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   tests.template
+   tests.test_swe_azalt_refrac
+   tests.test_swe_calc
+   tests.test_swe_calc_pctr
+   tests.test_swe_calc_ut
+   tests.test_swe_close
+   tests.test_swe_cotrans
+   tests.test_swe_cotrans_sp
+   tests.test_swe_cs2degstr
+   tests.test_swe_cs2lonlatstr
+   tests.test_swe_cs2timestr
+   tests.test_swe_csnorm
+   tests.test_swe_csroundsec
+   tests.test_swe_d2l
+   tests.test_swe_date_conversion
+   tests.test_swe_day_of_week
+   tests.test_swe_deg_midp
+   tests.test_swe_degnorm
+   tests.test_swe_deltat
+   tests.test_swe_deltat_ex
+   tests.test_swe_difcs2n
+   tests.test_swe_difcsn
+   tests.test_swe_difdeg2n
+   tests.test_swe_difdegn
+   tests.test_swe_difrad2n
+   tests.test_swe_fixstar
+   tests.test_swe_fixstar2
+   tests.test_swe_fixstar2_mag
+   tests.test_swe_fixstar2_ut
+   tests.test_swe_fixstar_mag
+   tests.test_swe_fixstar_ut
+   tests.test_swe_gauquelin_sector
+   tests.test_swe_get_ayanamsa
+   tests.test_swe_get_ayanamsa_ex
+   tests.test_swe_get_ayanamsa_name
+   tests.test_swe_get_current_file_data
+   tests.test_swe_get_library_path
+   tests.test_swe_get_orbital_elements
+   tests.test_swe_get_planet_name
+   tests.test_swe_get_tid_acc
+   tests.test_swe_heliacal_pheno_ut
+   tests.test_swe_heliacal_ut
+   tests.test_swe_helio_cross
+   tests.test_swe_helio_cross_ut
+   tests.test_swe_house_name
+   tests.test_swe_house_pos
+   tests.test_swe_houses
+   tests.test_swe_houses_armc
+   tests.test_swe_houses_armc_ex2
+   tests.test_swe_houses_ex
+   tests.test_swe_houses_ex2
+   tests.test_swe_jdet_to_utc
+   tests.test_swe_jdut1_to_utc
+   tests.test_swe_julday
+   tests.test_swe_lat_to_lmt
+   tests.test_swe_lmt_to_lat
+   tests.test_swe_lun_eclipse
+   tests.test_swe_lun_occult
+   tests.test_swe_pheno
+   tests.test_swe_pheno_ut
+   tests.test_swe_rad_midp
+   tests.test_swe_radnorm
+   tests.test_swe_revjul
+   tests.test_swe_rise_trans
+   tests.test_swe_rise_trans_true_hor
+   tests.test_swe_set_delta_t_userdef
+   tests.test_swe_set_ephe_path
+   tests.test_swe_set_jpl_file
+   tests.test_swe_set_sid_mode
+   tests.test_swe_set_topo
+   tests.test_swe_sidtime
+   tests.test_swe_sidtime0
+   tests.test_swe_sol_eclipse
+   tests.test_swe_solcross
+   tests.test_swe_solcross_ut
+   tests.test_swe_split_deg
+   tests.test_swe_tid_acc
+   tests.test_swe_time_equ
+   tests.test_swe_utc_time_zone
+   tests.test_swe_utc_to_jd
+   tests.test_swe_version
+   tests.test_swe_vis_limit_mag
