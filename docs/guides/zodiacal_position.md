@@ -28,37 +28,49 @@ We will use `swe.SPLIT_DEG_ZODIACAL`, which tells the function to reset the degr
 
 Let's take our Sun position and translate it to zodiacal position and DMS.
 
-```py
+```python
 import swisseph as swe
 from datetime import datetime, timezone
 
+# 1. Get current time in Coordinated Universal Time (UTC)
 now = datetime.now(timezone.utc)
 
-jd = swe.julday(
+# 2. Convert from UTC to Julian Day (JD) in Terrestrial Time (TT).
+# 'jd_tt' is the second element (index 1) of the returned tuple.
+jd_ut, jd_tt = swe.utc_to_jd(
     now.year,
     now.month,
     now.day,
-    now.hour + now.minute/60 + now.second/3600
-    )
+    now.hour,
+    now.minute,
+    now.second + now.microsecond / 1000000.0
+)
 
-coords, flag = swe.calc_ut(jd, swe.SUN)
+# 3. Calculate Sun position (swe.SUN is the constant for the Sun)
+# We use `jd_tt` for accurate planetary positions.
+coords, flags = swe.calc_ut(jd_tt, swe.SUN)
 
+# 4. Extract longitude (first element of the 6-element coordinates tuple)
 longitude = coords[0]
 
-# split longitude into degrees and signs
+# 5. Split longitude into degrees and signs
 dms = swe.split_deg(longitude, swe.SPLIT_DEG_ZODIACAL)
 
-# index the signs
+# 6. Index the signs
 sign_order = (
             "Ari", "Tau", "Gem", "Can",
             "Leo", "Vir", "Lib", "Sco",
             "Sag", "Cap", "Aqu", "Pis"
             )
 
+# 7. Get sign name from index
 sign_name = sign_order[dms[4]]
 
-# format output
+# 8. Format output
 print(f"{dms[0]} {sign_name} {dms[1]} {dms[2]}")
+
+# Example output:
+# 16 Lib 38 15
 ```
 
 ## Understanding the `swe.split_deg` output
