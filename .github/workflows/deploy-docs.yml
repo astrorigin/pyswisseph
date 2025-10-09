@@ -17,7 +17,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-            submodules: 'recursive'
+          submodules: 'recursive'
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -26,11 +26,19 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # Install Sphinx and any extensions from your requirements file
+          # Install Sphinx and any extensions (pyswisseph MUST NOT be in requirements.txt)
           pip install -r docs/requirements.txt
+
+      - name: Purge C Build Caches
+        run: |
+          echo "Removing stale build artifacts and caches..."
+          rm -rf build dist *.egg-info
+          find . -name "__pycache__" -exec rm -rf {} +
+          python -m pip cache purge || true
 
       - name: Build Sphinx documentation
         run: |
+          # Relies on the clean environment and the sys.path in conf.py
           sphinx-build -b html docs docs/_build/html
 
       - name: Setup Pages
@@ -40,7 +48,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          # The path is the directory containing your static files (HTML, CSS, etc.)
           path: 'docs/_build/html'
 
   deploy:
@@ -48,7 +55,6 @@ jobs:
       name: docs-dev-preview
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    # This job runs only after the 'build' job has successfully completed
     needs: build
     steps:
       - name: Deploy to GitHub Pages
