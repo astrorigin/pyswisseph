@@ -12,6 +12,7 @@ release = '2.10.02.0-dev'
 extensions = [
     'myst_parser',
     'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
     'sphinx_immaterial'
 ]
 
