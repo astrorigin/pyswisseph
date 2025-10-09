@@ -2,3 +2,5 @@ myst-parser
 sphinx
 sphinx-autobuild
 sphinx-immaterial
+setuptools
+wheel
