@@ -40,4 +40,4 @@ clean-docs:
 
 live:
 	@echo "Starting live documentation server..."
-	uv run sphinx-autobuild $(SPHINX_SOURCE_DIR) $(BUILD_DIR) --watch $(SPHINX_SOURCE_DIR)
+	uv run sphinx-autobuild --host 0.0.0.0 $(SPHINX_SOURCE_DIR) $(BUILD_DIR) --watch $(SPHINX_SOURCE_DIR)
