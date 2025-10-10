@@ -1,10 +1,9 @@
 # Concepts
 
-Much of the following is adapted from the Swiss Ephemeris C library docs:
-
-- [General Documentation](https://www.astro.com/swisseph/swisseph.htm)
-- [Programmer's Documentation](https://www.astro.com/swisseph/swephprg.htm)
+This section includes astronomical explanations and quick references for constants available in `pyswisseph`.
 
 ```{toctree}
+:maxdepth: 2
 bodies.md
+time_and_zones.md
 ```

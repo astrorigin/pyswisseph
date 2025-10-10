@@ -1,6 +1,6 @@
 # pyswisseph
 
-pyswisseph is a Python wrapper for the [Swiss Ephemeris](https://www.astro.com/swisseph/swephinfo_e.htm), a high-precision astrological calculation library.
+`pyswisseph` is a Python wrapper for the [Swiss Ephemeris](https://www.astro.com/swisseph/swephinfo_e.htm), a high-precision astrological calculation library.
 
 **New to pyswisseph?** Start with [Installation](installation.md) and [Quickstart](quickstart.md).
 
@@ -14,8 +14,8 @@ pyswisseph is a Python wrapper for the [Swiss Ephemeris](https://www.astro.com/s
 :maxdepth: 2
 installation.md
 quickstart.md
-guides/index.md
 concepts/index.md
+guides/index.md
 api/index.md
 ```
 
