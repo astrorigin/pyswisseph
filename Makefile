@@ -38,6 +38,6 @@ clean-docs:
 	@echo "Cleaning up documentation build directory ($(BUILD_DIR))..."
 	rm -rf $(BUILD_DIR)
 
-live:
+live: clean-docs
 	@echo "Starting live documentation server..."
 	uv run sphinx-autobuild --host 0.0.0.0 $(SPHINX_SOURCE_DIR) $(BUILD_DIR) --watch $(SPHINX_SOURCE_DIR)
