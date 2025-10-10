@@ -34,7 +34,7 @@ print(f"Sun longitude: {longitude}")
 ```
 
 
-## What just happened?
+### Explanation
 
 1. **Time scale accuracy**: The Swiss Ephemeris requires time to measure in **terrestrial time** (TT) for accurate planetary calcuations. We used `swe.utc_to_jd()` to correctly convert the current clock time (UTC) into Julian day TT, accounting for the delta-T correction.
 2. **Julian day**: The Swiss Ephemeris uses Julian day numbers for astronomical time. `swe.julday()` converts from calender dates.
