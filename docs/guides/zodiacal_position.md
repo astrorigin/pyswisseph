@@ -82,13 +82,13 @@ print(f"{dms[0]} {sign_name} {dms[1]} {dms[2]}")
 
 The `swe.split_deg` function, when called with the `swe.SPLIT_DEG_ZODIACAL` flag, returns a **5-element tuple** containing the `0`-based zodiacal position:
 
-| Index | Name              | Description                                       | Example (for 16 Lib 8 19) |
-| ----- | ----------------- | ------------------------------------------------- | ------------------------- |
-| **0** | Degrees           | The `0-29` degree within the sign.                | `16`                      |
-| **1** | Minutes           | The minutes `0-59`.                               | `8`                       |
-| **2** | Seconds           | The seconds `0-59`.                               | `19`                      |
-| **3** | `f of s`          | The fraction of a second (unused in this example) | `0.912388...`             |
-| **4** | **Sign Index**    | The `0-11` index of the zodiac sign.              | `6`                       |
+| Index | Name              | Description                                       |
+| ----- | ----------------- | ------------------------------------------------- |
+| **0** | Degrees           | The `0-29` degree within the sign.                |
+| **1** | Minutes           | The minutes `0-59`.                               |
+| **2** | Seconds           | The seconds `0-59`.                               |
+| **3** | `f of s`          | The fraction of a second (unused in this example) |
+| **4** | **Sign Index**    | The `0-11` index of the zodiac sign.              |
 
 The sign index at `dms[4]` corresponds to the `0`-based array/tuple index:
 
