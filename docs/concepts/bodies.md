@@ -1,9 +1,8 @@
-# Planetary Positions
+# Bodies
 
-## Bodies
+For the functions `swe.calc_ut`, `swe.calc`, and `swe.calc_pctr`, you'll need to pass an integer to identify which celestial body to calculate. You can use the named constants or the numeric values directly. These numbers are defined in [`swephexp.h`](https://github.com/aloistr/swisseph/blob/master/swephexp.h).
 
-Pass an integer to identify which celestial body to calculate. You can use the named constants or the numeric values directly.
-
+## Major bodies and asteroids
 
 | Constant | Value | Body |
 |----------|-------|------|
@@ -30,14 +29,57 @@ Pass an integer to identify which celestial body to calculate. You can use the n
 | `swe.VESTA`    | 20    | Vesta    |
 
 
-### Example using constants
+#### Example using constants
 ```py
 coords, flags = swe.calc_ut(jd, swe.MARS)
+print("Mars: {coords[0]}")
 ```
 
-### Example using numeric values
+#### Example using numeric values
 ```py
 for planet_id in range(10):
     coords, flags = swe.calc_ut(jd, planet_id)
-    print(f"Planet {planet_id}: {coords[0]:.2f}")
+    print(f"Planet {planet_id}: {coords[0]}")
 ```
+
+
+## Custom asteroids and minor planets
+
+To calculate the position of an asteroid or minor planet not listed in the standard bodies, you must combine the constant `swe.AST_OFFSET` with the asteroid's catalogue number.
+
+The catalogue number is added to the offset (`swe.AST_OFFSET = 10000`) to form the correct body ID (`ipl`) for use in functions like `swe.calc_ut()`. The names and catalogue numbers can be referenced in the Swiss Ephemeris file [`seasnam.txt`](https://github.com/aloistr/swisseph/blob/master/ephe/seasnam.txt).
+
+### Construction
+
+The required integer ID (`ipl`) is constructed using
+
+```
+ipl = swe.AST_OFFSET + catalogue number
+```
+
+### Example: Asteroid 433 Eros
+
+```{code-block} python
+:linenos:
+
+import swisseph as swe
+# The body ID for Eros
+EROS_ID = swe.AST_OFFSET + 433  # EROS_ID is 10433
+
+# Use the calculated ID in your position function
+jd = swe.julday(2025, 1, 1)
+coords, flag = swe.calc_ut(jd, EROS_ID)
+
+print(f"Eros Longitude: {coords[0]}")
+```
+
+
+### Configuration
+
+To access these minor objects, you'll have to download additional ephemeris files and set their path as described [in the installation instructions](../installation.md#configuration-using-extended-ephemeris-data).
+
+## See also
+
+- Swiss Ephemeris Programming Interface: [Bodies (int ipl)](https://www.astro.com/swisseph/swephprg.htm#_Toc112948960)
+- All major bodies: [`swephexp.h`](https://github.com/aloistr/swisseph/blob/master/swephexp.h)
+- All additional asteroids: [`seasnam.txt`](https://github.com/aloistr/swisseph/blob/master/ephe/seasnam.txt)
