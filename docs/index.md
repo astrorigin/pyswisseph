@@ -12,12 +12,14 @@ pyswisseph is a Python wrapper for the [Swiss Ephemeris](https://www.astro.com/s
 
 ## Documentation
 
-- [Installation](installation.md) - How to install pyswisseph
-- [Quickstart](quickstart.md) - Calculate your first planet position
-- [Concepts](concepts/index.md) - Understanding ephemerides, coordinate systems, and house systems
-- [Guides](guides/index.md) - Task-oriented how-tos for common calculations
-- [API Reference](api/index.md) - Complete function documentation
-- [C to Python](c_to_python/index.md) - Translation guide for Swiss Ephemeris users
+```{toctree}
+:maxdepth: 1
+installation.md
+quickstart.md
+guides/index.md
+concepts/index.md
+api/index.md
+```
 
 ## About this documentation
 
