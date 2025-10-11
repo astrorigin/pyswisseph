@@ -31,7 +31,6 @@ We will use `swe.SPLIT_DEG_ZODIACAL`, which tells the function to reset the degr
 Let's take our Sun position and translate it to zodiacal position and DMS.
 
 ```{code-block} python
-:linenos:
 :emphasize-lines: 26
 
 import swisseph as swe

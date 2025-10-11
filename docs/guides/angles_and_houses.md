@@ -2,7 +2,7 @@
 
 ## Using `swe.houses()`
 
-Let's calculate the house cusps and angles of a given chart. We've been using [the Swiss Ephemeris' initial release](https://www.astro.com/swisseph/swephchart_e.htm) throughout these examples with the following birth data:
+Let's calculate the house cusps and angles of a given chart. We'll use [the Swiss Ephemeris' initial release](https://www.astro.com/swisseph/swephchart_e.htm) in this example and the subsequent [Tutorial](tutorial.md) with the following birth data:
 
 - 1997 September 30
 - 4:00 p.m. CEST (UTC+2) -> 14:00 UTC
@@ -13,27 +13,26 @@ For ease, we're working with UTC so we can use the Python standard library `date
 As this is geocentric information that relies on coordinates, you'll need to get into the habit of using coordinates as **decimal degrees (DD)** where negative latitudes mean the **southern hemisphere** and negative longitudes fall **west of the prime meridian**.
 
 ```{code-block} python
-:linenos:
 import swisseph as swe
 from datetime import datetime, timezone
 
 # 1. Define a day and convert it to Julian day (JD)
-# Note: For UT, we can use the time tuple directly in swe.julday() as shown in concepts/time_and_zones.md
 date = datetime(1997, 9, 30, 14, 0, 0, tzinfo=timezone.utc)
-jd_ut = swe.julday(
+jd_ut, jd_tt = swe.utc_to_jd(
     date.year,
     date.month,
     date.day,
-    date.hour + date.minute/60 + date.second/3600
-)
+    date.hour,
+    date.minute,
+    date.second + date.microsecond / 1000000.0
+    )
 
 # 2. Define coordinates
 lat, lng = (47.33, 8.58)
 
 # 3. Calculate house cusps and angles
-# Using jd_ut instead of jd_tt for simplicity in this example
 # b'P' selects hsys (house system) Placidus
-cusps, ascmc = swe.houses(jd_ut, lat, lng, b'P')
+cusps, ascmc = swe.houses(jd_tt, lat, lng, b'P')
 
 # 4. Format and Print results
 # Format each of the first 12 cusps to two decimal places and join them with a comma
