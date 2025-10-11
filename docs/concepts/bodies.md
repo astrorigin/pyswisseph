@@ -76,7 +76,7 @@ print(f"Eros Longitude: {coords[0]}")
 
 ### Configuration
 
-To access these minor objects, you'll have to download additional ephemeris files and set their path as described [in the installation instructions](../installation.md#configuration-using-extended-ephemeris-data).
+To access these minor objects, you'll have to download additional ephemeris files and set their path as described [in the installation instructions](../installation.md#configuration).
 
 ## See also
 
