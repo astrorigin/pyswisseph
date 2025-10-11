@@ -1,6 +1,6 @@
 # Tutorial: Printing a Text Chart
 
-This tutorial combines the concepts from [Zodiacal Position](zodiacal_position.md) (`swe.calc_ut`, `swe.split_deg`) and [Angles and Houses](angles_and_houses.md) (`swe.houses`). You can free to skip all the commented-out `print()` statements; they're mostly here for verification, especially if you're using the Python interpreter in interactive mode.
+This tutorial combines the concepts from [Zodiacal Position](zodiacal_position.md) (`swe.calc_ut`, `swe.split_deg`) and [Angles and Houses](angles_and_houses.md) (`swe.houses`). You can feel free to skip all the commented-out `print()` statements; they're mostly here for verification, especially if you're using the Python interpreter in interactive mode.
 
 ## Define constants and calculate Julian day
 

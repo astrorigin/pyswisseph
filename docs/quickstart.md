@@ -3,7 +3,6 @@
 ## Calculate the sun's current position
 
 ```{code-block} python
-:linenos:
 import swisseph as swe
 from datetime import datetime, timezone
 
