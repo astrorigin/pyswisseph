@@ -14,8 +14,8 @@
 :maxdepth: 2
 installation.md
 quickstart.md
-concepts/index.md
 guides/index.md
+concepts/index.md
 api/index.md
 ```
 
