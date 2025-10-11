@@ -17,7 +17,7 @@ We're going to calculate the zodiacal positions of the 10 planets, ascendant and
 :emphasize-lines: 6,9-11
 ```
 
-- `b'W'`: This is the bit flag for **whole sign houses**, but anything works here since cusps are irrelevant to this tutorial.
+- `b'W'`: This is the byte character for **whole sign houses**, but anything works here since cusps are irrelevant to this tutorial.
 - `swe.utc_to_jd()`: Explained in [Quickstart](../quickstart.md) that `jd_tt` is more accurate than `jd_ut` given by `swe.julday`.
 
 

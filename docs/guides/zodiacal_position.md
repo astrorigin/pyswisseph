@@ -2,7 +2,7 @@
 
 When we [calculated the current position of the Sun](../quickstart.md), `pyswisseph` output the body's **ecliptic longitude** from Earth's point of view—in our example, `196.1388645301424` **decimal degrees** (DD). This absolute longitude is measured counter-clockwise along the ecliptic plane, starting from the vernal equinox.
 
-The 12 signs of the zodiac are `30`-degree segments of this `360`-degree circle. Each segment is an "alias" for a specific longitude range. The **tropical zodiac** places **`0` Aries** at the vernal equinox (`0.0` DD), while the **sideral zodiac** uses an offset (ayanamsa) that may reference fixed stars.
+The 12 signs of the zodiac are `30`-degree segments of this `360`-degree circle. Each segment is an "alias" for a specific longitude range. The **tropical zodiac** places **`0` Aries** at the vernal equinox (`0.0` DD), while the **sidereal zodiac** uses an offset (ayanamsa) that may reference fixed stars.
 
 Tropically, the starting absolute longitude of each sign is:
 
@@ -22,7 +22,7 @@ Tropically, the starting absolute longitude of each sign is:
 | Aquarius      | `300.0`                           |
 | Pisces        | `330.0`                           |
 
-Thus, `196.1388645301424` DD is a complete position if you only need absolute coordinates. However, to translate this to the more common **degrees-minutes-seconds** (DMS) format **relative to the sign** (where the degrees reset to `0` at the cusp of each sign), `pyswisseph` provides the function `swe.split_deg` that takes DD positions and **flag constant**. The flats tell the function *how* to split the degree value.
+Thus, `196.1388645301424` DD is a complete position if you only need absolute coordinates. However, to translate this to the more common **degrees-minutes-seconds** (DMS) format **relative to the sign** (where the degrees reset to `0` at the cusp of each sign), `pyswisseph` provides the function `swe.split_deg` that takes DD positions and **flag constants**. The flags tell the function *how* to split the degree value.
 
 We will use `swe.SPLIT_DEG_ZODIACAL`, which tells the function to reset the degrees at the start of each sign and append the sign's index to the result.
 
