@@ -4,6 +4,7 @@ The following are practical how-to's to help you get started developing applicat
 
 ```{toctree}
 :maxdepth: 2
-angles_and_houses.md
 zodiacal_position.md
+angles_and_houses.md
+tutorial.md
 ```
