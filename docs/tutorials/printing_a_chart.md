@@ -1,6 +1,6 @@
 # Printing a Chart
 
-This tutorial combines the concepts from [Zodiacal Position](zodiacal_position.md) (`swe.calc_ut`, `swe.split_deg`) and [Angles and Houses](angles_and_houses.md) (`swe.houses`). You can feel free to skip all the commented-out `print()` statements; they're mostly here for verification, especially if you're using the Python interpreter in interactive mode.
+This tutorial combines the concepts from [Zodiacal Position](zodiacal_position.md) ([`swe.calc_ut()`](../api/index.md#swisseph.calc_ut), [`swe.split_deg()`](../api/index.md#swisseph.split_deg)) and [Angles and Houses](angles_and_houses.md) ([`swe.houses()`](../api/index.md#swisseph.houses)). You can feel free to skip all the commented-out `print()` statements; they're mostly here for verification, especially if you're using the Python interpreter in interactive mode.
 
 ## Define constants and calculate Julian day
 
@@ -18,7 +18,7 @@ We're going to calculate the zodiacal positions of the 10 planets, ascendant and
 ```
 
 - `b'W'`: This is the byte character for **whole sign houses**, but anything works here since cusps are irrelevant to this tutorial.
-- `swe.utc_to_jd()`: Explained in [Quickstart](../quickstart.md) that `jd_tt` is more accurate than `jd_ut` given by `swe.julday`.
+- [`swe.utc_to_jd()`](../api/index.md#swisseph.utc_to_jd): Explained in [Quickstart](../quickstart.md) that `jd_tt` is more accurate than `jd_ut` given by `swe.julday`.
 
 
 ## Calculate ascendant and midheaven longitudes
@@ -30,7 +30,7 @@ We're going to calculate the zodiacal positions of the 10 planets, ascendant and
 :emphasize-lines: 1
 ```
 
-- `swe_houses()`: We only need the tuple at index `1`, `ascmc`, and only its first two elements, so we unpack them into a new list called `angles` for later concatenation.
+- [`swe.houses()`](../api/index.md#swisseph.houses): We only need the tuple at index `1`, `ascmc`, and only its first two elements, so we unpack them into a new list called `angles` for later concatenation.
 
 ## Calculate planetary longitudes
 
@@ -42,7 +42,7 @@ We're going to calculate the zodiacal positions of the 10 planets, ascendant and
 ```
 
 - `PLANET_IDS`: This dictionary explicitly uses constants, but you can easily loop over a range as described in [Bodies](../concepts/bodies.md).
-- `swe.calc_ut()`: `coords[0]` gives ecliptic longitude.
+- [`swe.calc_ut()`](../api/index.md#swisseph.calc_ut): `coords[0]` gives ecliptic longitude.
 
 ## Convert longitudes to DMS
 
@@ -53,7 +53,7 @@ We're going to calculate the zodiacal positions of the 10 planets, ascendant and
 :emphasize-lines: 5
 ```
 
-- `swe.split_deg`: Described in [Zodiacal Position](zodiacal_position.md). This tuple is `(degrees, minutes, seconds, fraction_of_seconds, sign index)` where `sign_index` is an integer from `0` to `11`.
+- [`swe.split_deg()`](../api/index.md#swisseph.split_deg): Described in [Zodiacal Position](zodiacal_position.md). This tuple is `(degrees, minutes, seconds, fraction_of_seconds, sign index)` where `sign_index` is an integer from `0` to `11`.
 - `SIGNS`: This tuple makes `sign_index` legible in printing.
 
 ## Format and print output

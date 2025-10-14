@@ -1,6 +1,6 @@
 # House Systems
 
-`swe.houses` takes four arguments:
+[`swe.houses()`](../api/index.md#swisseph.houses) takes four arguments:
 
 - `jd`: Julian day
 - `lat`: Latitude in decimal degrees (north positive)

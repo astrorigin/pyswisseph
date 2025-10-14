@@ -11,7 +11,7 @@ This method uses Python's robust time zone system to accurately convert localize
 1. A user provides a local date/time and a time zone name (e.g., `'America/Los_Angeles'`).
 2. Python's built-in `zoneinfo` (or external libraries like `pytz`) handles the complex historical logic, correctly determining the UTC offset and DST status for that specific moment.
 3. The local time is converted to a precise, non-ambiguous UTC time.
-4. This UTC time is then converted to a **Julian day (JD)** using one of the library's conversion functions (e.g., `swe.julday()` or `swe.utc_to_jd()`).
+4. This UTC time is then converted to a **Julian day (JD)** using one of the library's conversion functions (e.g., [`swe.julday()`](../api/index.md#swisseph.julday) or [`swe.utc_to_jd()`](../api/index.md#swisseph.utc_to_jd)).
 
 **Pros**
 
@@ -38,7 +38,7 @@ jd = swe.julday(dt_utc.year, dt_utc.month, dt_utc.day,
 
 ## Method 2: Using `swe.utc_time_zone()`
 
-The `swe.utc_time_zone()` function in the C library is designed to calculate a Julian Day when the exact numeric difference from UTC is already known. It takes a single numeric offset in hours (e.g., `−5.0`, `+10.5`).
+The [`swe.utc_time_zone()`](../api/index.md#swisseph.utc_time_zone) function in the C library is designed to calculate a Julian Day when the exact numeric difference from UTC is already known. It takes a single numeric offset in hours (e.g., `−5.0`, `+10.5`).
 
 **Cons**
 

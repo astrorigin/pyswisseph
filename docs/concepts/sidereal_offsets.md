@@ -28,15 +28,15 @@ Since the starting point for the sidereal zodiac is based on different astronomi
 
 The Swiss Ephemeris provides functions to handle this offset automatically.
 
-- `swe.set_sid_mode(jd_tt, ayanamsa_flag)`: Sets the preferred sidereal mode for the session. This is an optional low-level function if you need a non-standard offsets.
-- `swe.get_ayanamsa(jd_tt, ayanamsa_flag)`: Calculates the precise offset value (in decimal degrees) for a specific date (Julian Day) and sidereal mode.
+- [`swe.set_sid_mode()`](../api/index.md#swisseph.set_sid_mode): Sets the preferred sidereal mode for the session. This is an optional low-level function if you need a non-standard offsets.
+- [`swe.get_ayanamsa()`](../api/index.md#swisseph.get_ayanamsa): Calculates the precise offset value (in decimal degrees) for a specific date (Julian Day) and sidereal mode.
 
 ## Calculating sidereal positions
 
 Obtaining a sidereal position is a two-step process:
 
 1. **Set the global mode**: Tell the library which offset value to use.
-2. **Calculate with flag**: Call the position function (`swe.calc_ut`, `swe.houses`, etc.) and include the `swe.FLG_SIDEREAL` flag to trigger the ayanamsa subtraction.
+2. **Calculate with flag**: Call the position function ([`swe.calc_ut()`](../api/index.md#swisseph.calc_ut), [`swe.houses()`](../api/index.md#swisseph.houses), etc.) and include the `swe.FLG_SIDEREAL` flag to trigger the ayanamsa subtraction.
 
 ```{code-block} python
 :emphasize-lines: 19,22

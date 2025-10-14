@@ -22,7 +22,7 @@ Tropically, the starting absolute longitude of each sign is:
 | Aquarius      | `300.0`                           |
 | Pisces        | `330.0`                           |
 
-Thus, `196.1388645301424` DD is a complete position if you only need absolute coordinates. However, to translate this to the more common **degrees-minutes-seconds** (DMS) format **relative to the sign** (where the degrees reset to `0` at the cusp of each sign), `pyswisseph` provides the function `swe.split_deg` that takes DD positions and **flag constants**. The flags tell the function *how* to split the degree value.
+Thus, `196.1388645301424` DD is a complete position if you only need absolute coordinates. However, to translate this to the more common **degrees-minutes-seconds** (DMS) format **relative to the sign** (where the degrees reset to `0` at the cusp of each sign), `pyswisseph` provides the function [`swe.split_deg()`](../api/index.md#swisseph.split_deg) that takes DD positions and **flag constants**. The flags tell the function *how* to split the degree value.
 
 We will use `swe.SPLIT_DEG_ZODIACAL`, which tells the function to reset the degrees at the start of each sign and append the sign's index to the result.
 
@@ -77,9 +77,9 @@ print(f"{dms[0]} {sign_name} {dms[1]} {dms[2]}")
 # 16 Lib 38 15
 ```
 
-## Understanding the `swe.split_deg` output
+## Understanding the `swe.split_deg()` output
 
-The `swe.split_deg` function, when called with the `swe.SPLIT_DEG_ZODIACAL` flag, returns a **5-element tuple** containing the `0`-based zodiacal position:
+The [`swe.split_deg()`](../api/index.md#swisseph.split_deg) function, when called with the `swe.SPLIT_DEG_ZODIACAL` flag, returns a **5-element tuple** containing the `0`-based zodiacal position:
 
 | Index | Name              | Description                                       |
 | ----- | ----------------- | ------------------------------------------------- |

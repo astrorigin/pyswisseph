@@ -8,7 +8,7 @@ Let's calculate the house cusps and angles of a given chart. We'll use [the Swis
 - 4:00 p.m. CEST (UTC+2) -> 14:00 UTC
 - Zollikon, Switzerland -> 47.33 N, 8.58 E[^1]
 
-For ease, we're working with UTC so we can use the Python standard library `datetime` with `swe.utc_to_jd`, but you can also use `swe.utc_time_zone`. The merits of either are discussed in [Time Zones and Julian Day Conversions](../concepts/time_and_zones.md).
+For ease, we're working with UTC so we can use the Python standard library `datetime` with [`swe.utc_to_jd()`](../api/index.md#swisseph.utc_to_jd), but you can also use [`swe.utc_time_zone()`](../api/index.md#swisseph.utc_time_zone). The merits of either are discussed in [Time Zones and Julian Day Conversions](../concepts/time_and_zones.md).
 
 As this is geocentric information that relies on coordinates, you'll need to get into the habit of using coordinates as **decimal degrees (DD)** where negative latitudes mean the **southern hemisphere** and negative longitudes fall **west of the prime meridian**.
 
@@ -72,11 +72,11 @@ It's generally best practice to still use the `ascmc` tuple for the Ascendant an
 
 ## Other house functions
 
-`pywisseph` also offers:
+Besides [`swe.houses()`](../api/index.md#swisseph.houses), `pywisseph` also offers:
 
-- `swe.houses_armc`: Using the right ascension of the MC.
-- `swe.houses_armc_ex2`: House cusps with their speeds using ARMC.
-- `swe.houses_ex`: Extended house cusps (UT).
-- `swe.houses_ex2`: Extended cusps with their speeds (UT).
+- [`swe.houses_armc()`](../api/index.md#swisseph.houses_armc): Using the right ascension of the MC.
+- [`swe.houses_armc_ex2()`](../api/index.md#swisseph.houses_armc_ex2): House cusps with their speeds using ARMC.
+- [`swe.houses_ex()`](../api/index.md#swisseph.houses_ex): Extended house cusps (UT).
+- [`swe.houses_ex2()`](../api/index.md#swisseph.houses_ex2): Extended cusps with their speeds (UT).
 
 [^1]: [GeoHack - Zollikon](https://geohack.toolforge.org/geohack.php?pagename=Zollikon&params=47_20_N_8_35_E_region:CH-ZH_type:city(13311))

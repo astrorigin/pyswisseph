@@ -1,6 +1,6 @@
 # Bodies
 
-For the functions `swe.calc_ut`, `swe.calc`, and `swe.calc_pctr`, you'll need to pass an integer to identify which celestial body to calculate. You can use the named constants or the numeric values directly. These numbers are defined in [`swephexp.h`](https://github.com/aloistr/swisseph/blob/master/swephexp.h).
+For [`swe.calc()`](../api/index.md#swisseph.calc) and related functions, you'll need to pass an integer to identify which celestial body to calculate. You can use the named constants or the numeric values directly. These numbers are defined in [`swephexp.h`](https://github.com/aloistr/swisseph/blob/master/swephexp.h).
 
 ## Major bodies and asteroids
 
@@ -46,7 +46,7 @@ for planet_id in range(10):
 
 To calculate the position of an asteroid or minor planet not listed in the standard bodies, you must combine the constant `swe.AST_OFFSET` with the asteroid's catalogue number.
 
-The catalogue number is added to the offset (`swe.AST_OFFSET = 10000`) to form the correct body ID (`ipl`) for use in functions like `swe.calc_ut()`. The names and catalogue numbers can be referenced in the Swiss Ephemeris file [`seasnam.txt`](https://github.com/aloistr/swisseph/blob/master/ephe/seasnam.txt).
+The catalogue number is added to the offset (`swe.AST_OFFSET = 10000`) to form the correct body ID (`ipl`) for use in functions like [`swe.calc_ut()`](../api/index.md#swisseph.calc_ut). The names and catalogue numbers can be referenced in the Swiss Ephemeris file [`seasnam.txt`](https://github.com/aloistr/swisseph/blob/master/ephe/seasnam.txt).
 
 ### Construction
 
