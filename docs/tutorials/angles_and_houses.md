@@ -2,7 +2,7 @@
 
 ## Using `swe.houses()`
 
-Let's calculate the house cusps and angles of a given chart. We'll use [the Swiss Ephemeris' initial release](https://www.astro.com/swisseph/swephchart_e.htm) in this example and the subsequent [Tutorial](tutorial.md) with the following birth data:
+Let's calculate the house cusps and angles of a given chart. We'll use [the Swiss Ephemeris' initial release](https://www.astro.com/swisseph/swephchart_e.htm) in this example and the subsequent [Printing a Chart](printing_a_chart.md) tutorial with the following birth data:
 
 - 1997 September 30
 - 4:00 p.m. CEST (UTC+2) -> 14:00 UTC

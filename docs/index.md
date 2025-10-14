@@ -4,7 +4,7 @@
 
 **New to pyswisseph?** Start with [Installation](installation.md) and [Quickstart](quickstart.md).
 
-**Building an astrology app?** Check out the [Guides](guides/index.md).
+**Building an astrology app?** Check out the [Tutorials](tutorials/index.md).
 
 **Need detailed reference?** See the [API documentation](api/index.md).
 
