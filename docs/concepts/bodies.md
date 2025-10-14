@@ -29,13 +29,13 @@ For the functions `swe.calc_ut`, `swe.calc`, and `swe.calc_pctr`, you'll need to
 | `swe.VESTA`    | 20    | Vesta    |
 
 
-#### Example using constants
+### Example using constants
 ```py
 coords, flags = swe.calc_ut(jd, swe.MARS)
 print("Mars: {coords[0]}")
 ```
 
-#### Example using numeric values
+### Example using numeric values
 ```py
 for planet_id in range(10):
     coords, flags = swe.calc_ut(jd, planet_id)
@@ -76,7 +76,7 @@ print(f"Eros Longitude: {coords[0]}")
 
 ### Configuration
 
-To access these minor objects, you'll have to download additional ephemeris files and set their path as described [in the installation instructions](../installation.md#configuration).
+To access these minor objects, you'll have to download additional ephemeris files and set their path as described in :ref:'Configuration'.
 
 ## See also
 

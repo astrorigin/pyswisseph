@@ -47,6 +47,7 @@ print(swe.version)
 
 It should print `2.10.03`.
 
+(Configuration)=
 ## Configuration
 
 To go beyond the bundled data range (e.g., 13000 BCE - 4000 CE) or use extended data (e.g., asteroids), you must download the official Swiss Ephemeris `.se1,` `.se2`, etc., data files and point the library to them.
