@@ -12,19 +12,23 @@ While building [an astrology CLI](https://github.com/sailorfe/ephem) with pyswis
 
 Current docs assume you already understand both astronomical concepts AND the C API. Directories like `heliacal_events_eclipses_occultations_etc/` are unwieldy. Content includes C-specific sections (DLLs, Delphi, Visual Basic) irrelevant to Python users.
 
-## Solution
-
-Rebuild docs around how Python developers actually use the library:
+## Structure
 
 ```
 docs/
 |-- index.md
 |-- installation.md
 |-- quickstart.md
-|-- concepts/
 |-- guides/
+    |-- angles_and_houses.md
+    |-- zodiacal_position.md
+    `-- tutorial.md
 |-- api/
-`-- c_to_python/
+`-- concepts/
+    |-- bodies.md
+    |-- house_systems.md
+    |-- sidereal_offsets.md
+    `-- time_and_zones.md
 ```
 
 ### Key improvements:

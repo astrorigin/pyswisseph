@@ -6,5 +6,5 @@ The following are practical how-to's to help you get started developing applicat
 :maxdepth: 2
 zodiacal_position.md
 angles_and_houses.md
-tutorial.md
+printing_a_chart.md
 ```
