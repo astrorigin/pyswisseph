@@ -42,7 +42,6 @@ for planet_id in range(10):
     print(f"Planet {planet_id}: {coords[0]}")
 ```
 
-
 ## Custom asteroids and minor planets
 
 To calculate the position of an asteroid or minor planet not listed in the standard bodies, you must combine the constant `swe.AST_OFFSET` with the asteroid's catalogue number.
@@ -72,7 +71,6 @@ coords, flag = swe.calc_ut(jd, EROS_ID)
 
 print(f"Eros Longitude: {coords[0]}")
 ```
-
 
 ### Configuration
 
