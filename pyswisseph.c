@@ -277,6 +277,9 @@ PyDoc_STRVAR(pyswe_calc__doc__,
 ":Return: (xx), int retflags\n\n"
 " - xx: tuple of 6 float for results\n"
 " - retflags: bit flags indicating what kind of computation was done\n\n"
+" - serr: warning string (empty if no non-fatal warning occurred). This string "
+"carries important non-fatal messages, such as fallback ephemeris usage, "
+"which must be checked by the user.\n\n"
 "This function can raise swisseph.Error in case of fatal error.");
 
 static PyObject * pyswe_calc FUNCARGS_KEYWDS
@@ -291,7 +294,7 @@ static PyObject * pyswe_calc FUNCARGS_KEYWDS
     ret = swe_calc(jd, pl, flag, xx, err);
     if (ret < 0)
         return PyErr_Format(pyswe_Error, "swisseph.calc: %s", err);
-    return Py_BuildValue("(dddddd)i",xx[0],xx[1],xx[2],xx[3],xx[4],xx[5],ret);
+    return Py_BuildValue("(dddddd)is", xx[0],xx[1],xx[2],xx[3],xx[4],xx[5], ret, err);
 }
 
 /* swisseph.calc_pctr */
@@ -305,6 +308,9 @@ PyDoc_STRVAR(pyswe_calc_pctr__doc__,
 ":Return: (xx), int retflags\n\n"
 " - xx: tuple of 6 float for results\n"
 " - retflags: bit flags indicating what kind of computation was done\n\n"
+" - serr: warning string (empty if no non-fatal warning occurred). This string "
+"carries important non-fatal messages, such as fallback ephemeris usage, "
+"which must be checked by the user.\n\n"
 "This function can raise swisseph.Error in case of fatal error.");
 
 static PyObject * pyswe_calc_pctr FUNCARGS_KEYWDS
@@ -319,7 +325,7 @@ static PyObject * pyswe_calc_pctr FUNCARGS_KEYWDS
     ret = swe_calc_pctr(jd, pl, plctr, flag, xx, err);
     if (ret < 0)
         return PyErr_Format(pyswe_Error, "swisseph.calc_pctr: %s", err);
-    return Py_BuildValue("(dddddd)i",xx[0],xx[1],xx[2],xx[3],xx[4],xx[5],ret);
+    return Py_BuildValue("(dddddd)is",xx[0],xx[1],xx[2],xx[3],xx[4],xx[5],ret, err);
 }
 
 /* swisseph.calc_ut */
@@ -332,6 +338,9 @@ PyDoc_STRVAR(pyswe_calc_ut__doc__,
 ":Return: (xx), int retflags\n\n"
 " - xx: tuple of 6 float for results\n"
 " - retflags: bit flags indicating what kind of computation was done\n\n"
+" - serr: warning string (empty if no non-fatal warning occurred). This string "
+"carries important non-fatal messages, such as fallback ephemeris usage, "
+"which must be checked by the user.\n\n"
 "This function can raise swisseph.Error in case of fatal error.");
 
 static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
@@ -346,7 +355,7 @@ static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
     ret = swe_calc_ut(jd, pl, flag, xx, err);
     if (ret < 0)
         return PyErr_Format(pyswe_Error, "swisseph.calc_ut: %s", err);
-    return Py_BuildValue("(dddddd)i",xx[0],xx[1],xx[2],xx[3],xx[4],xx[5],ret);
+    return Py_BuildValue("(dddddd)is", xx[0],xx[1],xx[2],xx[3],xx[4],xx[5], ret, err);
 }
 
 /* swisseph.close */
