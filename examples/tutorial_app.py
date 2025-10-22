@@ -30,7 +30,7 @@ def get_planets(jd_tt: float) -> list[float]:
     }
     planets = []
     for id_val in PLANET_IDS.values():
-        coords, _ = swe.calc_ut(jd_tt, id_val)
+        coords, _, _ = swe.calc_ut(jd_tt, id_val)   # returns coordinates, flags, and error messages
         planets.append(coords[0])
     return planets
 

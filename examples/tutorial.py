@@ -43,7 +43,7 @@ PLANET_IDS = {
 
 planets = []
 for name, id_val in PLANET_IDS.items():
-    coords, flag = swe.calc_ut(jd_tt, id_val)
+    coords, flag, _ = swe.calc_ut(jd_tt, id_val)    # returns coordinates, flags, and error messages
     longitude = coords[0]
     planets.append(longitude)
 
