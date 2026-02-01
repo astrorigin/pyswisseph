@@ -1,54 +1,76 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+import os
+import sys
 
-# -- Path setup --------------------------------------------------------------
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
-
-
-# -- Project information -----------------------------------------------------
+sys.path.insert(0, os.path.abspath('..'))
 
 project = 'Pyswisseph'
-copyright = '2007-2021, Pyswisseph authors'
-author = ''
+copyright = '2007-2025, Pyswisseph authors and contributors'
+author = 'Pyswisseph Authors and Documentation Contributors'
 version = '2.10.02.0-dev'
 release = '2.10.02.0-dev'
 
-# -- General configuration ---------------------------------------------------
-
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
 extensions = [
-    'sphinx.ext.autodoc'
+    'myst_parser',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
+    'sphinx_immaterial'
 ]
 
-# Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build']
+
+html_theme = 'sphinx_immaterial'
 
 
-# -- Options for HTML output -------------------------------------------------
+autodoc_default_options = {
+    'members': True,
+    'undoc-members': True,
+    'show-inheritance': True,
+    'no-inherited-members': True,
+}
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
-html_theme = 'classic'
+toc_object_entries = False
 
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_theme_options = {
+    "icon": {
+        "logo": "material/orbit",
+        "repo": "fontawesome/brands/github",
+    },
+    "repo_url": "https://github.com/sailorfe/pyswisseph/",
+    "repo_name": "pyswisseph",
+    "toc_title": "On this page",
+    "toc_title_is_page_title": False,
+    "palette": [
+        {
+            "media": "(prefers-color-scheme)",
+            "scheme": "default",
+            "primary": "deep-purple",
+            "accent": "purple",
+            "toggle": {
+                "icon": "material/toggle-switch",
+                "name": "Switch to light mode",
+            }
+        },
+        {
+            "media": "(prefers-color-scheme: light)",
+            "scheme": "default",
+            "primary": "deep-purple",
+            "accent": "purple",
+            "toggle": {
+                "icon": "material/toggle-switch",
+                "name": "Switch to dark mode",
+            }
+        },
+        {
+            "media": "(prefers-color-scheme: dark)",
+            "scheme": "slate",
+            "primary": "deep-purple",
+            "accent": "purple",
+            "toggle": {
+                "icon": "material/toggle-switch-off-outline",
+                "name": "Switch to system preference",
+            }
+        }
+    ]
+}

@@ -277,6 +277,9 @@ PyDoc_STRVAR(pyswe_calc__doc__,
 ":Return: (xx), int retflags\n\n"
 " - xx: tuple of 6 float for results\n"
 " - retflags: bit flags indicating what kind of computation was done\n\n"
+" - serr: warning string (empty if no non-fatal warning occurred). This string "
+"carries important non-fatal messages, such as fallback ephemeris usage, "
+"which must be checked by the user.\n\n"
 "This function can raise swisseph.Error in case of fatal error.");
 
 static PyObject * pyswe_calc FUNCARGS_KEYWDS
@@ -291,7 +294,7 @@ static PyObject * pyswe_calc FUNCARGS_KEYWDS
     ret = swe_calc(jd, pl, flag, xx, err);
     if (ret < 0)
         return PyErr_Format(pyswe_Error, "swisseph.calc: %s", err);
-    return Py_BuildValue("(dddddd)i",xx[0],xx[1],xx[2],xx[3],xx[4],xx[5],ret);
+    return Py_BuildValue("(dddddd)is", xx[0],xx[1],xx[2],xx[3],xx[4],xx[5], ret, err);
 }
 
 /* swisseph.calc_pctr */
@@ -305,6 +308,9 @@ PyDoc_STRVAR(pyswe_calc_pctr__doc__,
 ":Return: (xx), int retflags\n\n"
 " - xx: tuple of 6 float for results\n"
 " - retflags: bit flags indicating what kind of computation was done\n\n"
+" - serr: warning string (empty if no non-fatal warning occurred). This string "
+"carries important non-fatal messages, such as fallback ephemeris usage, "
+"which must be checked by the user.\n\n"
 "This function can raise swisseph.Error in case of fatal error.");
 
 static PyObject * pyswe_calc_pctr FUNCARGS_KEYWDS
@@ -319,7 +325,7 @@ static PyObject * pyswe_calc_pctr FUNCARGS_KEYWDS
     ret = swe_calc_pctr(jd, pl, plctr, flag, xx, err);
     if (ret < 0)
         return PyErr_Format(pyswe_Error, "swisseph.calc_pctr: %s", err);
-    return Py_BuildValue("(dddddd)i",xx[0],xx[1],xx[2],xx[3],xx[4],xx[5],ret);
+    return Py_BuildValue("(dddddd)is",xx[0],xx[1],xx[2],xx[3],xx[4],xx[5],ret, err);
 }
 
 /* swisseph.calc_ut */
@@ -332,6 +338,9 @@ PyDoc_STRVAR(pyswe_calc_ut__doc__,
 ":Return: (xx), int retflags\n\n"
 " - xx: tuple of 6 float for results\n"
 " - retflags: bit flags indicating what kind of computation was done\n\n"
+" - serr: warning string (empty if no non-fatal warning occurred). This string "
+"carries important non-fatal messages, such as fallback ephemeris usage, "
+"which must be checked by the user.\n\n"
 "This function can raise swisseph.Error in case of fatal error.");
 
 static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
@@ -346,7 +355,7 @@ static PyObject * pyswe_calc_ut FUNCARGS_KEYWDS
     ret = swe_calc_ut(jd, pl, flag, xx, err);
     if (ret < 0)
         return PyErr_Format(pyswe_Error, "swisseph.calc_ut: %s", err);
-    return Py_BuildValue("(dddddd)i",xx[0],xx[1],xx[2],xx[3],xx[4],xx[5],ret);
+    return Py_BuildValue("(dddddd)is", xx[0],xx[1],xx[2],xx[3],xx[4],xx[5], ret, err);
 }
 
 /* swisseph.close */
@@ -679,8 +688,11 @@ PyDoc_STRVAR(pyswe_deltat_ex__doc__,
 ":Args: float tjdut, int flag\n\n"
 " - tjdut: input time, Julian day number, Universal Time\n"
 " - flag: ephemeris flag, ``FLG_SWIEPH`` ``FLG_JPLEPH`` ``FLG_MOSEPH``\n\n"
-":Return: float deltat\n\n"
-" - deltat: returned delta T value\n\n"
+":Return: float deltat, str serr\n\n"
+" - deltat: returned delta T value\n"
+" - serr: warning string (empty if no warning occurred). This string "
+"carries important warnings about the Delta T calculation method, "
+"such as mixed ephemeris file usage, which must be checked by the user.\n\n"
 "Calling this function without a previous call of ``set_ephe_path()`` or "
 " ``set_jpl_file()`` will raise swisseph.Error.\n\n"
 "The calculation of ephemerides in UT depends on the ephemeris-inherent value"
@@ -699,14 +711,14 @@ static PyObject * pyswe_deltat_ex FUNCARGS_KEYWDS
 {
     double jd, ret;
     int flag;
-    char err[256] = {0};
+    char err[256] = {0}; // Already correctly declared
     static char* kwlist[] = {"tjdut", "flag", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "di", kwlist, &jd, &flag))
         return NULL;
+
     ret = swe_deltat_ex(jd, flag, err);
-    if (err[0] != 0)
-        return PyErr_Format(pyswe_Error, "swisseph.deltat_ex: %s", err);
-    return Py_BuildValue("d", ret);
+
+    return Py_BuildValue("ds", ret, err);
 }
 
 /* swisseph.difcs2n */

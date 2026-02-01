@@ -1,0 +1,64 @@
+name: Deploy Sphinx Documentation to GitHub Pages
+
+on:
+  push:
+    branches: ["docs-dev"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+            sudo apt-get update
+            sudo apt-get install -y build-essential pkg-config git
+            pip install -r docs/requirements.txt
+            pip install -e .
+
+      - name: Purge C Build Caches
+        run: |
+            echo "Removing stale build artifacts and caches..."
+            rm -rf build dist *.egg-info
+            find . -name "__pycache__" -exec rm -rf {} +
+            python -m pip cache purge || true
+
+      - name: Build Sphinx documentation
+        run: |
+          # Relies on the clean environment and the sys.path in conf.py
+          sphinx-build -b html docs docs/_build/html
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: 'docs/_build/html'
+
+  deploy:
+    environment:
+      name: docs-dev-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
